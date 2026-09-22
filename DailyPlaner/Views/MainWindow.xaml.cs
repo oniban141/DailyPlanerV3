@@ -23,5 +23,13 @@ namespace DailyPlaner
             InitializeComponent();
             DataContext = new MainViewModel();
         }
+
+        public MainWindow(Models.User user)
+        {
+            InitializeComponent();
+            var viewModel = new MainViewModel();
+            DataContext = viewModel;
+            viewModel.CurrentUser = user;
+        }
     }
 }
