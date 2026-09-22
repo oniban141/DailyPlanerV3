@@ -16,18 +16,103 @@ namespace DailyPlaner
     {
         public static bool IsDarkTheme { get; private set; }
 
+        private const string SettingsRegistryKey = "SOFTWARE\\DailyPlanner";
+        private const string AutoStartRegistryKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+        private const string AppName = "DailyPlanner";
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             
-            ApplyTheme(IsDarkTheme);
+            ApplyTheme(LoadDarkThemeSetting());
             CheckAndCreateDatabase();
-            SetupAutoStart();
+            SetAutoStart(LoadAutoStartSetting());
+        }
+
+        public static bool LoadDarkThemeSetting()
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(SettingsRegistryKey, false))
+                {
+                    if (key != null && key.GetValue("DarkTheme") is int value)
+                    {
+                        return value == 1;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return false;
+        }
+
+        public static bool LoadAutoStartSetting()
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(SettingsRegistryKey, false))
+                {
+                    if (key != null && key.GetValue("AutoStart") is int value)
+                    {
+                        return value == 1;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return false;
+        }
+
+        private static void SaveSetting(string name, bool value)
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.CreateSubKey(SettingsRegistryKey))
+                {
+                    if (key != null)
+                    {
+                        key.SetValue(name, value ? 1 : 0, RegistryValueKind.DWord);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public static void SetAutoStart(bool enabled)
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(AutoStartRegistryKey, true))
+                {
+                    if (key != null)
+                    {
+                        if (enabled)
+                        {
+                            string exePath = Assembly.GetEntryAssembly().Location;
+                            key.SetValue(AppName, exePath);
+                        }
+                        else if (key.GetValue(AppName) != null)
+                        {
+                            key.DeleteValue(AppName);
+                        }
+                    }
+                }
+                SaveSetting("AutoStart", enabled);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Не удалось изменить настройки автозапуска: {ex.Message}", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         public static void ApplyTheme(bool isDark)
         {
             IsDarkTheme = isDark;
+            SaveSetting("DarkTheme", isDark);
             try
             {
                 var res = Current.Resources;
@@ -93,25 +178,5 @@ namespace DailyPlaner
             }
         }
 
-        private void SetupAutoStart()
-        {
-            try
-            {
-                string appName = "DailyPlanner";
-                string exePath = Assembly.GetEntryAssembly().Location;
-                
-                using (var key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
-                {
-                    if (key != null)
-                    {
-                        key.SetValue(appName, exePath);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to setup auto-start: {ex.Message}", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
     }
 }
