@@ -137,8 +137,7 @@ namespace DailyPlaner.ViewModels
             return !string.IsNullOrWhiteSpace(Username) &&
                    !string.IsNullOrWhiteSpace(Password) &&
                    Password == ConfirmPassword &&
-                   !string.IsNullOrWhiteSpace(Email) &&
-                   !string.IsNullOrWhiteSpace(FirstName);
+                   !string.IsNullOrWhiteSpace(Email);
         }
 
         private void ExecuteRegister(object parameter)
@@ -160,13 +159,11 @@ namespace DailyPlaner.ViewModels
                 var user = new User
                 {
                     Username = Username,
-                    Password = DatabaseService.HashPassword(Password),
+                    PasswordHash = DatabaseService.HashPassword(Password),
                     Email = Email,
-                    FirstName = FirstName,
-                    LastName = LastName,
                     GenderId = SelectedGenderId,
                     RoleId = 1,
-                    CreatedDate = DateTime.Now
+                    CreatedAt = DateTime.Now
                 };
 
                 bool result = _databaseService.CreateUser(user);
