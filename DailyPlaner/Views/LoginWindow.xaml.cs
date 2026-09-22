@@ -26,9 +26,16 @@ namespace DailyPlaner.Views
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            var passwordBox = (PasswordBox)sender;
             if (DataContext is LoginViewModel viewModel)
             {
-                viewModel.Password = ((PasswordBox)sender).Password;
+                viewModel.Password = passwordBox.Password;
+            }
+            if (PasswordWatermark != null)
+            {
+                PasswordWatermark.Visibility = string.IsNullOrEmpty(passwordBox.Password)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
             }
         }
     }
