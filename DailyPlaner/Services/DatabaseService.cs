@@ -8,15 +8,61 @@ namespace DailyPlaner.Services
 {
     public class DatabaseService
     {
-        private readonly string connectionString = "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        private readonly string connectionString;
 
         public DatabaseService()
         {
+            connectionString = GetConnectionString();
         }
 
         public DatabaseService(string customConnectionString)
         {
             connectionString = customConnectionString;
+        }
+
+        private static string GetConnectionString()
+        {
+            string configured = System.Configuration.ConfigurationManager.ConnectionStrings["DailyPlannerConnection"]?.ConnectionString;
+            if (!string.IsNullOrWhiteSpace(configured))
+            {
+                return configured;
+            }
+            return "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        }
+
+        public static string GetFriendlyDatabaseError(SqlException ex)
+        {
+            switch (ex.Number)
+            {
+                case -1:
+                case 2:
+                case 53:
+                    return "Сервер 'PCGl1tch' недоступен. Проверьте, что SQL Server запущен, и имя сервера указано верно (Server=PCGl1tch).";
+                case 4060:
+                    return "База данных 'DailyPlannerDB' не существует или недоступна. Выполните скрипт Database/DailyPlannerDB.sql для её создания.";
+                case 18456:
+                    return "Ошибка авторизации Windows. Проверьте, что учётная запись Windows имеет доступ к SQL Server.";
+                case 18452:
+                    return "Неудачная попытка входа. Проверьте режим аутентификации SQL Server (Windows Authentication).";
+                default:
+                    return $"Ошибка базы данных (код {ex.Number}): {ex.Message}";
+            }
+        }
+
+        public bool TestConnection()
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    return true;
+                }
+                catch (SqlException ex)
+                {
+                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
+                }
+            }
         }
 
         #region User Methods
@@ -96,7 +142,7 @@ namespace DailyPlaner.Services
                 catch (SqlException ex)
                 {
                     Console.WriteLine($"Database error getting user: {ex.Message}");
-                    throw new InvalidOperationException("Не удалось получить данные пользователя. Проверьте подключение к базе данных.", ex);
+                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
                 }
             }
             return user;
@@ -168,7 +214,7 @@ namespace DailyPlaner.Services
                 catch (SqlException ex)
                 {
                     Console.WriteLine($"Database error creating user: {ex.Message}");
-                    throw new InvalidOperationException("Не удалось сохранить данные в базу данных. Проверьте подключение к серверу.", ex);
+                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
                 }
                 catch (Exception ex)
                 {
@@ -195,7 +241,7 @@ namespace DailyPlaner.Services
                 catch (SqlException ex)
                 {
                     Console.WriteLine($"Database error checking username: {ex.Message}");
-                    throw new InvalidOperationException("Не удалось проверить имя пользователя. Проверьте подключение к базе данных.", ex);
+                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
                 }
             }
         }
