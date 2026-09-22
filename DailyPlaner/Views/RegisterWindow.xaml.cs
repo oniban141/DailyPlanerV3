@@ -28,17 +28,31 @@ namespace DailyPlaner.Views
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            var passwordBox = (PasswordBox)sender;
             if (ViewModel != null)
             {
-                ViewModel.Password = ((PasswordBox)sender).Password;
+                ViewModel.Password = passwordBox.Password;
+            }
+            if (PasswordWatermark != null)
+            {
+                PasswordWatermark.Visibility = string.IsNullOrEmpty(passwordBox.Password)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
             }
         }
 
         private void ConfirmPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            var passwordBox = (PasswordBox)sender;
             if (ViewModel != null)
             {
-                ViewModel.ConfirmPassword = ((PasswordBox)sender).Password;
+                ViewModel.ConfirmPassword = passwordBox.Password;
+            }
+            if (ConfirmPasswordWatermark != null)
+            {
+                ConfirmPasswordWatermark.Visibility = string.IsNullOrEmpty(passwordBox.Password)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
             }
         }
     }

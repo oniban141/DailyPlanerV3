@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -10,16 +10,16 @@ namespace DailyPlaner.Converters
         {
             if (value is bool boolValue)
             {
-                return boolValue ? "Completed" : "Pending";
+                return boolValue ? "Выполнена" : "Ожидает";
             }
-            return "Unknown";
+            return "Неизвестно";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is string stringValue)
             {
-                return stringValue.Equals("Completed", StringComparison.OrdinalIgnoreCase);
+                return stringValue.Equals("Выполнена", StringComparison.OrdinalIgnoreCase);
             }
             return false;
         }

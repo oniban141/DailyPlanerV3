@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DailyPlaner.Views"
         xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
         mc:Ignorable="d"
-        Title="Register" Height="500" Width="400" WindowStartupLocation="CenterScreen">
+        Title="Регистрация" Height="550" Width="400" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -31,30 +31,36 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Register New Account" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <TextBlock Grid.Row="0" Text="Регистрация нового аккаунта" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" TextWrapping="Wrap"/>
 
                 <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <TextBox Text="{Binding Username, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                    <TextBox Text="{Binding Username, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите имя пользователя"/>
                 </Border>
 
                 <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="PasswordBox_PasswordChanged" Margin="0,0,0,0"/>
+                    <Grid>
+                        <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="PasswordBox_PasswordChanged"/>
+                        <TextBlock x:Name="PasswordWatermark" Text="Введите пароль" Foreground="#FF9E9E9E" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                    </Grid>
                 </Border>
 
                 <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="ConfirmPasswordBox_PasswordChanged" Margin="0,0,0,0"/>
+                    <Grid>
+                        <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
+                        <TextBlock x:Name="ConfirmPasswordWatermark" Text="Подтвердите пароль" Foreground="#FF9E9E9E" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                    </Grid>
                 </Border>
 
                 <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <TextBox Text="{Binding Email, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                    <TextBox Text="{Binding Email, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите email"/>
                 </Border>
 
                 <Border Grid.Row="5" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <TextBox Text="{Binding FirstName, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                    <TextBox Text="{Binding FirstName, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите имя"/>
                 </Border>
 
                 <Border Grid.Row="6" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <TextBox Text="{Binding LastName, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                    <TextBox Text="{Binding LastName, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите фамилию"/>
                 </Border>
 
                 <Border Grid.Row="7" Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="0">
@@ -62,8 +68,8 @@
                 </Border>
 
                 <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0" Width="80"/>
-                    <Button Content="Register" Command="{Binding RegisterCommand}" Style="{StaticResource BaseButtonStyle}" Width="80"/>
+                    <Button Content="Отмена" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0" Width="90"/>
+                    <Button Content="Зарегистрироваться" Command="{Binding RegisterCommand}" Style="{StaticResource BaseButtonStyle}" Width="140"/>
                 </StackPanel>
             </Grid>
         </Border>

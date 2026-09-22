@@ -1,4 +1,4 @@
-<Window x:Class="DailyPlaner.MainWindow"
+﻿<Window x:Class="DailyPlaner.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DailyPlaner"
         xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
         mc:Ignorable="d"
-        Title="Daily Planner" Height="768" Width="1280" WindowStartupLocation="CenterScreen">
+        Title="Ежедневник" Height="768" Width="1280" WindowStartupLocation="CenterScreen">
     
     <Window.Resources>
         <ResourceDictionary>
@@ -25,19 +25,19 @@
         <!-- Sidebar -->
         <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="2" CornerRadius="0">
             <StackPanel VerticalAlignment="Stretch">
-                <TextBlock Text="Daily Planner" Style="{StaticResource PageTitleStyle}" Foreground="{StaticResource AccentBrush}" Margin="10" HorizontalAlignment="Center"/>
+                <TextBlock Text="Ежедневник" Style="{StaticResource PageTitleStyle}" Foreground="{StaticResource AccentBrush}" Margin="10" HorizontalAlignment="Center"/>
                 
-                <Button Content="Dashboard" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Tasks" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Events" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Notes" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Calendar" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Analytics" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
+                <Button Content="Обзор" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
+                <Button Content="Задачи" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
+                <Button Content="События" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
+                <Button Content="Заметки" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
+                <Button Content="Календарь" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
+                <Button Content="Аналитика" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
                 
                 <Border Margin="10,20,10,10" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="2" CornerRadius="8">
                     <StackPanel Orientation="Horizontal" Margin="5">
-                        <Button Content="Toggle Theme" Command="{Binding ToggleThemeCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                        <Button Content="Logout" Command="{Binding LogoutCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                        <Button Content="Сменить тему" Command="{Binding ToggleThemeCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                        <Button Content="Выйти" Command="{Binding LogoutCommand}" Style="{StaticResource BaseButtonStyle}"/>
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -63,10 +63,10 @@
             <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal">
                     <Border Style="{StaticResource CardStyle}" Margin="0,0,10,0" Padding="0,0,0,0">
-                        <TextBox Text="{Binding SearchText, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Width="200" Margin="0,0,0,0"/>
+                        <TextBox Text="{Binding SearchText, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Поиск задач..." Width="200" Margin="0,0,0,0"/>
                     </Border>
-                    <Button Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Clear" Command="{Binding ClearSearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="Поиск" Command="{Binding SearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="Очистить" Command="{Binding ClearSearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
                     
                     <ComboBox ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" DisplayMemberPath="Name" Style="{StaticResource BaseComboBoxStyle}" Width="150" Margin="0,0,10,0"/>
                     
@@ -77,7 +77,7 @@
             <!-- Tabs -->
             <TabControl Grid.Row="2">
                 <!-- Tasks Tab -->
-                <TabItem Header="Tasks">
+                <TabItem Header="Задачи">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -85,10 +85,10 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <Button Content="Add Task" Command="{Binding AddTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Edit Task" Command="{Binding EditTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Delete Task" Command="{Binding DeleteTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Complete" Command="{Binding CompleteTaskCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                            <Button Content="Добавить задачу" Command="{Binding AddTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Изменить задачу" Command="{Binding EditTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Удалить задачу" Command="{Binding DeleteTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Выполнено" Command="{Binding CompleteTaskCommand}" Style="{StaticResource BaseButtonStyle}"/>
                         </StackPanel>
 
                         <ListView Grid.Row="1" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" Style="{StaticResource BaseListViewStyle}">
@@ -99,11 +99,11 @@
                                             <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                             <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,5,0,0"/>
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Due: " Style="{StaticResource BaseTextBlockStyle}"/>
+                                                <TextBlock Text="Срок: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding DueDate, StringFormat=yyyy-MM-dd}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Priority: " Style="{StaticResource BaseTextBlockStyle}"/>
+                                                <TextBlock Text="Приоритет: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding Priority}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                         </StackPanel>
@@ -115,7 +115,7 @@
                 </TabItem>
 
                 <!-- Events Tab -->
-                <TabItem Header="Events">
+                <TabItem Header="События">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -123,9 +123,9 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <Button Content="Add Event" Command="{Binding AddEventCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Edit Event" Command="{Binding EditEventCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Delete Event" Command="{Binding DeleteEventCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                            <Button Content="Добавить событие" Command="{Binding AddEventCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Изменить событие" Command="{Binding EditEventCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Удалить событие" Command="{Binding DeleteEventCommand}" Style="{StaticResource BaseButtonStyle}"/>
                         </StackPanel>
 
                         <ListView Grid.Row="1" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" Style="{StaticResource BaseListViewStyle}">
@@ -136,15 +136,15 @@
                                             <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                             <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,5,0,0"/>
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Start: " Style="{StaticResource BaseTextBlockStyle}"/>
+                                                <TextBlock Text="Начало: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding StartDate, StringFormat=yyyy-MM-dd HH:mm}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="End: " Style="{StaticResource BaseTextBlockStyle}"/>
+                                                <TextBlock Text="Конец: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding EndDate, StringFormat=yyyy-MM-dd HH:mm}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Location: " Style="{StaticResource BaseTextBlockStyle}"/>
+                                                <TextBlock Text="Место: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding Location}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                         </StackPanel>
@@ -156,7 +156,7 @@
                 </TabItem>
 
                 <!-- Notes Tab -->
-                <TabItem Header="Notes">
+                <TabItem Header="Заметки">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -164,9 +164,9 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <Button Content="Add Note" Command="{Binding AddNoteCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Edit Note" Command="{Binding EditNoteCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Delete Note" Command="{Binding DeleteNoteCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                            <Button Content="Добавить заметку" Command="{Binding AddNoteCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Изменить заметку" Command="{Binding EditNoteCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Удалить заметку" Command="{Binding DeleteNoteCommand}" Style="{StaticResource BaseButtonStyle}"/>
                         </StackPanel>
 
                         <ListView Grid.Row="1" ItemsSource="{Binding Notes}" SelectedItem="{Binding SelectedNote}" Style="{StaticResource BaseListViewStyle}">
@@ -177,7 +177,7 @@
                                             <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                             <TextBlock Text="{Binding Content}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,5,0,0"/>
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Created: " Style="{StaticResource BaseTextBlockStyle}"/>
+                                                <TextBlock Text="Создано: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding CreatedDate, StringFormat=yyyy-MM-dd HH:mm}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                         </StackPanel>
@@ -189,7 +189,7 @@
                 </TabItem>
 
                 <!-- Calendar Tab -->
-                <TabItem Header="Calendar">
+                <TabItem Header="Календарь">
                     <Grid>
                         <Border Style="{StaticResource CardStyle}" Margin="20">
                             <Calendar HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
@@ -202,15 +202,15 @@
                 </TabItem>
 
                 <!-- Analytics Tab -->
-                <TabItem Header="Analytics">
+                <TabItem Header="Аналитика">
                     <Grid>
                         <Border Style="{StaticResource CardStyle}" Margin="20">
                             <StackPanel>
-                                <TextBlock Text="Productivity Analytics" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                                <TextBlock Text="Total Tasks: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
+                                <TextBlock Text="Аналитика продуктивности" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                                <TextBlock Text="Всего задач: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
                                 <TextBlock Text="{Binding Tasks.Count}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
                                 
-                                <TextBlock Text="Completed Tasks: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
+                                <TextBlock Text="Выполнено задач: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
                                 <TextBlock Text="{Binding CompletedTasksCount}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
                             </StackPanel>
                         </Border>
@@ -220,10 +220,10 @@
 
             <!-- Export/Import Buttons -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-                <Button Content="Export JSON" Command="{Binding ExportToJsonCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                <Button Content="Import JSON" Command="{Binding ImportFromJsonCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                <Button Content="Export CSV" Command="{Binding ExportToCsvCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                <Button Content="Import CSV" Command="{Binding ImportFromCsvCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                <Button Content="Экспорт JSON" Command="{Binding ExportToJsonCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                <Button Content="Импорт JSON" Command="{Binding ImportFromJsonCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                <Button Content="Экспорт CSV" Command="{Binding ExportToCsvCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                <Button Content="Импорт CSV" Command="{Binding ImportFromCsvCommand}" Style="{StaticResource BaseButtonStyle}"/>
             </StackPanel>
         </Grid>
     </Grid>

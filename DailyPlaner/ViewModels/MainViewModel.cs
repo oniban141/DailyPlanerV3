@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -221,7 +221,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading user data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки данных пользователя: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -233,7 +233,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading tags: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки тегов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -259,7 +259,7 @@ namespace DailyPlaner.ViewModels
                 var task = new Models.Task
                 {
                     UserId = CurrentUser.Id,
-                    Title = "New Task",
+                    Title = "Новая задача",
                     Description = string.Empty,
                     DueDate = DateTime.Today.AddDays(1),
                     IsCompleted = false,
@@ -274,7 +274,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding task: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при добавлении задачи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -293,7 +293,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error editing task: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при изменении задачи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -301,7 +301,7 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedTask != null && MessageBox.Show("Are you sure you want to delete this task?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (SelectedTask != null && MessageBox.Show("Вы уверены, что хотите удалить эту задачу?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     bool result = _databaseService.DeleteTask(SelectedTask.Id);
                     if (result)
@@ -312,7 +312,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting task: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при удалении задачи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -327,13 +327,13 @@ namespace DailyPlaner.ViewModels
                     if (result)
                     {
                         LoadUserData();
-                        _notificationService.ShowNotification("Task Updated", $"Task '{SelectedTask.Title}' marked as {(SelectedTask.IsCompleted ? "completed" : "incomplete")}");
+                        _notificationService.ShowNotification("Задача обновлена", $"Задача '{SelectedTask.Title}' отмечена как {(SelectedTask.IsCompleted ? "выполненная" : "невыполненная")}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error completing task: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при выполнении задачи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -344,7 +344,7 @@ namespace DailyPlaner.ViewModels
                 var ev = new Event
                 {
                     UserId = CurrentUser.Id,
-                    Title = "New Event",
+                    Title = "Новое событие",
                     Description = string.Empty,
                     StartDate = DateTime.Today,
                     EndDate = DateTime.Today.AddHours(1),
@@ -359,7 +359,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding event: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при добавлении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -378,7 +378,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error editing event: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при изменении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -386,7 +386,7 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedEvent != null && MessageBox.Show("Are you sure you want to delete this event?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (SelectedEvent != null && MessageBox.Show("Вы уверены, что хотите удалить это событие?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     bool result = _databaseService.DeleteEvent(SelectedEvent.Id);
                     if (result)
@@ -397,7 +397,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting event: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при удалении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -408,7 +408,7 @@ namespace DailyPlaner.ViewModels
                 var note = new Note
                 {
                     UserId = CurrentUser.Id,
-                    Title = "New Note",
+                    Title = "Новая заметка",
                     Content = string.Empty,
                     CreatedDate = DateTime.Now
                 };
@@ -421,7 +421,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding note: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при добавлении заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -440,7 +440,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error editing note: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при изменении заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -448,7 +448,7 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedNote != null && MessageBox.Show("Are you sure you want to delete this note?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (SelectedNote != null && MessageBox.Show("Вы уверены, что хотите удалить эту заметку?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     bool result = _databaseService.DeleteNote(SelectedNote.Id);
                     if (result)
@@ -459,7 +459,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error deleting note: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при удалении заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -492,7 +492,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error filtering tasks: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при фильтрации задач: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -517,12 +517,12 @@ namespace DailyPlaner.ViewModels
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     File.WriteAllText(saveFileDialog.FileName, json);
-                    MessageBox.Show("Tasks exported to JSON successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Задачи успешно экспортированы в JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error exporting to JSON: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при экспорте в JSON: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -548,13 +548,13 @@ namespace DailyPlaner.ViewModels
                             _databaseService.CreateTask(task);
                         }
                         LoadUserData();
-                        MessageBox.Show("Tasks imported from JSON successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Задачи успешно импортированы из JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error importing from JSON: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при импорте из JSON: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -577,12 +577,12 @@ namespace DailyPlaner.ViewModels
                     {
                         csv.WriteRecords(tasks);
                     }
-                    MessageBox.Show("Tasks exported to CSV successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Задачи успешно экспортированы в CSV!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error exporting to CSV: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при экспорте в CSV: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -607,13 +607,13 @@ namespace DailyPlaner.ViewModels
                             _databaseService.CreateTask(task);
                         }
                         LoadUserData();
-                        MessageBox.Show("Tasks imported from CSV successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Задачи успешно импортированы из CSV!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error importing from CSV: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при импорте из CSV: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -628,7 +628,7 @@ namespace DailyPlaner.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error during logout: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при выходе: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
