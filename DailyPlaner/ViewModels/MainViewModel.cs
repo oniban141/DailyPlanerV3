@@ -173,6 +173,7 @@ namespace DailyPlaner.ViewModels
         public ICommand SearchCommand { get; }
         public ICommand ClearSearchCommand { get; }
         public ICommand ToggleThemeCommand { get; }
+        public ICommand OpenSettingsCommand { get; }
         public ICommand ExportToJsonCommand { get; }
         public ICommand ImportFromJsonCommand { get; }
         public ICommand ExportToCsvCommand { get; }
@@ -202,6 +203,7 @@ namespace DailyPlaner.ViewModels
             SearchCommand = new RelayCommand(ExecuteSearch);
             ClearSearchCommand = new RelayCommand(ExecuteClearSearch);
             ToggleThemeCommand = new RelayCommand(ExecuteToggleTheme);
+            OpenSettingsCommand = new RelayCommand(ExecuteOpenSettings);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
             ExportToCsvCommand = new RelayCommand(ExecuteExportToCsv);
@@ -256,12 +258,19 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
+                var dialog = new Views.Dialogs.TaskDialog(string.Empty, string.Empty, DateTime.Today.AddDays(1));
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
                 var task = new Models.Task
                 {
                     UserId = CurrentUser.Id,
-                    Title = "Новая задача",
-                    Description = string.Empty,
-                    DueDate = DateTime.Today.AddDays(1),
+                    Title = dialog.TaskTitle,
+                    Description = dialog.TaskDescription,
+                    DueDate = dialog.TaskDueDate,
                     IsCompleted = false,
                     Priority = 1
                 };
@@ -270,6 +279,7 @@ namespace DailyPlaner.ViewModels
                 if (result)
                 {
                     LoadUserData();
+                    _notificationService.ShowNotification("Задача создана", $"Задача '{task.Title}' успешно добавлена");
                 }
             }
             catch (Exception ex)
@@ -282,13 +292,26 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedTask != null)
+                if (SelectedTask == null)
                 {
-                    bool result = _databaseService.UpdateTask(SelectedTask);
-                    if (result)
-                    {
-                        LoadUserData();
-                    }
+                    return;
+                }
+
+                var dialog = new Views.Dialogs.TaskDialog(SelectedTask.Title, SelectedTask.Description, SelectedTask.DueDate);
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                SelectedTask.Title = dialog.TaskTitle;
+                SelectedTask.Description = dialog.TaskDescription;
+                SelectedTask.DueDate = dialog.TaskDueDate;
+
+                bool result = _databaseService.UpdateTask(SelectedTask);
+                if (result)
+                {
+                    LoadUserData();
                 }
             }
             catch (Exception ex)
@@ -341,20 +364,28 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
+                var dialog = new Views.Dialogs.EventDialog(string.Empty, string.Empty, string.Empty, DateTime.Today);
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
                 var ev = new Event
                 {
                     UserId = CurrentUser.Id,
-                    Title = "Новое событие",
-                    Description = string.Empty,
-                    StartDate = DateTime.Today,
-                    EndDate = DateTime.Today.AddHours(1),
-                    Location = string.Empty
+                    Title = dialog.EventTitle,
+                    Description = dialog.EventDescription,
+                    StartDate = dialog.EventStart,
+                    EndDate = dialog.EventStart.AddHours(1),
+                    Location = dialog.EventLocation
                 };
 
                 bool result = _databaseService.CreateEvent(ev);
                 if (result)
                 {
                     LoadUserData();
+                    _notificationService.ShowNotification("Событие создано", $"Событие '{ev.Title}' успешно добавлено");
                 }
             }
             catch (Exception ex)
@@ -367,13 +398,28 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedEvent != null)
+                if (SelectedEvent == null)
                 {
-                    bool result = _databaseService.UpdateEvent(SelectedEvent);
-                    if (result)
-                    {
-                        LoadUserData();
-                    }
+                    return;
+                }
+
+                var dialog = new Views.Dialogs.EventDialog(SelectedEvent.Title, SelectedEvent.Description, SelectedEvent.Location, SelectedEvent.StartDate);
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                SelectedEvent.Title = dialog.EventTitle;
+                SelectedEvent.Description = dialog.EventDescription;
+                SelectedEvent.Location = dialog.EventLocation;
+                SelectedEvent.StartDate = dialog.EventStart;
+                SelectedEvent.EndDate = dialog.EventStart.AddHours(1);
+
+                bool result = _databaseService.UpdateEvent(SelectedEvent);
+                if (result)
+                {
+                    LoadUserData();
                 }
             }
             catch (Exception ex)
@@ -405,11 +451,18 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
+                var dialog = new Views.Dialogs.NoteDialog(string.Empty, string.Empty);
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
                 var note = new Note
                 {
                     UserId = CurrentUser.Id,
-                    Title = "Новая заметка",
-                    Content = string.Empty,
+                    Title = dialog.NoteTitle,
+                    Content = dialog.NoteContent,
                     CreatedDate = DateTime.Now
                 };
 
@@ -417,6 +470,7 @@ namespace DailyPlaner.ViewModels
                 if (result)
                 {
                     LoadUserData();
+                    _notificationService.ShowNotification("Заметка создана", $"Заметка '{note.Title}' успешно добавлена");
                 }
             }
             catch (Exception ex)
@@ -429,13 +483,25 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedNote != null)
+                if (SelectedNote == null)
                 {
-                    bool result = _databaseService.UpdateNote(SelectedNote);
-                    if (result)
-                    {
-                        LoadUserData();
-                    }
+                    return;
+                }
+
+                var dialog = new Views.Dialogs.NoteDialog(SelectedNote.Title, SelectedNote.Content);
+                dialog.Owner = Application.Current.MainWindow;
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                SelectedNote.Title = dialog.NoteTitle;
+                SelectedNote.Content = dialog.NoteContent;
+
+                bool result = _databaseService.UpdateNote(SelectedNote);
+                if (result)
+                {
+                    LoadUserData();
                 }
             }
             catch (Exception ex)
@@ -499,6 +565,15 @@ namespace DailyPlaner.ViewModels
         private void ExecuteToggleTheme(object parameter)
         {
             IsDarkTheme = !IsDarkTheme;
+            App.ApplyTheme(IsDarkTheme);
+        }
+
+        private void ExecuteOpenSettings(object parameter)
+        {
+            var dialog = new Views.Dialogs.SettingsDialog(IsDarkTheme);
+            dialog.Owner = Application.Current.MainWindow;
+            dialog.ShowDialog();
+            IsDarkTheme = dialog.IsDarkThemeRequested;
         }
 
         private void ExecuteExportToJson(object parameter)

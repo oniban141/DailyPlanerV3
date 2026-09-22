@@ -31,5 +31,15 @@ namespace DailyPlaner
             DataContext = viewModel;
             viewModel.CurrentUser = user;
         }
+
+        private void SidebarNav_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button &&
+                int.TryParse(button.Tag as string, out int index) &&
+                index >= 0 && index < MainTabControl.Items.Count)
+            {
+                MainTabControl.SelectedIndex = index;
+            }
+        }
     }
 }

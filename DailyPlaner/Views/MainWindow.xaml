@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Background="{StaticResource LightBackgroundBrush}">
+    <Grid Background="{DynamicResource LightBackgroundBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240"/>
             <ColumnDefinition Width="*"/>
@@ -44,15 +44,16 @@
 
                 <!-- Навигация -->
                 <StackPanel Grid.Row="1">
-                    <Button Content="🏠   Обзор" Style="{StaticResource SidebarActiveButtonStyle}"/>
-                    <Button Content="📋   Задачи" Style="{StaticResource SidebarButtonStyle}"/>
-                    <Button Content="📅   События" Style="{StaticResource SidebarButtonStyle}"/>
-                    <Button Content="📝   Заметки" Style="{StaticResource SidebarButtonStyle}"/>
-                    <Button Content="🗓   Календарь" Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="🏠   Обзор" Style="{StaticResource SidebarActiveButtonStyle}" Tag="0" Click="SidebarNav_Click"/>
+                    <Button Content="📋   Задачи" Style="{StaticResource SidebarButtonStyle}" Tag="0" Click="SidebarNav_Click"/>
+                    <Button Content="📅   События" Style="{StaticResource SidebarButtonStyle}" Tag="1" Click="SidebarNav_Click"/>
+                    <Button Content="📝   Заметки" Style="{StaticResource SidebarButtonStyle}" Tag="2" Click="SidebarNav_Click"/>
+                    <Button Content="🗓   Календарь" Style="{StaticResource SidebarButtonStyle}" Tag="3" Click="SidebarNav_Click"/>
 
                     <Border Background="#5B6F92" Height="1" Margin="20,14,20,14" CornerRadius="1"/>
 
-                    <Button Content="⚙   Настройки" Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="⚙   Настройки" Command="{Binding OpenSettingsCommand}"
+                            Style="{StaticResource SidebarButtonStyle}"/>
                     <Button Content="🌓   Сменить тему" Command="{Binding ToggleThemeCommand}"
                             Style="{StaticResource SidebarButtonStyle}"/>
                 </StackPanel>
@@ -136,7 +137,7 @@
             </Border>
 
             <!-- Tabs -->
-            <TabControl Grid.Row="2" Style="{StaticResource TabControlStyle}">
+            <TabControl Grid.Row="2" x:Name="MainTabControl" Style="{StaticResource TabControlStyle}">
 
                 <!-- ===== Задачи ===== -->
                 <TabItem Header="Задачи" Style="{StaticResource TabItemStyle}">
@@ -327,7 +328,7 @@
                             </StackPanel>
                             <Calendar Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12"
                                       SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
-                                      Background="{StaticResource LightCardBrush}"
+                                      Background="{DynamicResource LightCardBrush}"
                                       BorderBrush="Transparent" BorderThickness="0"/>
                         </Grid>
                     </Border>
