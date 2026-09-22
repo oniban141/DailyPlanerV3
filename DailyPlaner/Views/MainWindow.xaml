@@ -11,7 +11,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resourse/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/DailyPlaner;component/Resourse/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -62,7 +62,9 @@
             <!-- Toolbar -->
             <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Text="{Binding SearchText, Mode=TwoWay}" PlaceholderText="Search..." Style="{StaticResource BaseTextBoxStyle}" Width="200" Margin="0,0,10,0"/>
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,10,0" Padding="0,0,0,0">
+                        <TextBox Text="{Binding SearchText, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Width="200" Margin="0,0,0,0"/>
+                    </Border>
                     <Button Content="Search" Command="{Binding SearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="Clear" Command="{Binding ClearSearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
                     
@@ -103,10 +105,6 @@
                                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                                 <TextBlock Text="Priority: " Style="{StaticResource BaseTextBlockStyle}"/>
                                                 <TextBlock Text="{Binding Priority}" Style="{StaticResource BaseTextBlockStyle}"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Status: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BooleanToStatusConverter}}" Style="{StaticResource BaseTextBlockStyle}"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
@@ -193,11 +191,13 @@
                 <!-- Calendar Tab -->
                 <TabItem Header="Calendar">
                     <Grid>
-                        <Calendar HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
-                                  SelectedDate="{Binding SelectedDate, Mode=TwoWay}" 
-                                  Background="{StaticResource LightCardBrush}" 
-                                  BorderBrush="{StaticResource PrimaryBrush}" 
-                                  BorderThickness="2" CornerRadius="8"/>
+                        <Border Style="{StaticResource CardStyle}" Margin="20">
+                            <Calendar HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
+                                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}" 
+                                      Background="{StaticResource LightCardBrush}" 
+                                      BorderBrush="{StaticResource PrimaryBrush}" 
+                                      BorderThickness="2"/>
+                        </Border>
                     </Grid>
                 </TabItem>
 
@@ -212,9 +212,6 @@
                                 
                                 <TextBlock Text="Completed Tasks: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
                                 <TextBlock Text="{Binding Tasks.Count(t => t.IsCompleted)}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
-                                
-                                <TextBlock Text="Completion Rate: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
-                                <TextBlock Text="{Binding Tasks.Count(t => t.IsCompleted) * 100 / Tasks.Count}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
                             </StackPanel>
                         </Border>
                     </Grid>

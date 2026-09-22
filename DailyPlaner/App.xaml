@@ -7,7 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resourse\Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/DailyPlaner;component/Resourse/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

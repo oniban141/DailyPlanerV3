@@ -12,7 +12,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resourse/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/DailyPlaner;component/Resourse/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -31,9 +31,21 @@
                 
                 <TextBlock Grid.Row="0" Text="Daily Planner" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
                 
-                <TextBox Grid.Row="1" Text="{Binding Username, Mode=TwoWay}" PlaceholderText="Username" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,15"/>
+                <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,15" Padding="5">
+                    <TextBox Text="{Binding Username, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}">
+                        <TextBox.Background>
+                            <SolidColorBrush Color="Transparent"/>
+                        </TextBox.Background>
+                    </TextBox>
+                </Border>
                 
-                <PasswordBox Grid.Row="2" Password="{Binding Password, Mode=TwoWay}" PlaceholderText="Password" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,15"/>
+                <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,15" Padding="5">
+                    <PasswordBox Password="{Binding Password, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}">
+                        <PasswordBox.Background>
+                            <SolidColorBrush Color="Transparent"/>
+                        </PasswordBox.Background>
+                    </PasswordBox>
+                </Border>
                 
                 <Button Grid.Row="3" Content="Login" Command="{Binding LoginCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,0,15"/>
                 

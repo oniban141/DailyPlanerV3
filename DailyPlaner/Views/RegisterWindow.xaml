@@ -11,7 +11,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resourse/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/DailyPlaner;component/Resourse/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -33,19 +33,33 @@
 
                 <TextBlock Grid.Row="0" Text="Register New Account" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
-                <TextBox Grid.Row="1" Text="{Binding Username, Mode=TwoWay}" PlaceholderText="Username" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,10"/>
+                <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                    <TextBox Text="{Binding Username, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
-                <PasswordBox Grid.Row="2" Password="{Binding Password, Mode=TwoWay}" PlaceholderText="Password" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,10"/>
+                <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                    <PasswordBox Password="{Binding Password, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
-                <PasswordBox Grid.Row="3" Password="{Binding ConfirmPassword, Mode=TwoWay}" PlaceholderText="Confirm Password" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,10"/>
+                <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                    <PasswordBox Password="{Binding ConfirmPassword, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
-                <TextBox Grid.Row="4" Text="{Binding Email, Mode=TwoWay}" PlaceholderText="Email" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,10"/>
+                <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                    <TextBox Text="{Binding Email, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
-                <TextBox Grid.Row="5" Text="{Binding FirstName, Mode=TwoWay}" PlaceholderText="First Name" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,10"/>
+                <Border Grid.Row="5" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                    <TextBox Text="{Binding FirstName, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
-                <TextBox Grid.Row="6" Text="{Binding LastName, Mode=TwoWay}" PlaceholderText="Last Name" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,10"/>
+                <Border Grid.Row="6" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                    <TextBox Text="{Binding LastName, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
-                <ComboBox Grid.Row="7" ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Id" Style="{StaticResource BaseComboBoxStyle}" Margin="0,0,0,20"/>
+                <Border Grid.Row="7" Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="0">
+                    <ComboBox ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Id" Style="{StaticResource BaseComboBoxStyle}" Margin="0,0,0,0"/>
+                </Border>
 
                 <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Cancel" Command="{Binding CancelCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0" Width="80"/>
