@@ -14,9 +14,12 @@ namespace DailyPlaner.Models
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime DueDate { get; set; }
-        public bool IsCompleted { get; set; }
+        public string Status { get; set; }
         public int Priority { get; set; }
-        public int? TagId { get; set; }
-        public Tag Tag { get; set; }
+        public bool IsCompleted
+        {
+            get => Status == "Выполнена" || Status == "Completed";
+            set => Status = value ? "Выполнена" : "Ожидает";
+        }
     }
 }

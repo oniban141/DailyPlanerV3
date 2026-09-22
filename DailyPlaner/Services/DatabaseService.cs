@@ -86,13 +86,11 @@ namespace DailyPlaner.Services
                                 {
                                     Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
                                     Username = reader["Username"] != DBNull.Value ? reader["Username"].ToString() : string.Empty,
-                                    Password = reader["Password"] != DBNull.Value ? reader["Password"].ToString() : string.Empty,
+                                    PasswordHash = reader["PasswordHash"] != DBNull.Value ? reader["PasswordHash"].ToString() : string.Empty,
                                     Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
-                                    FirstName = reader["FirstName"] != DBNull.Value ? reader["FirstName"].ToString() : string.Empty,
-                                    LastName = reader["LastName"] != DBNull.Value ? reader["LastName"].ToString() : string.Empty,
                                     GenderId = reader["GenderId"] != DBNull.Value ? Convert.ToInt32(reader["GenderId"]) : 0,
                                     RoleId = reader["RoleId"] != DBNull.Value ? Convert.ToInt32(reader["RoleId"]) : 0,
-                                    CreatedDate = reader["CreatedDate"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedDate"]) : DateTime.Now
+                                    CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
                                 };
                                 users.Add(user);
                             }
@@ -127,13 +125,11 @@ namespace DailyPlaner.Services
                                 {
                                     Id = Convert.ToInt32(reader["Id"]),
                                     Username = reader["Username"].ToString(),
-                                    Password = reader["Password"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    FirstName = reader["FirstName"].ToString(),
-                                    LastName = reader["LastName"].ToString(),
+                                    PasswordHash = reader["PasswordHash"].ToString(),
+                                    Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
                                     GenderId = Convert.ToInt32(reader["GenderId"]),
                                     RoleId = Convert.ToInt32(reader["RoleId"]),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
+                                    CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
                                 };
                             }
                         }
@@ -168,13 +164,11 @@ namespace DailyPlaner.Services
                                 {
                                     Id = Convert.ToInt32(reader["Id"]),
                                     Username = reader["Username"].ToString(),
-                                    Password = reader["Password"].ToString(),
-                                    Email = reader["Email"].ToString(),
-                                    FirstName = reader["FirstName"].ToString(),
-                                    LastName = reader["LastName"].ToString(),
+                                    PasswordHash = reader["PasswordHash"].ToString(),
+                                    Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
                                     GenderId = Convert.ToInt32(reader["GenderId"]),
                                     RoleId = Convert.ToInt32(reader["RoleId"]),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
+                                    CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
                                 };
                             }
                         }
@@ -195,18 +189,16 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Users (Username, Password, Email, FirstName, LastName, GenderId, RoleId, CreatedDate) " +
-                                   "VALUES (@Username, @Password, @Email, @FirstName, @LastName, @GenderId, @RoleId, @CreatedDate)";
+                    string query = "INSERT INTO Users (Username, PasswordHash, Email, GenderId, RoleId, CreatedAt) " +
+                                   "VALUES (@Username, @PasswordHash, @Email, @GenderId, @RoleId, @CreatedAt)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Username", user.Username);
-                        command.Parameters.AddWithValue("@Password", user.Password);
-                        command.Parameters.AddWithValue("@Email", user.Email);
-                        command.Parameters.AddWithValue("@FirstName", user.FirstName);
-                        command.Parameters.AddWithValue("@LastName", user.LastName);
+                        command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
+                        command.Parameters.AddWithValue("@Email", user.Email ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@GenderId", user.GenderId);
                         command.Parameters.AddWithValue("@RoleId", user.RoleId);
-                        command.Parameters.AddWithValue("@CreatedDate", user.CreatedDate);
+                        command.Parameters.AddWithValue("@CreatedAt", user.CreatedAt);
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
@@ -272,17 +264,15 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    string query = "UPDATE Users SET Username = @Username, Password = @Password, Email = @Email, " +
-                                   "FirstName = @FirstName, LastName = @LastName, GenderId = @GenderId, RoleId = @RoleId " +
+                    string query = "UPDATE Users SET Username = @Username, PasswordHash = @PasswordHash, Email = @Email, " +
+                                   "GenderId = @GenderId, RoleId = @RoleId " +
                                    "WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", user.Id);
                         command.Parameters.AddWithValue("@Username", user.Username);
-                        command.Parameters.AddWithValue("@Password", user.Password);
-                        command.Parameters.AddWithValue("@Email", user.Email);
-                        command.Parameters.AddWithValue("@FirstName", user.FirstName);
-                        command.Parameters.AddWithValue("@LastName", user.LastName);
+                        command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
+                        command.Parameters.AddWithValue("@Email", user.Email ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@GenderId", user.GenderId);
                         command.Parameters.AddWithValue("@RoleId", user.RoleId);
                         int result = command.ExecuteNonQuery();
@@ -344,9 +334,8 @@ namespace DailyPlaner.Services
                                     Title = reader["Title"].ToString(),
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     DueDate = Convert.ToDateTime(reader["DueDate"]),
-                                    IsCompleted = Convert.ToBoolean(reader["IsCompleted"]),
-                                    Priority = Convert.ToInt32(reader["Priority"]),
-                                    TagId = reader["TagId"] != DBNull.Value ? Convert.ToInt32(reader["TagId"]) : (int?)null
+                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
+                                    Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
                                 };
                                 tasks.Add(task);
                             }
@@ -384,9 +373,8 @@ namespace DailyPlaner.Services
                                     Title = reader["Title"].ToString(),
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     DueDate = Convert.ToDateTime(reader["DueDate"]),
-                                    IsCompleted = Convert.ToBoolean(reader["IsCompleted"]),
-                                    Priority = Convert.ToInt32(reader["Priority"]),
-                                    TagId = reader["TagId"] != DBNull.Value ? Convert.ToInt32(reader["TagId"]) : (int?)null
+                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
+                                    Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
                                 };
                                 tasks.Add(task);
                             }
@@ -424,9 +412,8 @@ namespace DailyPlaner.Services
                                     Title = reader["Title"].ToString(),
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     DueDate = Convert.ToDateTime(reader["DueDate"]),
-                                    IsCompleted = Convert.ToBoolean(reader["IsCompleted"]),
-                                    Priority = Convert.ToInt32(reader["Priority"]),
-                                    TagId = reader["TagId"] != DBNull.Value ? Convert.ToInt32(reader["TagId"]) : (int?)null
+                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
+                                    Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
                                 };
                             }
                         }
@@ -447,17 +434,16 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Tasks (UserId, Title, Description, DueDate, IsCompleted, Priority, TagId) " +
-                                   "VALUES (@UserId, @Title, @Description, @DueDate, @IsCompleted, @Priority, @TagId)";
+                    string query = "INSERT INTO Tasks (UserId, Title, Description, DueDate, Priority, Status) " +
+                                   "VALUES (@UserId, @Title, @Description, @DueDate, @Priority, @Status)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserId", task.UserId);
                         command.Parameters.AddWithValue("@Title", task.Title);
                         command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                        command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
-                        command.Parameters.AddWithValue("@Priority", task.Priority);
-                        command.Parameters.AddWithValue("@TagId", task.TagId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Priority", task.Priority.ToString());
+                        command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
@@ -478,7 +464,7 @@ namespace DailyPlaner.Services
                 {
                     connection.Open();
                     string query = "UPDATE Tasks SET UserId = @UserId, Title = @Title, Description = @Description, " +
-                                   "DueDate = @DueDate, IsCompleted = @IsCompleted, Priority = @Priority, TagId = @TagId " +
+                                   "DueDate = @DueDate, Priority = @Priority, Status = @Status " +
                                    "WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -487,9 +473,8 @@ namespace DailyPlaner.Services
                         command.Parameters.AddWithValue("@Title", task.Title);
                         command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                        command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
-                        command.Parameters.AddWithValue("@Priority", task.Priority);
-                        command.Parameters.AddWithValue("@TagId", task.TagId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Priority", task.Priority.ToString());
+                        command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
@@ -748,7 +733,7 @@ namespace DailyPlaner.Services
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     Title = reader["Title"].ToString(),
                                     Content = reader["Content"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
+                                    CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
                                 };
                                 notes.Add(note);
                             }
@@ -785,7 +770,7 @@ namespace DailyPlaner.Services
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     Title = reader["Title"].ToString(),
                                     Content = reader["Content"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
+                                    CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
                                 };
                                 notes.Add(note);
                             }
@@ -822,7 +807,7 @@ namespace DailyPlaner.Services
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     Title = reader["Title"].ToString(),
                                     Content = reader["Content"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedDate"])
+                                    CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
                                 };
                             }
                         }
@@ -843,14 +828,14 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Notes (UserId, Title, Content, CreatedDate) " +
-                                   "VALUES (@UserId, @Title, @Content, @CreatedDate)";
+                    string query = "INSERT INTO Notes (UserId, Title, Content, CreatedAt) " +
+                                   "VALUES (@UserId, @Title, @Content, @CreatedAt)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserId", note.UserId);
                         command.Parameters.AddWithValue("@Title", note.Title);
                         command.Parameters.AddWithValue("@Content", note.Content);
-                        command.Parameters.AddWithValue("@CreatedDate", note.CreatedDate);
+                        command.Parameters.AddWithValue("@CreatedAt", note.CreatedDate);
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
@@ -1077,9 +1062,9 @@ namespace DailyPlaner.Services
                                     Id = Convert.ToInt32(reader["Id"]),
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     TaskId = Convert.ToInt32(reader["TaskId"]),
-                                    ReminderDate = Convert.ToDateTime(reader["ReminderDate"]),
+                                    ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
                                     Message = reader["Message"].ToString(),
-                                    IsShown = Convert.ToBoolean(reader["IsShown"])
+                                    IsShown = Convert.ToBoolean(reader["IsActive"])
                                 };
                                 reminders.Add(reminder);
                             }
@@ -1115,9 +1100,9 @@ namespace DailyPlaner.Services
                                     Id = Convert.ToInt32(reader["Id"]),
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     TaskId = Convert.ToInt32(reader["TaskId"]),
-                                    ReminderDate = Convert.ToDateTime(reader["ReminderDate"]),
+                                    ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
                                     Message = reader["Message"].ToString(),
-                                    IsShown = Convert.ToBoolean(reader["IsShown"])
+                                    IsShown = Convert.ToBoolean(reader["IsActive"])
                                 };
                                 reminders.Add(reminder);
                             }
@@ -1139,15 +1124,15 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Reminders (UserId, TaskId, ReminderDate, Message, IsShown) " +
-                                   "VALUES (@UserId, @TaskId, @ReminderDate, @Message, @IsShown)";
+                    string query = "INSERT INTO Reminders (UserId, TaskId, ReminderTime, Message, IsActive) " +
+                                   "VALUES (@UserId, @TaskId, @ReminderTime, @Message, @IsActive)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserId", reminder.UserId);
                         command.Parameters.AddWithValue("@TaskId", reminder.TaskId);
-                        command.Parameters.AddWithValue("@ReminderDate", reminder.ReminderDate);
+                        command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderDate);
                         command.Parameters.AddWithValue("@Message", reminder.Message);
-                        command.Parameters.AddWithValue("@IsShown", reminder.IsShown);
+                        command.Parameters.AddWithValue("@IsActive", reminder.IsShown);
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
@@ -1167,16 +1152,16 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    string query = "UPDATE Reminders SET UserId = @UserId, TaskId = @TaskId, ReminderDate = @ReminderDate, " +
-                                   "Message = @Message, IsShown = @IsShown WHERE Id = @Id";
+                    string query = "UPDATE Reminders SET UserId = @UserId, TaskId = @TaskId, ReminderTime = @ReminderTime, " +
+                                   "Message = @Message, IsActive = @IsActive WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", reminder.Id);
                         command.Parameters.AddWithValue("@UserId", reminder.UserId);
                         command.Parameters.AddWithValue("@TaskId", reminder.TaskId);
-                        command.Parameters.AddWithValue("@ReminderDate", reminder.ReminderDate);
+                        command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderDate);
                         command.Parameters.AddWithValue("@Message", reminder.Message);
-                        command.Parameters.AddWithValue("@IsShown", reminder.IsShown);
+                        command.Parameters.AddWithValue("@IsActive", reminder.IsShown);
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }

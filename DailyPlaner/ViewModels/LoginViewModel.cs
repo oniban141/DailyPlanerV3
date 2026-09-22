@@ -73,7 +73,7 @@ namespace DailyPlaner.ViewModels
             try
             {
                 var user = _databaseService.GetUserByUsername(Username);
-                if (user != null && user.Password == DatabaseService.HashPassword(Password))
+                if (user != null && user.PasswordHash == DatabaseService.HashPassword(Password))
                 {
                     MessageBox.Show("Вход выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
