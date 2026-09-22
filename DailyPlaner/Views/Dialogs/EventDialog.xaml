@@ -1,0 +1,42 @@
+<Window x:Class="DailyPlaner.Views.Dialogs.EventDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Событие" Height="480" Width="440"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{DynamicResource WindowBackgroundBrush}">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Название" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,4"/>
+        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите название события"/>
+
+        <TextBlock Grid.Row="2" Text="Описание" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
+        <TextBox Grid.Row="3" x:Name="DescriptionBox" Style="{StaticResource WatermarkTextBoxStyle}"
+                 Tag="Введите описание" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
+                 VerticalContentAlignment="Top"/>
+
+        <TextBlock Grid.Row="4" Text="Начало" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
+        <DatePicker Grid.Row="5" x:Name="StartDatePicker" Style="{StaticResource BaseDatePickerStyle}"
+                    HorizontalAlignment="Left" Width="200"/>
+
+        <TextBlock Grid.Row="6" Text="Место" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
+        <TextBox Grid.Row="7" x:Name="LocationBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите место проведения"/>
+
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Отмена" Click="Cancel_Click" Style="{StaticResource SecondaryButtonStyle}"
+                    Width="100" Margin="0,0,12,0"/>
+            <Button Content="Сохранить" Click="Save_Click" Style="{StaticResource BaseButtonStyle}" Width="110"/>
+        </StackPanel>
+    </Grid>
+</Window>
