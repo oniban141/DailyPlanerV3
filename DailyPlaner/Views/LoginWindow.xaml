@@ -4,7 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DailyPlaner.Views"
-      xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels" d:DataContext="{d:DesignInstance Type=viewModels:LoginViewModel}"
+      xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
+      xmlns:converters="clr-namespace:DailyPlaner.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="LoginWindow">
@@ -14,6 +15,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/DailyPlaner;component/Resourse/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </ResourceDictionary>
     </Page.Resources>
 
@@ -40,7 +42,7 @@
                 </Border>
                 
                 <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,15" Padding="5">
-                    <PasswordBox Password="{Binding Password, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}">
+                    <PasswordBox Password="{Binding Password, Mode=TwoWay}">
                         <PasswordBox.Background>
                             <SolidColorBrush Color="Transparent"/>
                         </PasswordBox.Background>

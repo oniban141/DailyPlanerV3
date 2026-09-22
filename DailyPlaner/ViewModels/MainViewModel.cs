@@ -30,6 +30,7 @@ namespace DailyPlaner.ViewModels
         private Tag _selectedTag;
         private DateTime _selectedDate;
         private bool _isDarkTheme;
+        private int _completedTaskCount;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -158,6 +159,16 @@ namespace DailyPlaner.ViewModels
             }
         }
 
+        public int CompletedTaskCount
+        {
+            get => _completedTaskCount;
+            set
+            {
+                _completedTaskCount = value;
+                OnPropertyChanged(nameof(CompletedTaskCount));
+            }
+        }
+
         public ICommand AddTaskCommand { get; }
         public ICommand EditTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
@@ -216,6 +227,7 @@ namespace DailyPlaner.ViewModels
                 Tasks = new ObservableCollection<Models.Task>(_databaseService.GetTasksByUserId(CurrentUser.Id));
                 Events = new ObservableCollection<Event>(_databaseService.GetEventsByUserId(CurrentUser.Id));
                 Notes = new ObservableCollection<Note>(_databaseService.GetNotesByUserId(CurrentUser.Id));
+                CompletedTaskCount = Tasks.Count(t => t.IsCompleted);
             }
             catch (Exception ex)
             {

@@ -96,14 +96,12 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                var registerWindow = new Views.RegisterWindow();
-                var registerViewModel = new RegisterViewModel(_databaseService);
-                registerWindow.DataContext = registerViewModel;
-                registerWindow.Show();
+                var mainWindow = new MainWindow();
+                mainWindow.Show();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error opening registration: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error opening main window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
