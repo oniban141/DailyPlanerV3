@@ -321,7 +321,7 @@
                             <StackPanel Grid.Row="0" Orientation="Horizontal">
                                 <TextBlock Text="Календарь" Style="{StaticResource SectionTitleStyle}" Margin="0,0,16,0"/>
                                 <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Padding="10,3">
-                                    <TextBlock Text="{Binding SelectedDate, StringFormat=dddd, dd MMMM}"
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM'}"
                                                Foreground="#FFFFFF" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"/>
                                 </Border>
                             </StackPanel>
