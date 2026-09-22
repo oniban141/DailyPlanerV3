@@ -73,7 +73,7 @@ namespace DailyPlaner.ViewModels
             try
             {
                 var user = _databaseService.GetUserByUsername(Username);
-                if (user != null && user.Password == Password)
+                if (user != null && user.Password == DatabaseService.HashPassword(Password))
                 {
                     MessageBox.Show("Вход выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -81,6 +81,10 @@ namespace DailyPlaner.ViewModels
                 {
                     MessageBox.Show("Неверное имя пользователя или пароль.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
