@@ -570,7 +570,7 @@ namespace DailyPlaner.ViewModels
 
         private void ExecuteOpenSettings(object parameter)
         {
-            var dialog = new Views.Dialogs.SettingsDialog(IsDarkTheme);
+            var dialog = new Views.Dialogs.SettingsDialog(IsDarkTheme, App.LoadAutoStartSetting());
             dialog.Owner = Application.Current.MainWindow;
             dialog.ShowDialog();
             IsDarkTheme = dialog.IsDarkThemeRequested;
