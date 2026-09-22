@@ -31,7 +31,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                string fullMessage = $"{message}\n\nDue: {dueDate.ToString(\"yyyy-MM-dd HH:mm\")}";
+                string fullMessage = $"{message}\n\nDue: {dueDate:yyyy-MM-dd HH:mm}";
                 ShowNotification(title, fullMessage);
             }
             catch (Exception ex)

@@ -158,6 +158,8 @@ namespace DailyPlaner.ViewModels
             }
         }
 
+        public int CompletedTasksCount => Tasks.Count(t => t.IsCompleted);
+
         public ICommand AddTaskCommand { get; }
         public ICommand EditTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
@@ -482,8 +484,8 @@ namespace DailyPlaner.ViewModels
                 else
                 {
                     var filteredTasks = _databaseService.GetTasksByUserId(CurrentUser.Id)
-                        .Where(t => t.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                   t.Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                        .Where(t => (t.Title != null && t.Title.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                                   (t.Description != null && t.Description.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0))
                         .ToList();
                     Tasks = new ObservableCollection<Models.Task>(filteredTasks);
                 }

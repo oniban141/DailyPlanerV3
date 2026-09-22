@@ -211,7 +211,7 @@
                                 <TextBlock Text="{Binding Tasks.Count}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
                                 
                                 <TextBlock Text="Completed Tasks: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
-                                <TextBlock Text="{Binding Tasks.Count(t => t.IsCompleted)}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
+                                <TextBlock Text="{Binding CompletedTasksCount}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
                             </StackPanel>
                         </Border>
                     </Grid>
