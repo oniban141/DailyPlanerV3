@@ -40,11 +40,7 @@
                 </Border>
                 
                 <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,15" Padding="5">
-                    <PasswordBox Password="{Binding Password, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}">
-                        <PasswordBox.Background>
-                            <SolidColorBrush Color="Transparent"/>
-                        </PasswordBox.Background>
-                    </PasswordBox>
+                    <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="PasswordBox_PasswordChanged"/>
                 </Border>
                 
                 <Button Grid.Row="3" Content="Login" Command="{Binding LoginCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,0,15"/>
