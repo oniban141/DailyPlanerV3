@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DailyPlaner.Views"
         xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
         mc:Ignorable="d"
-        Title="Регистрация" Height="550" Width="400" WindowStartupLocation="CenterScreen">
+        Title="Регистрация" Height="640" Width="440" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -17,49 +17,84 @@
     </Window.Resources>
 
     <Grid Background="{StaticResource LightBackgroundBrush}">
-        <Border Style="{StaticResource CardStyle}" Margin="20">
+        <Border Style="{StaticResource CardStyle}" Margin="20" Padding="0" VerticalAlignment="Center">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Регистрация нового аккаунта" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" TextWrapping="Wrap"/>
-
-                <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <TextBox Text="{Binding Username, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите имя пользователя"/>
+                <!-- Шапка карточки (серо-синяя полоса) -->
+                <Border Grid.Row="0" Background="{StaticResource SecondaryBrush}" CornerRadius="14,14,0,0" Padding="24,20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource PrimaryBrush}">
+                                <TextBlock Text="Д" Foreground="#FFFFFF" FontFamily="Segoe UI" FontSize="18"
+                                           FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="Ежедневник" Foreground="#FFFFFF" FontFamily="Segoe UI"
+                                       FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBlock Text="Создайте аккаунт" Foreground="#FFFFFF" FontFamily="Segoe UI"
+                                   FontSize="20" FontWeight="Bold" Margin="0,14,0,0"/>
+                        <TextBlock Text="Это займёт меньше минуты" Foreground="#C9D2E0"
+                                   FontFamily="Segoe UI" FontSize="12" Margin="0,4,0,0"/>
+                    </StackPanel>
                 </Border>
 
-                <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                <!-- Форма -->
+                <StackPanel Grid.Row="1" Margin="28,24,28,24">
+                    <TextBlock Text="Имя пользователя" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
+                        <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите имя пользователя"/>
+                    </Border>
+
+                    <TextBlock Text="Пароль" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
+                        <Grid>
+                            <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}"
+                                        PasswordChanged="PasswordBox_PasswordChanged"/>
+                            <TextBlock x:Name="PasswordWatermark" Text="Введите пароль"
+                                       Foreground="{StaticResource MutedTextBrush}" Margin="14,0,0,0"
+                                       VerticalAlignment="Center" IsHitTestVisible="False"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="Подтвердите пароль" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
+                        <Grid>
+                            <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}"
+                                        PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
+                            <TextBlock x:Name="ConfirmPasswordWatermark" Text="Повторите пароль"
+                                       Foreground="{StaticResource MutedTextBrush}" Margin="14,0,0,0"
+                                       VerticalAlignment="Center" IsHitTestVisible="False"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="Email" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
+                        <TextBox Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите email"/>
+                    </Border>
+
+                    <TextBlock Text="Пол" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}"
+                              DisplayMemberPath="Name" SelectedValuePath="Id"
+                              Style="{StaticResource BaseComboBoxStyle}" Margin="0,0,0,22"/>
+
                     <Grid>
-                        <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="PasswordBox_PasswordChanged"/>
-                        <TextBlock x:Name="PasswordWatermark" Text="Введите пароль" Foreground="#FF9E9E9E" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Отмена" Command="{Binding CancelCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                Style="{StaticResource SecondaryButtonStyle}"/>
+                        <Button Grid.Column="2" Content="Зарегистрироваться" Command="{Binding RegisterCommand}"
+                                Style="{StaticResource BaseButtonStyle}"/>
                     </Grid>
-                </Border>
-
-                <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <Grid>
-                        <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
-                        <TextBlock x:Name="ConfirmPasswordWatermark" Text="Подтвердите пароль" Foreground="#FF9E9E9E" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
-                    </Grid>
-                </Border>
-
-                <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <TextBox Text="{Binding Email, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите email"/>
-                </Border>
-
-                <Border Grid.Row="5" Style="{StaticResource CardStyle}" Margin="0,0,0,20" Padding="0">
-                    <ComboBox ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="Id" Style="{StaticResource BaseComboBoxStyle}" Margin="0,0,0,0"/>
-                </Border>
-
-                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Отмена" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0" Width="90"/>
-                    <Button Content="Зарегистрироваться" Command="{Binding RegisterCommand}" Style="{StaticResource BaseButtonStyle}" Width="140"/>
                 </StackPanel>
             </Grid>
         </Border>

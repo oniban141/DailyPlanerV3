@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
         mc:Ignorable="d"
         Title="Ежедневник" Height="768" Width="1280" WindowStartupLocation="CenterScreen">
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -18,33 +18,68 @@
 
     <Grid Background="{StaticResource LightBackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="240"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Sidebar -->
-        <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="2" CornerRadius="0">
-            <StackPanel VerticalAlignment="Stretch">
-                <TextBlock Text="Ежедневник" Style="{StaticResource PageTitleStyle}" Foreground="{StaticResource AccentBrush}" Margin="10" HorizontalAlignment="Center"/>
-                
-                <Button Content="Обзор" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Задачи" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="События" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Заметки" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Календарь" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                <Button Content="Аналитика" Style="{StaticResource BaseButtonStyle}" Margin="5" HorizontalAlignment="Stretch"/>
-                
-                <Border Margin="10,20,10,10" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="2" CornerRadius="8">
-                    <StackPanel Orientation="Horizontal" Margin="5">
-                        <Button Content="Сменить тему" Command="{Binding ToggleThemeCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                        <Button Content="Выйти" Command="{Binding LogoutCommand}" Style="{StaticResource BaseButtonStyle}"/>
+        <!-- ================= SIDEBAR ================= -->
+        <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}"
+                CornerRadius="0,24,24,0" Margin="0,12,0,12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Логотип -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,24">
+                    <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource PrimaryBrush}">
+                        <TextBlock Text="Д" Foreground="#FFFFFF" FontFamily="Segoe UI" FontSize="18"
+                                   FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Ежедневник" Foreground="#FFFFFF" FontFamily="Segoe UI"
+                               FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                </StackPanel>
+
+                <!-- Навигация -->
+                <StackPanel Grid.Row="1">
+                    <Button Content="🏠   Обзор" Style="{StaticResource SidebarActiveButtonStyle}"/>
+                    <Button Content="📋   Задачи" Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="📅   События" Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="📝   Заметки" Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="🗓   Календарь" Style="{StaticResource SidebarButtonStyle}"/>
+
+                    <Border Background="#5B6F92" Height="1" Margin="20,14,20,14" CornerRadius="1"/>
+
+                    <Button Content="⚙   Настройки" Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="🌓   Сменить тему" Command="{Binding ToggleThemeCommand}"
+                            Style="{StaticResource SidebarButtonStyle}"/>
+                </StackPanel>
+
+                <!-- Профиль / выход -->
+                <Border Grid.Row="2" Margin="14,0,14,14" Background="#41547663" CornerRadius="12" Padding="12">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="32" Height="32" CornerRadius="16" Background="{StaticResource PrimaryBrush}">
+                                <TextBlock Text="👤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
+                                <TextBlock Text="{Binding CurrentUser.Username}" Foreground="#FFFFFF"
+                                           FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"/>
+                                <TextBlock Text="Личный кабинет" Foreground="#C9D2E0"
+                                           FontFamily="Segoe UI" FontSize="11"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Button Content="Выйти" Command="{Binding LogoutCommand}"
+                                Style="{StaticResource SidebarButtonStyle}" Margin="0,8,0,0" Padding="12,8"/>
                     </StackPanel>
                 </Border>
-            </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- Main Content -->
-        <Grid Grid.Column="1" Margin="10">
+        <!-- ================= MAIN ================= -->
+        <Grid Grid.Column="1" Margin="24,12,24,12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -52,60 +87,112 @@
             </Grid.RowDefinitions>
 
             <!-- Header -->
-            <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding CurrentUser.Username}" Style="{StaticResource PageTitleStyle}"/>
+            <Grid Grid.Row="0" Margin="0,4,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="Привет, " Style="{StaticResource PageTitleStyle}"/>
+                    <TextBlock Text="{Binding CurrentUser.Username}" Style="{StaticResource PageTitleStyle}"
+                               Foreground="{StaticResource PrimaryBrush}"/>
+                    <TextBlock Text="!" Style="{StaticResource PageTitleStyle}"/>
                 </StackPanel>
-            </Border>
+
+                <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Экспорт JSON ⤓" Command="{Binding ExportToJsonCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="Импорт JSON ⤒" Command="{Binding ImportFromJsonCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="CSV ⤓" Command="{Binding ExportToCsvCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="CSV ⤒" Command="{Binding ImportFromCsvCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
 
             <!-- Toolbar -->
-            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
                 <StackPanel Orientation="Horizontal">
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,10,0" Padding="0,0,0,0">
-                        <TextBox Text="{Binding SearchText, Mode=TwoWay}" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Поиск задач..." Width="200" Margin="0,0,0,0"/>
+                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,10,0" Width="260">
+                        <Grid>
+                            <TextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource WatermarkTextBoxStyle}" Tag="🔍  Поиск..."
+                                     Background="Transparent" BorderThickness="0"/>
+                        </Grid>
                     </Border>
-                    <Button Content="Поиск" Command="{Binding SearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Очистить" Command="{Binding ClearSearchCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                    
-                    <ComboBox ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}" DisplayMemberPath="Name" Style="{StaticResource BaseComboBoxStyle}" Width="150" Margin="0,0,10,0"/>
-                    
-                    <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}" Style="{StaticResource BaseDatePickerStyle}" Width="150" Margin="0,0,10,0"/>
+                    <Button Content="Поиск" Command="{Binding SearchCommand}"
+                            Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="Очистить" Command="{Binding ClearSearchCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,16,0"/>
+                    <ComboBox ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}"
+                              DisplayMemberPath="Name" Style="{StaticResource BaseComboBoxStyle}"
+                              Width="160" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                Style="{StaticResource BaseDatePickerStyle}" Width="170" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
             <!-- Tabs -->
-            <TabControl Grid.Row="2">
-                <!-- Tasks Tab -->
-                <TabItem Header="Задачи">
+            <TabControl Grid.Row="2" Style="{StaticResource TabControlStyle}">
+
+                <!-- ===== Задачи ===== -->
+                <TabItem Header="Задачи" Style="{StaticResource TabItemStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <Button Content="Добавить задачу" Command="{Binding AddTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Изменить задачу" Command="{Binding EditTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Удалить задачу" Command="{Binding DeleteTaskCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Выполнено" Command="{Binding CompleteTaskCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,14">
+                            <Button Content="+ Новая задача" Command="{Binding AddTaskCommand}"
+                                    Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Изменить" Command="{Binding EditTaskCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Удалить" Command="{Binding DeleteTaskCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="✔ Выполнено" Command="{Binding CompleteTaskCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 
-                        <ListView Grid.Row="1" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" Style="{StaticResource BaseListViewStyle}">
+                        <ListView Grid.Row="1" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}"
+                                  Style="{StaticResource BaseListViewStyle}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource CardStyle}" Margin="0,5,0,5">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
-                                            <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,5,0,0"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Срок: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding DueDate, StringFormat=yyyy-MM-dd}" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}"
+                                                    CornerRadius="14,0,0,14"/>
+                                            <StackPanel Grid.Column="1" Margin="16,12,16,12">
+                                                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
+                                                <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}"
+                                                           Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"
+                                                           TextWrapping="Wrap"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                                            Padding="8,3" Margin="0,0,8,0">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="📅 " Style="{StaticResource MutedTextBlockStyle}"/>
+                                                            <TextBlock Text="{Binding DueDate, StringFormat=dd.MM.yyyy}"
+                                                                       Style="{StaticResource MutedTextBlockStyle}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                                            Padding="8,3">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="⚡ " Style="{StaticResource MutedTextBlockStyle}"/>
+                                                            <TextBlock Text="{Binding Priority}" Style="{StaticResource MutedTextBlockStyle}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Приоритет: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding Priority}" Style="{StaticResource BaseTextBlockStyle}"/>
-                                            </StackPanel>
-                                        </StackPanel>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -113,40 +200,62 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Events Tab -->
-                <TabItem Header="События">
+                <!-- ===== События ===== -->
+                <TabItem Header="События" Style="{StaticResource TabItemStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <Button Content="Добавить событие" Command="{Binding AddEventCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Изменить событие" Command="{Binding EditEventCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Удалить событие" Command="{Binding DeleteEventCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,14">
+                            <Button Content="+ Новое событие" Command="{Binding AddEventCommand}"
+                                    Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Изменить" Command="{Binding EditEventCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Удалить" Command="{Binding DeleteEventCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 
-                        <ListView Grid.Row="1" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" Style="{StaticResource BaseListViewStyle}">
+                        <ListView Grid.Row="1" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}"
+                                  Style="{StaticResource BaseListViewStyle}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource CardStyle}" Margin="0,5,0,5">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
-                                            <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,5,0,0"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Начало: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding StartDate, StringFormat=yyyy-MM-dd HH:mm}" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}"
+                                                    CornerRadius="14,0,0,14"/>
+                                            <StackPanel Grid.Column="1" Margin="16,12,16,12">
+                                                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
+                                                <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}"
+                                                           Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"
+                                                           TextWrapping="Wrap"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                                            Padding="8,3" Margin="0,0,8,0">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="🕘 " Style="{StaticResource MutedTextBlockStyle}"/>
+                                                            <TextBlock Text="{Binding StartDate, StringFormat='dd.MM HH:mm'}"
+                                                                       Style="{StaticResource MutedTextBlockStyle}"/>
+                                                            <TextBlock Text=" — " Style="{StaticResource MutedTextBlockStyle}"/>
+                                                            <TextBlock Text="{Binding EndDate, StringFormat='dd.MM HH:mm'}"
+                                                                       Style="{StaticResource MutedTextBlockStyle}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                                            Padding="8,3">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="📍 " Style="{StaticResource MutedTextBlockStyle}"/>
+                                                            <TextBlock Text="{Binding Location}" Style="{StaticResource MutedTextBlockStyle}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Конец: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding EndDate, StringFormat=yyyy-MM-dd HH:mm}" Style="{StaticResource BaseTextBlockStyle}"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Место: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding Location}" Style="{StaticResource BaseTextBlockStyle}"/>
-                                            </StackPanel>
-                                        </StackPanel>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -154,32 +263,46 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Notes Tab -->
-                <TabItem Header="Заметки">
+                <!-- ===== Заметки ===== -->
+                <TabItem Header="Заметки" Style="{StaticResource TabItemStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-                            <Button Content="Добавить заметку" Command="{Binding AddNoteCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Изменить заметку" Command="{Binding EditNoteCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                            <Button Content="Удалить заметку" Command="{Binding DeleteNoteCommand}" Style="{StaticResource BaseButtonStyle}"/>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,14">
+                            <Button Content="+ Новая заметка" Command="{Binding AddNoteCommand}"
+                                    Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Изменить" Command="{Binding EditNoteCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                            <Button Content="Удалить" Command="{Binding DeleteNoteCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 
-                        <ListView Grid.Row="1" ItemsSource="{Binding Notes}" SelectedItem="{Binding SelectedNote}" Style="{StaticResource BaseListViewStyle}">
+                        <ListView Grid.Row="1" ItemsSource="{Binding Notes}" SelectedItem="{Binding SelectedNote}"
+                                  Style="{StaticResource BaseListViewStyle}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource CardStyle}" Margin="0,5,0,5">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
-                                            <TextBlock Text="{Binding Content}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,5,0,0"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                                <TextBlock Text="Создано: " Style="{StaticResource BaseTextBlockStyle}"/>
-                                                <TextBlock Text="{Binding CreatedDate, StringFormat=yyyy-MM-dd HH:mm}" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="#C9A27E" CornerRadius="14,0,0,14"/>
+                                            <StackPanel Grid.Column="1" Margin="16,12,16,12">
+                                                <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
+                                                <TextBlock Text="{Binding Content}" Style="{StaticResource BaseTextBlockStyle}"
+                                                           Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"
+                                                           TextWrapping="Wrap"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                                    <TextBlock Text="✍ Создано: " Style="{StaticResource MutedTextBlockStyle}"/>
+                                                    <TextBlock Text="{Binding CreatedDate, StringFormat='dd.MM.yyyy HH:mm'}"
+                                                               Style="{StaticResource MutedTextBlockStyle}"/>
+                                                </StackPanel>
                                             </StackPanel>
-                                        </StackPanel>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -187,43 +310,57 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Calendar Tab -->
-                <TabItem Header="Календарь">
-                    <Grid>
-                        <Border Style="{StaticResource CardStyle}" Margin="20">
-                            <Calendar HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
-                                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}" 
-                                      Background="{StaticResource LightCardBrush}" 
-                                      BorderBrush="{StaticResource PrimaryBrush}" 
-                                      BorderThickness="2"/>
-                        </Border>
-                    </Grid>
-                </TabItem>
-
-                <!-- Analytics Tab -->
-                <TabItem Header="Аналитика">
-                    <Grid>
-                        <Border Style="{StaticResource CardStyle}" Margin="20">
-                            <StackPanel>
-                                <TextBlock Text="Аналитика продуктивности" Style="{StaticResource PageTitleStyle}" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-                                <TextBlock Text="Всего задач: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
-                                <TextBlock Text="{Binding Tasks.Count}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
-                                
-                                <TextBlock Text="Выполнено задач: " Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
-                                <TextBlock Text="{Binding CompletedTasksCount}" Style="{StaticResource BaseTextBlockStyle}" Margin="0,0,0,20"/>
+                <!-- ===== Календарь ===== -->
+                <TabItem Header="Календарь" Style="{StaticResource TabItemStyle}">
+                    <Border Style="{StaticResource CardStyle}" Margin="0,10,0,10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                <TextBlock Text="Календарь" Style="{StaticResource SectionTitleStyle}" Margin="0,0,16,0"/>
+                                <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Padding="10,3">
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat=dddd, dd MMMM}"
+                                               Foreground="#FFFFFF" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"/>
+                                </Border>
                             </StackPanel>
-                        </Border>
-                    </Grid>
+                            <Calendar Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12"
+                                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                      Background="{StaticResource LightCardBrush}"
+                                      BorderBrush="Transparent" BorderThickness="0"/>
+                        </Grid>
+                    </Border>
+                </TabItem>
+
+                <!-- ===== Аналитика (только счётчики, без графиков) ===== -->
+                <TabItem Header="Аналитика" Style="{StaticResource TabItemStyle}">
+                    <StackPanel Margin="0,10,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,10,10">
+                                <StackPanel>
+                                    <TextBlock Text="Всего задач" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,6"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Tasks.Count}" Style="{StaticResource PageTitleStyle}"
+                                                   FontSize="34" Foreground="{StaticResource PrimaryBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="10,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Выполнено задач" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{Binding CompletedTasksCount}" Style="{StaticResource PageTitleStyle}"
+                                               FontSize="34" Foreground="{StaticResource SecondaryBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
                 </TabItem>
             </TabControl>
-
-            <!-- Export/Import Buttons -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-                <Button Content="Экспорт JSON" Command="{Binding ExportToJsonCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                <Button Content="Импорт JSON" Command="{Binding ImportFromJsonCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                <Button Content="Экспорт CSV" Command="{Binding ExportToCsvCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                <Button Content="Импорт CSV" Command="{Binding ImportFromCsvCommand}" Style="{StaticResource BaseButtonStyle}"/>
-            </StackPanel>
         </Grid>
     </Grid>
 </Window>
