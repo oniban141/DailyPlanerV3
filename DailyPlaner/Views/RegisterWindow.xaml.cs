@@ -16,12 +16,12 @@ using DailyPlaner.ViewModels;
 
 namespace DailyPlaner.Views
 {
-    public partial class LoginWindow : Page
+    public partial class RegisterWindow : Window
     {
-        public LoginWindow()
+        public RegisterWindow()
         {
             InitializeComponent();
-            DataContext = new LoginViewModel();
+            DataContext = new RegisterViewModel(new Services.DatabaseService());
         }
     }
 }

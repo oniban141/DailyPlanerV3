@@ -1,4 +1,161 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
+    <!-- Color Resources -->
+    <Color x:Key="PrimaryColor">#D12128</Color>
+    <Color x:Key="SecondaryColor">#01344F</Color>
+    <Color x:Key="AccentColor">#FAE3AC</Color>
+    
+    <!-- Light Theme Colors -->
+    <Color x:Key="LightBackground">#F5F5F5</Color>
+    <Color x:Key="LightForeground">#333333</Color>
+    <Color x:Key="LightCardBackground">#FFFFFF</Color>
+    <Color x:Key="LightBorder">#000000</Color>
+    
+    <!-- Dark Theme Colors -->
+    <Color x:Key="DarkBackground">#121212</Color>
+    <Color x:Key="DarkForeground">#E0E0E0</Color>
+    <Color x:Key="DarkCardBackground">#1E1E1E</Color>
+    <Color x:Key="DarkBorder">#FAE3AC</Color>
+    
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+    
+    <!-- Light Theme Brushes -->
+    <SolidColorBrush x:Key="LightBackgroundBrush" Color="{StaticResource LightBackground}"/>
+    <SolidColorBrush x:Key="LightForegroundBrush" Color="{StaticResource LightForeground}"/>
+    <SolidColorBrush x:Key="LightCardBrush" Color="{StaticResource LightCardBackground}"/>
+    <SolidColorBrush x:Key="LightBorderBrush" Color="{StaticResource LightBorder}"/>
+    
+    <!-- Dark Theme Brushes -->
+    <SolidColorBrush x:Key="DarkBackgroundBrush" Color="{StaticResource DarkBackground}"/>
+    <SolidColorBrush x:Key="DarkForegroundBrush" Color="{StaticResource DarkForeground}"/>
+    <SolidColorBrush x:Key="DarkCardBrush" Color="{StaticResource DarkCardBackground}"/>
+    <SolidColorBrush x:Key="DarkBorderBrush" Color="{StaticResource DarkBorder}"/>
+    
+    <!-- Styles -->
+    <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    
+    <Style x:Key="BaseButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+    
+    <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource LightCardBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    
+    <Style x:Key="BaseComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="Background" Value="{StaticResource LightCardBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    
+    <Style x:Key="BaseListViewStyle" TargetType="ListView">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    
+    <Style x:Key="BaseDatePickerStyle" TargetType="DatePicker">
+        <Setter Property="Background" Value="{StaticResource LightCardBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource LightCardBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Padding" Value="15"/>
+    </Style>
+    
+    <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    
+    <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    
+    <!-- Dark Theme Styles -->
+    <Style x:Key="DarkBaseTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource DarkForegroundBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    
+    <Style x:Key="DarkBaseButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource DarkForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+    
+    <Style x:Key="DarkCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource DarkCardBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Padding" Value="15"/>
+    </Style>
+    
+    <Style x:Key="DarkPageTitleStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    
+    <Style x:Key="DarkSectionTitleStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
 </ResourceDictionary>
