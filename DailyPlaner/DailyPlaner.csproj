@@ -79,6 +79,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model1.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToStatusConverter.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
