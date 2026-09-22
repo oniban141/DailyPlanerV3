@@ -161,7 +161,7 @@ namespace DailyPlaner.ViewModels
                 if (result)
                 {
                     MessageBox.Show("Registration successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    ExecuteCancel(null);
+                    CloseRegisterWindow();
                 }
                 else
                 {
@@ -183,11 +183,21 @@ namespace DailyPlaner.ViewModels
                 {
                     window.Close();
                 }
+                else
+                {
+                    CloseRegisterWindow();
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error closing window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void CloseRegisterWindow()
+        {
+            var registerWindow = Application.Current.Windows.OfType<Views.RegisterWindow>().FirstOrDefault();
+            registerWindow?.Close();
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
