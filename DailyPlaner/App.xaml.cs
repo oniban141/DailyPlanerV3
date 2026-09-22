@@ -26,11 +26,11 @@ namespace DailyPlaner
             try
             {
                 var databaseService = new Services.DatabaseService();
-                var users = databaseService.GetAllUsers();
+                databaseService.TestConnection();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Database connection failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось подключиться к базе данных:\n{ex.Message}\n\nПроверьте, что SQL Server (PCGl1tch) запущен и база DailyPlannerDB создана.", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
