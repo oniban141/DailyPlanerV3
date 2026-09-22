@@ -145,10 +145,22 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
+                if (Password.Length < 6)
+                {
+                    MessageBox.Show("Пароль должен содержать не менее 6 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_databaseService.UsernameExists(Username))
+                {
+                    MessageBox.Show($"Имя пользователя \"{Username}\" уже занято. Выберите другое.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 var user = new User
                 {
                     Username = Username,
-                    Password = Password,
+                    Password = DatabaseService.HashPassword(Password),
                     Email = Email,
                     FirstName = FirstName,
                     LastName = LastName,
@@ -160,13 +172,17 @@ namespace DailyPlaner.ViewModels
                 bool result = _databaseService.CreateUser(user);
                 if (result)
                 {
-                    MessageBox.Show("Регистрация прошла успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Вы успешно зарегистрировались!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     CloseRegisterWindow();
                 }
                 else
                 {
-                    MessageBox.Show("Не удалось зарегистрироваться.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Не удалось зарегистрироваться. Попробуйте ещё раз.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {

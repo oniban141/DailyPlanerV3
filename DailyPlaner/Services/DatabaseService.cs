@@ -93,9 +93,10 @@ namespace DailyPlaner.Services
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (SqlException ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Console.WriteLine($"Database error getting user: {ex.Message}");
+                    throw new InvalidOperationException("Не удалось получить данные пользователя. Проверьте подключение к базе данных.", ex);
                 }
             }
             return user;
@@ -164,11 +165,57 @@ namespace DailyPlaner.Services
                         return result > 0;
                     }
                 }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine($"Database error creating user: {ex.Message}");
+                    throw new InvalidOperationException("Не удалось сохранить данные в базу данных. Проверьте подключение к серверу.", ex);
+                }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
-                    return false;
+                    throw;
                 }
+            }
+        }
+
+        public bool UsernameExists(string username)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT COUNT(1) FROM Users WHERE Username = @Username";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Username", username);
+                        return Convert.ToInt32(command.ExecuteScalar()) > 0;
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine($"Database error checking username: {ex.Message}");
+                    throw new InvalidOperationException("Не удалось проверить имя пользователя. Проверьте подключение к базе данных.", ex);
+                }
+            }
+        }
+
+        public static string HashPassword(string password)
+        {
+            if (string.IsNullOrEmpty(password))
+            {
+                return string.Empty;
+            }
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(password);
+                byte[] hash = sha256.ComputeHash(bytes);
+                var stringBuilder = new System.Text.StringBuilder(hash.Length * 2);
+                foreach (byte b in hash)
+                {
+                    stringBuilder.Append(b.ToString("x2"));
+                }
+                return stringBuilder.ToString();
             }
         }
 
