@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f620a9ed11f843129608e5cd9754f49b" Name="Diagram1">
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Event" Width="1.5" PointX="5.25" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Gender" Width="1.5" PointX="0.75" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Note" Width="1.5" PointX="5.25" PointY="6.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Reminder" Width="1.5" PointX="7.5" PointY="12.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Role" Width="1.5" PointX="0.75" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Tag" Width="1.5" PointX="5.25" PointY="13.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.Task" Width="1.5" PointX="5.25" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.TaskTag" Width="1.5" PointX="7.5" PointY="16.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DailyPlannerDBModel.User" Width="1.5" PointX="3" PointY="8" IsExpanded="true" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Events_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Users_Genders" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Notes_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Reminders_Tasks" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Reminders_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Users_Roles" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Tags_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_TaskTags_Tags" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_Tasks_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="DailyPlannerDBModel.FK_TaskTags_Tasks" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

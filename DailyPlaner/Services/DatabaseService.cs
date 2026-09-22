@@ -8,7 +8,7 @@ namespace DailyPlaner.Services
 {
     public class DatabaseService
     {
-        private readonly string connectionString = "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        private readonly string connectionString = "Server=PCGL1TCH;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public DatabaseService()
         {
