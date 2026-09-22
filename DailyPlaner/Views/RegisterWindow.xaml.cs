@@ -18,10 +18,28 @@ namespace DailyPlaner.Views
 {
     public partial class RegisterWindow : Window
     {
+        private RegisterViewModel ViewModel => (RegisterViewModel)DataContext;
+
         public RegisterWindow()
         {
             InitializeComponent();
             DataContext = new RegisterViewModel(new Services.DatabaseService());
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                ViewModel.Password = ((PasswordBox)sender).Password;
+            }
+        }
+
+        private void ConfirmPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                ViewModel.ConfirmPassword = ((PasswordBox)sender).Password;
+            }
         }
     }
 }

@@ -38,11 +38,11 @@
                 </Border>
 
                 <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <PasswordBox Password="{Binding Password, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                    <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="PasswordBox_PasswordChanged" Margin="0,0,0,0"/>
                 </Border>
 
                 <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
-                    <PasswordBox Password="{Binding ConfirmPassword, Mode=TwoWay}" Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,0,0"/>
+                    <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}" PasswordChanged="ConfirmPasswordBox_PasswordChanged" Margin="0,0,0,0"/>
                 </Border>
 
                 <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -62,7 +62,7 @@
                 </Border>
 
                 <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Cancel" Command="{Binding CancelCommand}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0" Width="80"/>
+                    <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0" Width="80"/>
                     <Button Content="Register" Command="{Binding RegisterCommand}" Style="{StaticResource BaseButtonStyle}" Width="80"/>
                 </StackPanel>
             </Grid>
