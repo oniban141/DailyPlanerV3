@@ -24,7 +24,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- ============ Левая панель (серо-синяя, как сайдбар референса) ============ -->
-        <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}" CornerRadius="0,28,28,0" Margin="0,16,0,16">
+        <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}" CornerRadius="0,28,28,0">
             <StackPanel VerticalAlignment="Center" Margin="48,40">
                 <!-- Логотип -->
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,48">
