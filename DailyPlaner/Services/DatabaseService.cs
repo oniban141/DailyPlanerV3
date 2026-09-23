@@ -63,12 +63,49 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
+                    EnsureTasksConstraints(connection);
                     return true;
                 }
                 catch (SqlException ex)
                 {
                     throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
                 }
+            }
+        }
+
+        private void EnsureTasksConstraints(SqlConnection connection)
+        {
+            try
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = @"
+IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Priority')
+    ALTER TABLE dbo.Tasks DROP CONSTRAINT CHK_Tasks_Priority;
+IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Status')
+    ALTER TABLE dbo.Tasks DROP CONSTRAINT CHK_Tasks_Status;
+UPDATE Tasks
+SET Priority = CASE Priority
+    WHEN '1' THEN N'Низкий'
+    WHEN '2' THEN N'Средний'
+    WHEN '3' THEN N'Высокий'
+    ELSE Priority
+END
+WHERE Priority IN ('1', '2', '3');
+UPDATE Tasks
+SET Status = CASE
+    WHEN Status LIKE N'%ыполнен%' OR Status LIKE N'Completed%' OR Status LIKE N'Done%' OR Status LIKE N'Готово%' THEN N'Выполнена'
+    ELSE N'Ожидает'
+END
+WHERE Status IS NULL OR Status NOT IN (N'Ожидает', N'Выполнена');
+ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Priority CHECK (Priority IN (N'Низкий', N'Средний', N'Высокий'));
+ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожидает', N'Выполнена'));";
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Constraints check warning: {ex.Message}");
             }
         }
 
