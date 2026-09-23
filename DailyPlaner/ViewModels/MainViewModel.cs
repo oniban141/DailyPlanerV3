@@ -18,6 +18,7 @@ namespace DailyPlaner.ViewModels
     {
         private readonly DatabaseService _databaseService;
         private readonly NotificationService _notificationService;
+        private ReminderScheduler _reminderScheduler;
         private User _currentUser;
         private ObservableCollection<Models.Task> _tasks;
         private ObservableCollection<Event> _events;
@@ -43,6 +44,7 @@ namespace DailyPlaner.ViewModels
                 if (_currentUser != null)
                 {
                     LoadUserData();
+                    StartReminderScheduler();
                 }
             }
         }
@@ -173,7 +175,6 @@ namespace DailyPlaner.ViewModels
         public ICommand SearchCommand { get; }
         public ICommand ClearSearchCommand { get; }
         public ICommand ToggleThemeCommand { get; }
-        public ICommand OpenSettingsCommand { get; }
         public ICommand ExportToJsonCommand { get; }
         public ICommand ImportFromJsonCommand { get; }
         public ICommand ExportToCsvCommand { get; }
@@ -203,7 +204,6 @@ namespace DailyPlaner.ViewModels
             SearchCommand = new RelayCommand(ExecuteSearch);
             ClearSearchCommand = new RelayCommand(ExecuteClearSearch);
             ToggleThemeCommand = new RelayCommand(ExecuteToggleTheme);
-            OpenSettingsCommand = new RelayCommand(ExecuteOpenSettings);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
             ExportToCsvCommand = new RelayCommand(ExecuteExportToCsv);
@@ -211,6 +211,15 @@ namespace DailyPlaner.ViewModels
             LogoutCommand = new RelayCommand(ExecuteLogout);
 
             LoadTags();
+        }
+
+        private void StartReminderScheduler()
+        {
+            if (_reminderScheduler == null)
+            {
+                _reminderScheduler = new ReminderScheduler();
+            }
+            _reminderScheduler.Start();
         }
 
         private void LoadUserData()
@@ -278,6 +287,18 @@ namespace DailyPlaner.ViewModels
                 bool result = _databaseService.CreateTask(task);
                 if (result)
                 {
+                    if (dialog.ReminderEnabled && dialog.ReminderTime.HasValue)
+                    {
+                        var reminder = new Reminder
+                        {
+                            UserId = CurrentUser.Id,
+                            TaskId = task.Id,
+                            ReminderDate = dialog.ReminderTime.Value,
+                            Message = $"Задача '{task.Title}' — срок {dialog.TaskDueDate:dd.MM.yyyy HH:mm}",
+                            IsShown = true
+                        };
+                        _databaseService.CreateReminder(reminder);
+                    }
                     LoadUserData();
                     _notificationService.ShowNotification("Задача создана", $"Задача '{task.Title}' успешно добавлена");
                 }
@@ -384,6 +405,18 @@ namespace DailyPlaner.ViewModels
                 bool result = _databaseService.CreateEvent(ev);
                 if (result)
                 {
+                    if (dialog.ReminderEnabled && dialog.ReminderTime.HasValue)
+                    {
+                        var reminder = new Reminder
+                        {
+                            UserId = CurrentUser.Id,
+                            TaskId = 0,
+                            ReminderDate = dialog.ReminderTime.Value,
+                            Message = $"Событие '{ev.Title}' — начало {dialog.EventStart:dd.MM.yyyy HH:mm}" + (string.IsNullOrWhiteSpace(ev.Location) ? "" : $", место: {ev.Location}"),
+                            IsShown = true
+                        };
+                        _databaseService.CreateReminder(reminder);
+                    }
                     LoadUserData();
                     _notificationService.ShowNotification("Событие создано", $"Событие '{ev.Title}' успешно добавлено");
                 }
@@ -566,14 +599,6 @@ namespace DailyPlaner.ViewModels
         {
             IsDarkTheme = !IsDarkTheme;
             App.ApplyTheme(IsDarkTheme);
-        }
-
-        private void ExecuteOpenSettings(object parameter)
-        {
-            var dialog = new Views.Dialogs.SettingsDialog(IsDarkTheme, App.LoadAutoStartSetting());
-            dialog.Owner = Application.Current.MainWindow;
-            dialog.ShowDialog();
-            IsDarkTheme = dialog.IsDarkThemeRequested;
         }
 
         private void ExecuteExportToJson(object parameter)

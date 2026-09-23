@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DailyPlaner.Views"
         xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
         mc:Ignorable="d"
-        Title="Регистрация" Height="640" Width="440" WindowStartupLocation="CenterScreen">
+        Title="Регистрация" Height="760" Width="440" WindowStartupLocation="CenterScreen" MinHeight="720">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -79,9 +79,15 @@
                     </Border>
 
                     <TextBlock Text="Пол" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
-                    <ComboBox ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}"
-                              DisplayMemberPath="Name" SelectedValuePath="Id"
-                              Style="{StaticResource BaseComboBoxStyle}" Margin="0,0,0,22"/>
+                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,22">
+                        <Grid>
+                            <ComboBox x:Name="GenderComboBox" ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}"
+                                      DisplayMemberPath="Name" SelectedValuePath="Id"
+                                      Style="{StaticResource BaseComboBoxStyle}" Background="Transparent"/>
+                            <TextBlock x:Name="GenderWatermark" Text="Выберите пол" IsHitTestVisible="False"
+                                       Foreground="{StaticResource MutedTextBrush}" Margin="14,0,0,0" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
 
                     <Grid>
                         <Grid.ColumnDefinitions>

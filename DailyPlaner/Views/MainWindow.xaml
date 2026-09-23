@@ -52,10 +52,12 @@
 
                     <Border Background="#5B6F92" Height="1" Margin="20,14,20,14" CornerRadius="1"/>
 
-                    <Button Content="⚙   Настройки" Command="{Binding OpenSettingsCommand}"
-                            Style="{StaticResource SidebarButtonStyle}"/>
                     <Button Content="🙃   Сменить тему" Command="{Binding ToggleThemeCommand}"
                             Style="{StaticResource SidebarButtonStyle}"/>
+                    <CheckBox x:Name="AutoStartSidebarCheckBox" Content="🔁   Автозапуск"
+                              Foreground="#EFE6DA" FontFamily="Segoe UI" FontSize="14"
+                              Checked="AutoStartSidebar_Changed" Unchecked="AutoStartSidebar_Changed"
+                              Margin="20,6,20,6"/>
                 </StackPanel>
 
                 <!-- Профиль / выход -->
@@ -258,7 +260,7 @@
                 </StackPanel>
 
                 <ListView Grid.Row="1" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}"
-                          Style="{StaticResource BaseListViewStyle}">
+                          Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="TasksList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -316,7 +318,7 @@
                 </StackPanel>
 
                 <ListView Grid.Row="1" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}"
-                          Style="{StaticResource BaseListViewStyle}">
+                          Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="EventsList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -377,7 +379,7 @@
                 </StackPanel>
 
                 <ListView Grid.Row="1" ItemsSource="{Binding Notes}" SelectedItem="{Binding SelectedNote}"
-                          Style="{StaticResource BaseListViewStyle}">
+                          Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="NotesList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -407,23 +409,69 @@
 
             <!-- ================= PAGE: КАЛЕНДАРЬ ================= -->
             <Grid x:Name="CalendarPage" Grid.Row="2" Visibility="Collapsed">
-                <Border Style="{StaticResource CardStyle}" Margin="0,10,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,10,16,10" Width="300">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Orientation="Horizontal">
-                            <TextBlock Text="Календарь" Style="{StaticResource SectionTitleStyle}" Margin="0,0,16,0"/>
-                            <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Padding="10,3">
-                                <TextBlock Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM'}"
-                                           Foreground="#FFFFFF" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"/>
-                            </Border>
-                        </StackPanel>
-                        <Calendar Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12"
+                        <TextBlock Grid.Row="0" Text="Календарь" Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
+                        <Calendar Grid.Row="1" x:Name="MainCalendar" HorizontalAlignment="Center" VerticalAlignment="Top"
                                   SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                                   Background="{DynamicResource LightCardBrush}"
                                   BorderBrush="Transparent" BorderThickness="0"/>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,10,0,10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}"
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,12"/>
+
+                        <TextBlock Grid.Row="1" Text="События на этот день" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,6"/>
+                        <ListView Grid.Row="2" x:Name="DayEventsList" Style="{StaticResource BaseListViewStyle}"
+                                  MouseDoubleClick="DayItem_MouseDoubleClick">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8" Padding="12">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="🕰" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding StartDate, StringFormat='HH:mm'}" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding Title}" Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <TextBlock Grid.Row="3" Text="Задачи на этот день" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,6"/>
+                        <ListView Grid.Row="4" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
+                                  MouseDoubleClick="DayItem_MouseDoubleClick">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8" Padding="12">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="📋" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding DueDate, StringFormat='HH:mm'}" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding Title}" Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </Grid>
                 </Border>
             </Grid>
