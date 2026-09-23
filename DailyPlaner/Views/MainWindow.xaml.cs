@@ -19,13 +19,12 @@ namespace DailyPlaner
 {
     public partial class MainWindow : Window
     {
-        private System.Windows.Forms.NotifyIcon _trayIcon;
+        public bool AllowClose { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainViewModel();
-            SetupTrayIcon();
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
             Loaded += (s, e) => RefreshDayLists();
         }
@@ -36,7 +35,6 @@ namespace DailyPlaner
             var viewModel = new MainViewModel();
             DataContext = viewModel;
             viewModel.CurrentUser = user;
-            SetupTrayIcon();
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
             viewModel.PropertyChanged += (s, e) =>
             {
@@ -173,45 +171,17 @@ namespace DailyPlaner
                 "Подробная информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void SetupTrayIcon()
-        {
-            if (_trayIcon != null)
-            {
-                return;
-            }
-            _trayIcon = new System.Windows.Forms.NotifyIcon
-            {
-                Text = "Ежедневник",
-                Visible = true,
-                Icon = System.Drawing.SystemIcons.Application
-            };
-            _trayIcon.DoubleClick += (s, e) => RestoreFromTray();
-        }
-
-        private void RestoreFromTray()
-        {
-            Show();
-            WindowState = WindowState.Normal;
-            Activate();
-        }
-
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            if (_trayIcon != null)
+            if (!AllowClose && !App.IsExiting)
             {
-                _trayIcon.Dispose();
-                _trayIcon = null;
+                e.Cancel = true;
+                Hide();
+                App.TrayIcon?.ShowBalloonTip(3000, "Ежедневник",
+                    "Приложение свернуто в трей и продолжает работу. Дважды щёлкните по значку, чтобы открыть.",
+                    System.Windows.Forms.ToolTipIcon.Info);
             }
             base.OnClosing(e);
-        }
-
-        protected override void OnStateChanged(EventArgs e)
-        {
-            if (WindowState == WindowState.Minimized)
-            {
-                Hide();
-            }
-            base.OnStateChanged(e);
         }
     }
 }
