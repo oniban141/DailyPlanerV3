@@ -152,6 +152,9 @@ namespace DailyPlaner
             var card = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#4B607F" : "#FDFBF8"));
             var border = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#4B607F" : "#DCc9b6"));
             var subtle = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#3D4F6B" : "#F5F0E8"));
+            var sidebar = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#2E3949" : "#4B607F"));
+            var inputBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#3D4F6B" : "#F5F0E8"));
+            var mutedText = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#B9C2D4" : "#8B93A3"));
 
             if (resources.Contains("WindowBackgroundBrush"))
             {
@@ -167,6 +170,21 @@ namespace DailyPlaner
                 resources["LightForegroundBrush"] = foreground;
                 resources["LightCardBrush"] = card;
                 resources["LightBorderBrush"] = border;
+            }
+
+            if (resources.Contains("SecondaryBrush"))
+            {
+                resources["SecondaryBrush"] = sidebar;
+            }
+
+            if (resources.Contains("SoftBeigeBrush"))
+            {
+                resources["SoftBeigeBrush"] = inputBackground;
+            }
+
+            if (resources.Contains("MutedTextBrush"))
+            {
+                resources["MutedTextBrush"] = mutedText;
             }
         }
 

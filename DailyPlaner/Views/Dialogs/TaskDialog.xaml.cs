@@ -13,12 +13,22 @@ namespace DailyPlaner.Views.Dialogs
         public DateTime TaskDueDate { get; private set; }
         public bool ReminderEnabled => ReminderCheckBox.IsChecked == true;
         public DateTime? ReminderTime { get; private set; }
+        public string TaskPriority { get; private set; }
 
         public TaskDialog(string title, string description, DateTime dueDate)
+            : this(title, description, dueDate, "Средний")
+        {
+        }
+
+        public TaskDialog(string title, string description, DateTime dueDate, string priority)
         {
             InitializeComponent();
 
             TaskDueDate = dueDate;
+            var priorityItems = new[] { "Низкий", "Средний", "Высокий" };
+            PriorityComboBox.ItemsSource = priorityItems;
+            int priorityIndex = Array.IndexOf(priorityItems, string.IsNullOrWhiteSpace(priority) ? "Средний" : priority);
+            PriorityComboBox.SelectedIndex = priorityIndex >= 0 ? priorityIndex : 1;
             FillTimeItems(dueDate);
             DueDatePicker.SelectedDate = dueDate.Date;
             SelectTime(dueDate.TimeOfDay);
@@ -120,6 +130,7 @@ namespace DailyPlaner.Views.Dialogs
             }
 
             TaskDueDate = GetDueDateFromControls();
+            TaskPriority = PriorityComboBox.SelectedItem?.ToString() ?? "Средний";
 
             if (ReminderEnabled)
             {

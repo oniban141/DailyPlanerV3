@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -281,7 +281,7 @@ namespace DailyPlaner.ViewModels
                     Description = dialog.TaskDescription,
                     DueDate = dialog.TaskDueDate,
                     IsCompleted = false,
-                    Priority = 1
+                    Priority = dialog.TaskPriority
                 };
 
                 bool result = _databaseService.CreateTask(task);
@@ -318,7 +318,7 @@ namespace DailyPlaner.ViewModels
                     return;
                 }
 
-                var dialog = new Views.Dialogs.TaskDialog(SelectedTask.Title, SelectedTask.Description, SelectedTask.DueDate);
+                var dialog = new Views.Dialogs.TaskDialog(SelectedTask.Title, SelectedTask.Description, SelectedTask.DueDate, SelectedTask.Priority);
                 dialog.Owner = Application.Current.MainWindow;
                 if (dialog.ShowDialog() != true)
                 {
@@ -328,6 +328,7 @@ namespace DailyPlaner.ViewModels
                 SelectedTask.Title = dialog.TaskTitle;
                 SelectedTask.Description = dialog.TaskDescription;
                 SelectedTask.DueDate = dialog.TaskDueDate;
+                SelectedTask.Priority = dialog.TaskPriority;
 
                 bool result = _databaseService.UpdateTask(SelectedTask);
                 if (result)
@@ -407,15 +408,8 @@ namespace DailyPlaner.ViewModels
                 {
                     if (dialog.ReminderEnabled && dialog.ReminderTime.HasValue)
                     {
-                        var reminder = new Reminder
-                        {
-                            UserId = CurrentUser.Id,
-                            TaskId = 0,
-                            ReminderDate = dialog.ReminderTime.Value,
-                            Message = $"Событие '{ev.Title}' — начало {dialog.EventStart:dd.MM.yyyy HH:mm}" + (string.IsNullOrWhiteSpace(ev.Location) ? "" : $", место: {ev.Location}"),
-                            IsShown = true
-                        };
-                        _databaseService.CreateReminder(reminder);
+                        string message = $"Событие '{ev.Title}' — начало {dialog.EventStart:dd.MM.yyyy HH:mm}" + (string.IsNullOrWhiteSpace(ev.Location) ? "" : $", место: {ev.Location}");
+                        _notificationService.ScheduleNotification("Напоминание", message, dialog.ReminderTime.Value);
                     }
                     LoadUserData();
                     _notificationService.ShowNotification("Событие создано", $"Событие '{ev.Title}' успешно добавлено");
@@ -721,10 +715,32 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
+                _reminderScheduler?.Stop();
                 CurrentUser = null;
                 Tasks.Clear();
                 Events.Clear();
                 Notes.Clear();
+
+                var loginPage = new Views.LoginWindow();
+                var loginHost = new System.Windows.Navigation.NavigationWindow
+                {
+                    Content = loginPage,
+                    ShowsNavigationUI = false,
+                    Title = "Ежедневник — вход",
+                    Width = 1000,
+                    Height = 650,
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen
+                };
+                loginHost.Show();
+                Application.Current.MainWindow = loginHost;
+
+                foreach (System.Windows.Window window in Application.Current.Windows)
+                {
+                    if (window != loginHost)
+                    {
+                        window.Close();
+                    }
+                }
             }
             catch (Exception ex)
             {
