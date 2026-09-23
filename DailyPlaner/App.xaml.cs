@@ -121,8 +121,13 @@ namespace DailyPlaner
                 {
                     SetThemeBrushes(dict, isDark);
                 }
-                foreach (var window in Current.Windows)
+                foreach (var windowObject in Current.Windows)
                 {
+                    var window = windowObject as Window;
+                    if (window == null)
+                    {
+                        continue;
+                    }
                     SetThemeBrushes(window.Resources, isDark);
                     foreach (var dict in window.Resources.MergedDictionaries)
                     {
