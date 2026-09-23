@@ -1,0 +1,32 @@
+[
+  {
+    "Id": 0,
+    "UserId": 0,
+    "Title": "Купить продукты",
+    "Description": "Молоко, хлеб, яйца, овощи",
+    "DueDate": "2026-09-25T18:00:00",
+    "Status": "Ожидает",
+    "Priority": "Средний",
+    "IsCompleted": false
+  },
+  {
+    "Id": 0,
+    "UserId": 0,
+    "Title": "Сдать отчёт",
+    "Description": "Подготовить квартальный отчёт и отправить руководителю",
+    "DueDate": "2026-09-26T14:30:00",
+    "Status": "Ожидает",
+    "Priority": "Высокий",
+    "IsCompleted": false
+  },
+  {
+    "Id": 0,
+    "UserId": 0,
+    "Title": "Прочитать главу книги",
+    "Description": "Глава 5, 30 страниц",
+    "DueDate": "2026-09-27T21:00:00",
+    "Status": "Ожидает",
+    "Priority": "Низкий",
+    "IsCompleted": false
+  }
+]

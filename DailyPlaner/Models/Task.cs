@@ -15,7 +15,7 @@ namespace DailyPlaner.Models
         public string Description { get; set; }
         public DateTime DueDate { get; set; }
         public string Status { get; set; }
-        public int Priority { get; set; }
+        public string Priority { get; set; } = "Средний";
         public bool IsCompleted
         {
             get => Status == "Выполнена" || Status == "Completed";

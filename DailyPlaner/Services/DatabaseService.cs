@@ -342,7 +342,7 @@ namespace DailyPlaner.Services
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     DueDate = reader["DueDate"] != DBNull.Value ? Convert.ToDateTime(reader["DueDate"]) : DateTime.Today,
                                     Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
-                                    Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
+                                    Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
                                 };
                                 tasks.Add(task);
                             }
@@ -381,7 +381,7 @@ namespace DailyPlaner.Services
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     DueDate = Convert.ToDateTime(reader["DueDate"]),
                                     Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
-                                    Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
+                                    Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
                                 };
                                 tasks.Add(task);
                             }
@@ -420,7 +420,7 @@ namespace DailyPlaner.Services
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     DueDate = Convert.ToDateTime(reader["DueDate"]),
                                     Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
-                                    Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
+                                    Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
                                 };
                             }
                         }
@@ -449,7 +449,7 @@ namespace DailyPlaner.Services
                         command.Parameters.AddWithValue("@Title", task.Title);
                         command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                        command.Parameters.AddWithValue("@Priority", task.Priority.ToString());
+                        command.Parameters.AddWithValue("@Priority", (object)task.Priority ?? "Средний");
                         command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
                         var scalar = command.ExecuteScalar();
                         if (scalar != null && int.TryParse(scalar.ToString(), out int newId))
@@ -484,7 +484,7 @@ namespace DailyPlaner.Services
                         command.Parameters.AddWithValue("@Title", task.Title);
                         command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                        command.Parameters.AddWithValue("@Priority", task.Priority.ToString());
+                        command.Parameters.AddWithValue("@Priority", (object)task.Priority ?? "Средний");
                         command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
                         int result = command.ExecuteNonQuery();
                         return result > 0;

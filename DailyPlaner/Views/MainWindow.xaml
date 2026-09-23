@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- ================= SIDEBAR ================= -->
-        <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}"
+        <Border Grid.Column="0" Background="{DynamicResource SecondaryBrush}"
                 CornerRadius="0,24,24,0" Margin="0,12,0,12">
             <Grid>
                 <Grid.RowDefinitions>
@@ -118,7 +118,7 @@
             <!-- Toolbar -->
             <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
                 <StackPanel Orientation="Horizontal">
-                    <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,10,0" Width="260">
+                    <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,10,0" Width="260">
                         <Grid>
                             <TextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource WatermarkTextBoxStyle}" Tag="🔍  Поиск..."
@@ -172,7 +172,7 @@
                             <StackPanel>
                                 <TextBlock Text="Выполнено задач" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,6"/>
                                 <TextBlock Text="{Binding CompletedTasksCount}" Style="{StaticResource PageTitleStyle}"
-                                           FontSize="34" Foreground="{StaticResource SecondaryBrush}"/>
+                                           FontSize="34" Foreground="{DynamicResource SecondaryBrush}"/>
                             </StackPanel>
                         </Border>
                         <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="10,0,10,10">
@@ -209,12 +209,12 @@
                                                     <ColumnDefinition Width="6"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}"
+                                                <Border Grid.Column="0" Background="{DynamicResource SecondaryBrush}"
                                                         CornerRadius="14,0,0,14"/>
                                                 <StackPanel Grid.Column="1" Margin="16,12,16,12">
                                                     <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                                        <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                                        <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
                                                                 Padding="8,3" Margin="0,0,8,0">
                                                             <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="🕰 " Style="{StaticResource MutedTextBlockStyle}"/>
@@ -222,7 +222,7 @@
                                                                            Style="{StaticResource MutedTextBlockStyle}"/>
                                                             </StackPanel>
                                                         </Border>
-                                                        <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                                        <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
                                                                 Padding="8,3">
                                                             <StackPanel Orientation="Horizontal">
                                                                 <TextBlock Text="📍 " Style="{StaticResource MutedTextBlockStyle}"/>
@@ -274,10 +274,10 @@
                                     <StackPanel Grid.Column="1" Margin="16,12,16,12">
                                         <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                         <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}"
-                                                   Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0"
                                                    TextWrapping="Wrap"/>
                                         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                            <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                            <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
                                                     Padding="8,3" Margin="0,0,8,0">
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="📅 " Style="{StaticResource MutedTextBlockStyle}"/>
@@ -285,7 +285,7 @@
                                                                Style="{StaticResource MutedTextBlockStyle}"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                            <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
                                                     Padding="8,3">
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="⚡ " Style="{StaticResource MutedTextBlockStyle}"/>
@@ -327,15 +327,15 @@
                                         <ColumnDefinition Width="6"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}"
+                                    <Border Grid.Column="0" Background="{DynamicResource SecondaryBrush}"
                                             CornerRadius="14,0,0,14"/>
                                     <StackPanel Grid.Column="1" Margin="16,12,16,12">
                                         <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                         <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}"
-                                                   Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0"
                                                    TextWrapping="Wrap"/>
                                         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                            <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                            <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
                                                     Padding="8,3" Margin="0,0,8,0">
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="🕰 " Style="{StaticResource MutedTextBlockStyle}"/>
@@ -346,7 +346,7 @@
                                                                Style="{StaticResource MutedTextBlockStyle}"/>
                                                 </StackPanel>
                                             </Border>
-                                            <Border Background="{StaticResource SoftBeigeBrush}" CornerRadius="8"
+                                            <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
                                                     Padding="8,3">
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="📍 " Style="{StaticResource MutedTextBlockStyle}"/>
@@ -392,7 +392,7 @@
                                     <StackPanel Grid.Column="1" Margin="16,12,16,12">
                                         <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
                                         <TextBlock Text="{Binding Content}" Style="{StaticResource BaseTextBlockStyle}"
-                                                   Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0"
                                                    TextWrapping="Wrap"/>
                                         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                             <TextBlock Text="✍ Создано: " Style="{StaticResource MutedTextBlockStyle}"/>
