@@ -30,8 +30,15 @@ namespace DailyPlaner.Services
             return "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
         }
 
-        public static string GetFriendlyDatabaseError(SqlException ex)
+        public static string GetFriendlyDatabaseError(Exception exception)
         {
+            var sqlEx = exception as SqlException;
+            if (sqlEx == null)
+            {
+                return $"Ошибка базы данных: {exception.Message}";
+            }
+
+            var ex = sqlEx;
             switch (ex.Number)
             {
                 case -1:
