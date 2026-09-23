@@ -19,6 +19,7 @@ namespace DailyPlaner.Views.Dialogs
         {
             InitializeComponent();
 
+            EventStart = start;
             FillTimeItems(start);
             StartDatePicker.SelectedDate = start.Date;
             SelectTime(start.TimeOfDay);
@@ -78,15 +79,37 @@ namespace DailyPlaner.Views.Dialogs
             }
         }
 
+        private DateTime GetStartFromControls()
+        {
+            var date = StartDatePicker.SelectedDate ?? DateTime.Today;
+            var time = TimeSpan.Zero;
+            if (TimeComboBox.SelectedItem != null && TimeSpan.TryParse(TimeComboBox.SelectedItem.ToString(), out var parsed))
+            {
+                time = parsed;
+            }
+            return date.Date + time;
+        }
+
         private void UpdateReminderTime()
         {
+            ReminderTime = null;
+            if (ReminderCheckBox.IsChecked != true)
+            {
+                return;
+            }
+
             int index = ReminderOffsetComboBox.SelectedIndex;
             if (index < 0 || index >= ReminderOffsetMinutes.Length)
             {
-                ReminderTime = null;
                 return;
             }
-            ReminderTime = EventStart.AddMinutes(-ReminderOffsetMinutes[index]);
+
+            var start = GetStartFromControls();
+            if (start < DateTime.MinValue.AddMinutes(ReminderOffsetMinutes[index]))
+            {
+                return;
+            }
+            ReminderTime = start.AddMinutes(-ReminderOffsetMinutes[index]);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -98,13 +121,7 @@ namespace DailyPlaner.Views.Dialogs
                 return;
             }
 
-            var date = StartDatePicker.SelectedDate ?? DateTime.Today;
-            var time = TimeSpan.Zero;
-            if (TimeComboBox.SelectedItem != null && TimeSpan.TryParse(TimeComboBox.SelectedItem.ToString(), out var parsed))
-            {
-                time = parsed;
-            }
-            EventStart = date.Date + time;
+            EventStart = GetStartFromControls();
 
             if (ReminderEnabled)
             {

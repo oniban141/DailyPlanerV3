@@ -18,6 +18,7 @@ namespace DailyPlaner.Views.Dialogs
         {
             InitializeComponent();
 
+            TaskDueDate = dueDate;
             FillTimeItems(dueDate);
             DueDatePicker.SelectedDate = dueDate.Date;
             SelectTime(dueDate.TimeOfDay);
@@ -76,15 +77,37 @@ namespace DailyPlaner.Views.Dialogs
             }
         }
 
+        private DateTime GetDueDateFromControls()
+        {
+            var date = DueDatePicker.SelectedDate ?? DateTime.Today;
+            var time = TimeSpan.Zero;
+            if (TimeComboBox.SelectedItem != null && TimeSpan.TryParse(TimeComboBox.SelectedItem.ToString(), out var parsed))
+            {
+                time = parsed;
+            }
+            return date.Date + time;
+        }
+
         private void UpdateReminderTime()
         {
+            ReminderTime = null;
+            if (ReminderCheckBox.IsChecked != true)
+            {
+                return;
+            }
+
             int index = ReminderOffsetComboBox.SelectedIndex;
             if (index < 0 || index >= ReminderOffsetMinutes.Length)
             {
-                ReminderTime = null;
                 return;
             }
-            ReminderTime = TaskDueDate.AddMinutes(-ReminderOffsetMinutes[index]);
+
+            var dueDate = GetDueDateFromControls();
+            if (dueDate < DateTime.MinValue.AddMinutes(ReminderOffsetMinutes[index]))
+            {
+                return;
+            }
+            ReminderTime = dueDate.AddMinutes(-ReminderOffsetMinutes[index]);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -96,13 +119,7 @@ namespace DailyPlaner.Views.Dialogs
                 return;
             }
 
-            var date = DueDatePicker.SelectedDate ?? DateTime.Today;
-            var time = TimeSpan.Zero;
-            if (TimeComboBox.SelectedItem != null && TimeSpan.TryParse(TimeComboBox.SelectedItem.ToString(), out var parsed))
-            {
-                time = parsed;
-            }
-            TaskDueDate = date.Date + time;
+            TaskDueDate = GetDueDateFromControls();
 
             if (ReminderEnabled)
             {
