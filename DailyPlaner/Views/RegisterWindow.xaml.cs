@@ -24,6 +24,17 @@ namespace DailyPlaner.Views
         {
             InitializeComponent();
             DataContext = new RegisterViewModel(new Services.DatabaseService());
+            GenderComboBox.SelectionChanged += GenderComboBox_SelectionChanged;
+        }
+
+        private void GenderComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (GenderWatermark != null)
+            {
+                GenderWatermark.Visibility = GenderComboBox.SelectedItem != null
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
+            }
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
