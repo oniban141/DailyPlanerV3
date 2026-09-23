@@ -116,11 +116,39 @@ namespace DailyPlaner.ViewModels
             LoadGenders();
         }
 
+        private static string LocalizeGender(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+            var lowered = name.Trim().ToLowerInvariant();
+            if (lowered == "male" || lowered == "мужской" || lowered == "м" || lowered == "мужчина")
+            {
+                return "Мужской";
+            }
+            if (lowered == "female" || lowered == "женский" || lowered == "ж" || lowered == "женщина")
+            {
+                return "Женский";
+            }
+            return name.Trim();
+        }
+
         private void LoadGenders()
         {
             try
             {
-                Genders = _databaseService.GetAllGenders();
+                var allGenders = _databaseService.GetAllGenders();
+                Genders = allGenders
+                    .Where(g => g.Name != null &&
+                                g.Name.Trim().ToLowerInvariant() != "other" &&
+                                g.Name.Trim().ToLowerInvariant() != "другое")
+                    .Select(g =>
+                    {
+                        g.Name = LocalizeGender(g.Name);
+                        return g;
+                    })
+                    .ToList();
                 if (Genders.Count > 0)
                 {
                     SelectedGenderId = Genders[0].Id;

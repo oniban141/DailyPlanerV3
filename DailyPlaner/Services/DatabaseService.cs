@@ -333,7 +333,7 @@ namespace DailyPlaner.Services
                                     UserId = Convert.ToInt32(reader["UserId"]),
                                     Title = reader["Title"].ToString(),
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    DueDate = Convert.ToDateTime(reader["DueDate"]),
+                                    DueDate = reader["DueDate"] != DBNull.Value ? Convert.ToDateTime(reader["DueDate"]) : DateTime.Today,
                                     Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
                                     Priority = int.TryParse(reader["Priority"]?.ToString(), out int taskPriority) ? taskPriority : 1
                                 };
@@ -435,7 +435,7 @@ namespace DailyPlaner.Services
                 {
                     connection.Open();
                     string query = "INSERT INTO Tasks (UserId, Title, Description, DueDate, Priority, Status) " +
-                                   "VALUES (@UserId, @Title, @Description, @DueDate, @Priority, @Status)";
+                                   "VALUES (@UserId, @Title, @Description, @DueDate, @Priority, @Status); SELECT CAST(SCOPE_IDENTITY() AS INT);";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserId", task.UserId);
@@ -444,13 +444,17 @@ namespace DailyPlaner.Services
                         command.Parameters.AddWithValue("@DueDate", task.DueDate);
                         command.Parameters.AddWithValue("@Priority", task.Priority.ToString());
                         command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
+                        var scalar = command.ExecuteScalar();
+                        if (scalar != null && int.TryParse(scalar.ToString(), out int newId))
+                        {
+                            task.Id = newId;
+                        }
+                        return true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     return false;
                 }
             }
@@ -650,7 +654,7 @@ namespace DailyPlaner.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     return false;
                 }
             }
@@ -842,7 +846,7 @@ namespace DailyPlaner.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     return false;
                 }
             }
@@ -1139,7 +1143,7 @@ namespace DailyPlaner.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     return false;
                 }
             }
