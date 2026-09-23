@@ -15,6 +15,8 @@ namespace DailyPlaner
     public partial class App : Application
     {
         public static bool IsDarkTheme { get; private set; }
+        public static bool IsExiting { get; private set; }
+        public static System.Windows.Forms.NotifyIcon TrayIcon { get; private set; }
 
         private const string SettingsRegistryKey = "SOFTWARE\\DailyPlanner";
         private const string AutoStartRegistryKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
@@ -24,9 +26,62 @@ namespace DailyPlaner
         {
             base.OnStartup(e);
             
+            SetupTrayIcon();
             ApplyTheme(LoadDarkThemeSetting());
             CheckAndCreateDatabase();
             SetAutoStart(LoadAutoStartSetting());
+        }
+
+        private void SetupTrayIcon()
+        {
+            if (TrayIcon != null)
+            {
+                return;
+            }
+            var menu = new System.Windows.Forms.ContextMenuStrip();
+            menu.Items.Add("Открыть", null, (s, args) => RestoreFromTray());
+            menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
+            menu.Items.Add("Выход", null, (s, args) => ExitApp());
+            TrayIcon = new System.Windows.Forms.NotifyIcon
+            {
+                Text = "Ежедневник",
+                Icon = System.Drawing.SystemIcons.Application,
+                ContextMenuStrip = menu,
+                Visible = true
+            };
+            TrayIcon.DoubleClick += (s, args) => RestoreFromTray();
+        }
+
+        public static void RestoreFromTray()
+        {
+            var window = Current.MainWindow;
+            if (window == null)
+            {
+                return;
+            }
+            window.Show();
+            if (window.WindowState == WindowState.Minimized)
+            {
+                window.WindowState = WindowState.Normal;
+            }
+            window.Activate();
+        }
+
+        public static void ExitApp()
+        {
+            IsExiting = true;
+            Current.Shutdown();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            if (TrayIcon != null)
+            {
+                TrayIcon.Visible = false;
+                TrayIcon.Dispose();
+                TrayIcon = null;
+            }
+            base.OnExit(e);
         }
 
         public static bool LoadDarkThemeSetting()

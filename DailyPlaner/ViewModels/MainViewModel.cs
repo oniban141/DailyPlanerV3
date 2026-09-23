@@ -738,6 +738,10 @@ namespace DailyPlaner.ViewModels
                 {
                     if (window != loginHost)
                     {
+                        if (window is MainWindow mainWindow)
+                        {
+                            mainWindow.AllowClose = true;
+                        }
                         window.Close();
                     }
                 }
