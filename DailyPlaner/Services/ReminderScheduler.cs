@@ -18,13 +18,14 @@ namespace DailyPlaner.Services
             _shownReminderIds = new HashSet<int>();
             _timer = new System.Windows.Threading.DispatcherTimer
             {
-                Interval = TimeSpan.FromMinutes(1)
+                Interval = TimeSpan.FromSeconds(30)
             };
             _timer.Tick += (s, e) => CheckReminders();
         }
 
         public void Start()
         {
+            CheckReminders();
             _timer.Start();
         }
 
@@ -61,6 +62,51 @@ namespace DailyPlaner.Services
             }
             catch (Exception)
             {
+            }
+        }
+
+        public int GetPendingReminderCount()
+        {
+            try
+            {
+                var reminders = _databaseService.GetAllReminders();
+                var now = DateTime.Now;
+                int count = 0;
+                foreach (var reminder in reminders)
+                {
+                    if (reminder != null && reminder.IsShown && !_shownReminderIds.Contains(reminder.Id)
+                        && reminder.ReminderDate > now)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
+
+        public DateTime? GetNextReminderTime()
+        {
+            try
+            {
+                var reminders = _databaseService.GetAllReminders();
+                DateTime? next = null;
+                foreach (var reminder in reminders)
+                {
+                    if (reminder != null && reminder.IsShown && reminder.ReminderDate > DateTime.Now
+                        && (next == null || reminder.ReminderDate < next.Value))
+                    {
+                        next = reminder.ReminderDate;
+                    }
+                }
+                return next;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

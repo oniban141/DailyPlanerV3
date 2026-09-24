@@ -54,6 +54,8 @@
 
                     <Button Content="🙃   Сменить тему" Command="{Binding ToggleThemeCommand}"
                             Style="{StaticResource SidebarButtonStyle}"/>
+                    <Button Content="🔔   Проверить напоминания" Command="{Binding TestNotificationCommand}"
+                            Style="{StaticResource SidebarButtonStyle}"/>
                     <CheckBox x:Name="AutoStartSidebarCheckBox" Content="🔁   Автозапуск"
                               Foreground="#EFE6DA" FontFamily="Segoe UI" FontSize="14"
                               Checked="AutoStartSidebar_Changed" Unchecked="AutoStartSidebar_Changed"
