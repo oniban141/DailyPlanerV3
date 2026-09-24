@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DailyPlaner"
              xmlns:converters="clr-namespace:DailyPlaner.Converters"
-             StartupUri="Views\LoginWindow.xaml">
+            >
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

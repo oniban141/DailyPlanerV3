@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using CsvHelper;
 using Newtonsoft.Json;
 using DailyPlaner.Models;
 using DailyPlaner.Services;
@@ -177,8 +176,6 @@ namespace DailyPlaner.ViewModels
         public ICommand ToggleThemeCommand { get; }
         public ICommand ExportToJsonCommand { get; }
         public ICommand ImportFromJsonCommand { get; }
-        public ICommand ExportToCsvCommand { get; }
-        public ICommand ImportFromCsvCommand { get; }
         public ICommand LogoutCommand { get; }
 
         public MainViewModel()
@@ -206,8 +203,6 @@ namespace DailyPlaner.ViewModels
             ToggleThemeCommand = new RelayCommand(ExecuteToggleTheme);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
-            ExportToCsvCommand = new RelayCommand(ExecuteExportToCsv);
-            ImportFromCsvCommand = new RelayCommand(ExecuteImportFromCsv);
             LogoutCommand = new RelayCommand(ExecuteLogout);
 
             LoadTags();
@@ -346,12 +341,18 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedTask != null && MessageBox.Show("Вы уверены, что хотите удалить эту задачу?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                var task = SelectedTask;
+                if (task != null && MessageBox.Show("Вы уверены, что хотите удалить эту задачу?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    bool result = _databaseService.DeleteTask(SelectedTask.Id);
+                    bool result = _databaseService.DeleteTask(task.Id);
                     if (result)
                     {
                         LoadUserData();
+                        SelectedTask = null;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось удалить задачу. Повторите попытку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
             }
@@ -365,14 +366,17 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                if (SelectedTask != null)
+                var task = SelectedTask;
+                if (task != null)
                 {
-                    SelectedTask.IsCompleted = !SelectedTask.IsCompleted;
-                    bool result = _databaseService.UpdateTask(SelectedTask);
+                    task.IsCompleted = !task.IsCompleted;
+                    bool result = _databaseService.UpdateTask(task);
                     if (result)
                     {
+                        string taskTitle = task.Title;
+                        bool isCompleted = task.IsCompleted;
                         LoadUserData();
-                        _notificationService.ShowNotification("Задача обновлена", $"Задача '{SelectedTask.Title}' отмечена как {(SelectedTask.IsCompleted ? "выполненная" : "невыполненная")}");
+                        _notificationService.ShowNotification("Задача обновлена", $"Задача '{taskTitle}' отмечена как {(isCompleted ? "выполненная" : "невыполненная")}");
                     }
                 }
             }
@@ -600,7 +604,13 @@ namespace DailyPlaner.ViewModels
             try
             {
                 var tasks = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                string json = JsonConvert.SerializeObject(tasks, Formatting.Indented);
+                if (tasks == null || tasks.Count == 0)
+                {
+                    MessageBox.Show("У вас нет задач для экспорта.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                string json = JsonConvert.SerializeObject(tasks, Formatting.Indented,
+                    new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
                 var saveFileDialog = new Microsoft.Win32.SaveFileDialog
                 {
@@ -632,6 +642,11 @@ namespace DailyPlaner.ViewModels
                 if (openFileDialog.ShowDialog() == true)
                 {
                     string json = File.ReadAllText(openFileDialog.FileName);
+                    if (string.IsNullOrWhiteSpace(json))
+                    {
+                        MessageBox.Show("Файл пуст — нечего импортировать.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
                     var tasks = JsonConvert.DeserializeObject<List<Models.Task>>(json);
 
                     if (tasks != null)
@@ -652,66 +667,7 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        private void ExecuteExportToCsv(object parameter)
-        {
-            try
-            {
-                var tasks = _databaseService.GetTasksByUserId(CurrentUser.Id);
-
-                var saveFileDialog = new Microsoft.Win32.SaveFileDialog
-                {
-                    Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
-                    DefaultExt = ".csv"
-                };
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    using (var writer = new StreamWriter(saveFileDialog.FileName))
-                    using (var csv = new CsvWriter(writer, System.Globalization.CultureInfo.CurrentCulture))
-                    {
-                        csv.WriteRecords(tasks);
-                    }
-                    MessageBox.Show("Задачи успешно экспортированы в CSV!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при экспорте в CSV: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ExecuteImportFromCsv(object parameter)
-        {
-            try
-            {
-                var openFileDialog = new Microsoft.Win32.OpenFileDialog
-                {
-                    Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*"
-                };
-
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    using (var reader = new StreamReader(openFileDialog.FileName))
-                    using (var csv = new CsvReader(reader, System.Globalization.CultureInfo.CurrentCulture))
-                    {
-                        var tasks = csv.GetRecords<Models.Task>().ToList();
-                        foreach (var task in tasks)
-                        {
-                            task.UserId = CurrentUser.Id;
-                            _databaseService.CreateTask(task);
-                        }
-                        LoadUserData();
-                        MessageBox.Show("Задачи успешно импортированы из CSV!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при импорте из CSV: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ExecuteLogout(object parameter)
+                        private void ExecuteLogout(object parameter)
         {
             try
             {

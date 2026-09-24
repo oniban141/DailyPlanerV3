@@ -24,6 +24,7 @@ namespace DailyPlaner
         public MainWindow()
         {
             InitializeComponent();
+            App.SetWindowIcon(this);
             DataContext = new MainViewModel();
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
             Loaded += (s, e) => RefreshDayLists();
@@ -32,6 +33,7 @@ namespace DailyPlaner
         public MainWindow(Models.User user)
         {
             InitializeComponent();
+            App.SetWindowIcon(this);
             var viewModel = new MainViewModel();
             DataContext = viewModel;
             viewModel.CurrentUser = user;
