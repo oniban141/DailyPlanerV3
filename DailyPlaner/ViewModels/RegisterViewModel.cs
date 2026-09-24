@@ -149,10 +149,7 @@ namespace DailyPlaner.ViewModels
                         return g;
                     })
                     .ToList();
-                if (Genders.Count > 0)
-                {
-                    SelectedGenderId = Genders[0].Id;
-                }
+                SelectedGenderId = 0;
             }
             catch (Exception ex)
             {
@@ -165,7 +162,8 @@ namespace DailyPlaner.ViewModels
             return !string.IsNullOrWhiteSpace(Username) &&
                    !string.IsNullOrWhiteSpace(Password) &&
                    Password == ConfirmPassword &&
-                   !string.IsNullOrWhiteSpace(Email);
+                   !string.IsNullOrWhiteSpace(Email) &&
+                   SelectedGenderId > 0;
         }
 
         private void ExecuteRegister(object parameter)
@@ -175,6 +173,12 @@ namespace DailyPlaner.ViewModels
                 if (Password.Length < 6)
                 {
                     MessageBox.Show("Пароль должен содержать не менее 6 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (SelectedGenderId <= 0)
+                {
+                    MessageBox.Show("Выберите пол.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 

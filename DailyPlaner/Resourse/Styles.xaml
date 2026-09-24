@@ -93,11 +93,6 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="14"/>
         <Setter Property="Padding" Value="16"/>
-        <Setter Property="Effect">
-            <Setter.Value>
-                <DropShadowEffect BlurRadius="12" ShadowDepth="2" Direction="270" Opacity="0.10" Color="#4B607F"/>
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <!-- ============================================================
@@ -232,7 +227,7 @@
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="Padding" Value="14,9"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CaretBrush" Value="{StaticResource PrimaryBrush}"/>
@@ -269,7 +264,7 @@
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="Padding" Value="14,9"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CaretBrush" Value="{StaticResource PrimaryBrush}"/>
@@ -320,7 +315,7 @@
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="Padding" Value="14,9"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
