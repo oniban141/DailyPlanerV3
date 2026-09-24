@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using System.IO;
 using System.Reflection;
@@ -26,23 +25,11 @@ namespace DailyPlaner
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
+            
             SetupTrayIcon();
             ApplyTheme(LoadDarkThemeSetting());
             CheckAndCreateDatabase();
             SetAutoStart(LoadAutoStartSetting());
-
-            var loginHost = new System.Windows.Navigation.NavigationWindow
-            {
-                Content = new Views.LoginWindow(),
-                ShowsNavigationUI = false,
-                Title = "Ежедневник — вход",
-                Width = 1000,
-                Height = 650,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen
-            };
-            SetWindowIcon(loginHost);
-            loginHost.Show();
         }
 
         private void SetupTrayIcon()
@@ -58,80 +45,11 @@ namespace DailyPlaner
             TrayIcon = new System.Windows.Forms.NotifyIcon
             {
                 Text = "Ежедневник",
-                Icon = LoadTrayIcon(),
+                Icon = System.Drawing.SystemIcons.Application,
                 ContextMenuStrip = menu,
                 Visible = true
             };
             TrayIcon.DoubleClick += (s, args) => RestoreFromTray();
-        }
-
-
-        private static string FindIconFile()
-        {
-            var candidates = new List<string>
-            {
-                System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Icon.jpg"),
-                System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Icon.jpg"),
-                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "Icon.jpg")
-            };
-            foreach (var path in candidates)
-            {
-                if (System.IO.File.Exists(path))
-                {
-                    return path;
-                }
-            }
-            return null;
-        }
-
-        private static System.Drawing.Icon LoadTrayIcon()
-        {
-            try
-            {
-                string iconPath = FindIconFile();
-                if (iconPath != null)
-                {
-                    using (var bitmap = new System.Drawing.Bitmap(iconPath))
-                    {
-                        IntPtr handle = bitmap.GetHicon();
-                        var icon = System.Drawing.Icon.FromHandle(handle);
-                        var clone = (System.Drawing.Icon)icon.Clone();
-                        _ = Win32.DestroyIcon(handle);
-                        return clone;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-            return System.Drawing.SystemIcons.Application;
-        }
-
-        public static void SetWindowIcon(Window window)
-        {
-            if (window == null)
-            {
-                return;
-            }
-            try
-            {
-                string iconPath = FindIconFile();
-                if (iconPath != null)
-                {
-                    var bitmap = new BitmapImage(new Uri(iconPath));
-                    bitmap.Freeze();
-                    window.Icon = bitmap;
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        internal static class Win32
-        {
-            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool DestroyIcon(IntPtr hIcon);
         }
 
         public static void RestoreFromTray()

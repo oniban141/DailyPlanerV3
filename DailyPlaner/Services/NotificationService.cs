@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Uwp.Notifications;
-
 namespace DailyPlaner.Services
 {
     public class NotificationService
@@ -22,34 +20,12 @@ namespace DailyPlaner.Services
                     return;
                 }
 
-                try
-                {
-                    new ToastContentBuilder()
-                        .AddText(title)
-                        .AddText(message)
-                        .Show();
-                }
-                catch
-                {
-                    ShowTrayFallback(title, message);
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowTrayFallback(title, message);
-                Console.WriteLine($"Error showing notification: {ex.Message}");
-            }
-        }
-
-        private static void ShowTrayFallback(string title, string message)
-        {
-            try
-            {
                 var icon = App.TrayIcon;
                 if (icon == null || !icon.Visible)
                 {
                     return;
                 }
+
                 icon.BalloonTipTitle = title;
                 icon.BalloonTipText = message;
                 icon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
@@ -57,7 +33,7 @@ namespace DailyPlaner.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error showing tray notification: {ex.Message}");
+                Console.WriteLine($"Error showing notification: {ex.Message}");
             }
         }
 
@@ -112,5 +88,4 @@ namespace DailyPlaner.Services
                 Console.WriteLine($"Error scheduling notification: {ex.Message}");
             }
         }
-    }
-}
+    }}

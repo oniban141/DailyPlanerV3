@@ -542,12 +542,6 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                 try
                 {
                     connection.Open();
-                    string cleanupQuery = "DELETE FROM Reminders WHERE TaskId = @Id; DELETE FROM TaskTags WHERE TaskId = @Id";
-                    using (SqlCommand cleanupCommand = new SqlCommand(cleanupQuery, connection))
-                    {
-                        cleanupCommand.Parameters.AddWithValue("@Id", id);
-                        cleanupCommand.ExecuteNonQuery();
-                    }
                     string query = "DELETE FROM Tasks WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
