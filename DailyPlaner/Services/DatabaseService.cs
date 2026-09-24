@@ -1115,10 +1115,10 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                                 {
                                     Id = Convert.ToInt32(reader["Id"]),
                                     UserId = Convert.ToInt32(reader["UserId"]),
-                                    TaskId = Convert.ToInt32(reader["TaskId"]),
+                                    TaskId = reader["TaskId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TaskId"]),
                                     ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
-                                    Message = reader["Message"].ToString(),
-                                    IsShown = Convert.ToBoolean(reader["IsActive"])
+                                    Message = reader["Message"] == DBNull.Value ? string.Empty : reader["Message"].ToString(),
+                                    IsShown = reader["IsActive"] == DBNull.Value || Convert.ToBoolean(reader["IsActive"])
                                 };
                                 reminders.Add(reminder);
                             }
@@ -1153,10 +1153,10 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                                 {
                                     Id = Convert.ToInt32(reader["Id"]),
                                     UserId = Convert.ToInt32(reader["UserId"]),
-                                    TaskId = Convert.ToInt32(reader["TaskId"]),
+                                    TaskId = reader["TaskId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TaskId"]),
                                     ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
-                                    Message = reader["Message"].ToString(),
-                                    IsShown = Convert.ToBoolean(reader["IsActive"])
+                                    Message = reader["Message"] == DBNull.Value ? string.Empty : reader["Message"].ToString(),
+                                    IsShown = reader["IsActive"] == DBNull.Value || Convert.ToBoolean(reader["IsActive"])
                                 };
                                 reminders.Add(reminder);
                             }

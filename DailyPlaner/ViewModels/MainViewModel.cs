@@ -176,6 +176,7 @@ namespace DailyPlaner.ViewModels
         public ICommand ToggleThemeCommand { get; }
         public ICommand ExportToJsonCommand { get; }
         public ICommand ImportFromJsonCommand { get; }
+        public ICommand TestNotificationCommand { get; }
         public ICommand LogoutCommand { get; }
 
         public MainViewModel()
@@ -203,6 +204,7 @@ namespace DailyPlaner.ViewModels
             ToggleThemeCommand = new RelayCommand(ExecuteToggleTheme);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
+            TestNotificationCommand = new RelayCommand(ExecuteTestNotification);
             LogoutCommand = new RelayCommand(ExecuteLogout);
 
             LoadTags();
@@ -215,6 +217,42 @@ namespace DailyPlaner.ViewModels
                 _reminderScheduler = new ReminderScheduler();
             }
             _reminderScheduler.Start();
+        }
+
+        private void ExecuteTestNotification(object parameter)
+        {
+            try
+            {
+                if (_reminderScheduler == null)
+                {
+                    StartReminderScheduler();
+                }
+
+                int pending = _reminderScheduler != null ? _reminderScheduler.GetPendingReminderCount() : -1;
+                DateTime? next = _reminderScheduler != null ? _reminderScheduler.GetNextReminderTime() : null;
+                string schedulerInfo;
+                if (pending < 0)
+                {
+                    schedulerInfo = "Не удалось получить данные о напоминаниях из базы (проверьте подключение к базе данных).";
+                }
+                else if (pending == 0)
+                {
+                    schedulerInfo = "Активных напоминаний в базе нет — напоминания показываются только для существующих записей.";
+                }
+                else
+                {
+                    schedulerInfo = $"Активных напоминаний в базе: {pending}. Ближайшее: {next:dd.MM.yyyy HH:mm}.";
+                }
+
+                _notificationService.ShowReminderNotification(
+                    "Проверка напоминаний",
+                    $"Если вы видите это уведомление — напоминания работают.\n\n{schedulerInfo}",
+                    DateTime.Now);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при проверке напоминаний: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadUserData()
