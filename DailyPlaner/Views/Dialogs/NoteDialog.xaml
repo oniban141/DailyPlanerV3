@@ -14,11 +14,11 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="Название" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,4"/>
-        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag=" Введите название заметки"/>
+        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag="  Введите название заметки"/>
 
         <TextBlock Grid.Row="2" Text="Содержимое" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
         <TextBox Grid.Row="3" x:Name="ContentBox" Style="{StaticResource WatermarkTextBoxStyle}"
-                 Tag=" Введите текст заметки" TextWrapping="Wrap" AcceptsReturn="True"
+                 Tag="  Введите текст заметки" TextWrapping="Wrap" AcceptsReturn="True"
                  VerticalContentAlignment="Top"/>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">

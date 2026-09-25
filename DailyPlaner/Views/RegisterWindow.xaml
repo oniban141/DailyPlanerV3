@@ -46,7 +46,7 @@
                     <TextBlock Text="Имя пользователя" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
                     <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
                         <TextBox
-                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag=" Введите имя пользователя" TextChanged="TextBox_TextChanged"/>
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="  Введите имя пользователя" TextChanged="TextBox_TextChanged"/>
                     </Border>
 
                     <TextBlock Text="Пароль" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
@@ -54,7 +54,7 @@
                         <Grid>
                             <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}"
                                         PasswordChanged="PasswordBox_PasswordChanged"/>
-                            <TextBlock x:Name="PasswordWatermark" Text=" Введите пароль"
+                            <TextBlock x:Name="PasswordWatermark" Text="  Введите пароль"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="6,0,0,0"
                                        VerticalAlignment="Center" IsHitTestVisible="False"/>
                         </Grid>
@@ -65,7 +65,7 @@
                         <Grid>
                             <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}"
                                         PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
-                            <TextBlock x:Name="ConfirmPasswordWatermark" Text=" Повторите пароль"
+                            <TextBlock x:Name="ConfirmPasswordWatermark" Text="  Повторите пароль"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="6,0,0,0"
                                        VerticalAlignment="Center" IsHitTestVisible="False"/>
                         </Grid>
@@ -74,7 +74,7 @@
                     <TextBlock Text="Email" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
                     <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
                         <TextBox Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag=" Введите email"/>
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="  Введите email"/>
                     </Border>
 
                     <TextBlock Text="Пол" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
@@ -89,7 +89,7 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <TextBlock x:Name="GenderWatermark" Text=" Выберите пол" IsHitTestVisible="False"
+                            <TextBlock x:Name="GenderWatermark" Text="  Выберите пол" IsHitTestVisible="False"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="6,0,0,0" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
