@@ -108,6 +108,7 @@ namespace DailyPlaner.ViewModels
                 var registerWindow = new Views.RegisterWindow();
                 var registerViewModel = new RegisterViewModel(_databaseService);
                 registerWindow.DataContext = registerViewModel;
+                App.SetWindowIcon(registerWindow);
                 registerWindow.Show();
             }
             catch (Exception ex)

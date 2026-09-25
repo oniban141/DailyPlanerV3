@@ -82,8 +82,14 @@
                     <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,22">
                         <Grid>
                             <ComboBox x:Name="GenderComboBox" ItemsSource="{Binding Genders}" SelectedValue="{Binding SelectedGenderId, Mode=TwoWay}"
-                                      DisplayMemberPath="Name" SelectedValuePath="Id"
-                                      Style="{StaticResource BaseComboBoxStyle}" Background="Transparent"/>
+                                      SelectedValuePath="Id"
+                                      Style="{StaticResource BaseComboBoxStyle}" Background="Transparent">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                             <TextBlock x:Name="GenderWatermark" Text="Выберите пол" IsHitTestVisible="False"
                                        Foreground="{DynamicResource MutedTextBrush}" Margin="14,0,0,0" VerticalAlignment="Center"/>
                         </Grid>
