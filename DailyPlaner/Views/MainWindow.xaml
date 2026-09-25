@@ -104,7 +104,7 @@
                             Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <Border x:Name="SearchTextBoxHost" Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10">
                         <TextBox x:Name="SearchTextBox" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag=" 🔍  Поиск по названию..."
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="  🔍  Поиск по названию..."
                                  Background="Transparent" BorderThickness="0" VerticalAlignment="Center" KeyDown="SearchTextBox_KeyDown"/>
                     </Border>
                 </DockPanel>
