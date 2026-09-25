@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DailyPlaner.Views"
         xmlns:viewModels="clr-namespace:DailyPlaner.ViewModels"
         mc:Ignorable="d"
-        Title="Регистрация" Height="760" Width="440" WindowStartupLocation="CenterScreen" MinHeight="720">
+        Title="Регистрация" Height="760" Width="480" WindowStartupLocation="CenterScreen" MinHeight="720">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -29,8 +29,7 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource PrimaryBrush}">
-                                <TextBlock Text="Д" Foreground="#FFFFFF" FontFamily="Segoe UI" FontSize="18"
-                                           FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Image x:Name="HeaderIcon" Stretch="UniformToFill"/>
                             </Border>
                             <TextBlock Text="Ежедневник" Foreground="#FFFFFF" FontFamily="Segoe UI"
                                        FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0"/>

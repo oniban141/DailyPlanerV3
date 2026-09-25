@@ -26,6 +26,24 @@ namespace DailyPlaner.Views
             App.SetWindowIcon(this);
             DataContext = new RegisterViewModel(new Services.DatabaseService());
             GenderComboBox.SelectionChanged += GenderComboBox_SelectionChanged;
+            LoadHeaderIcon();
+        }
+
+        private void LoadHeaderIcon()
+        {
+            try
+            {
+                string iconPath = App.FindIconFile();
+                if (iconPath != null)
+                {
+                    var bitmap = new BitmapImage(new Uri(iconPath));
+                    bitmap.Freeze();
+                    HeaderIcon.Source = bitmap;
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void GenderComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

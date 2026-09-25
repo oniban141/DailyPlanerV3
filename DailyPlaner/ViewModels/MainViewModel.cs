@@ -33,7 +33,6 @@ namespace DailyPlaner.ViewModels
         private Event _selectedEvent;
         private Note _selectedNote;
         private string _searchText;
-        private bool _dateFilterActive;
         private DateTime _selectedDate;
         private bool _isDarkTheme;
 
@@ -61,6 +60,7 @@ namespace DailyPlaner.ViewModels
             {
                 _tasks = value;
                 OnPropertyChanged(nameof(Tasks));
+                OnPropertyChanged(nameof(CompletedTasksCount));
             }
         }
 
@@ -134,11 +134,6 @@ namespace DailyPlaner.ViewModels
             {
                 _selectedDate = value;
                 OnPropertyChanged(nameof(SelectedDate));
-                if (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes)
-                {
-                    _dateFilterActive = true;
-                    ApplyNameSearch();
-                }
             }
         }
 
@@ -760,15 +755,10 @@ namespace DailyPlaner.ViewModels
             {
                 string query = SearchText?.Trim() ?? string.Empty;
                 bool hasQuery = query.Length > 0;
-                var date = SelectedDate.Date;
 
                 if (ActivePage == PageTasks)
                 {
                     var items = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                    if (_dateFilterActive)
-                    {
-                        items = items.Where(t => t.DueDate.Date == date).ToList();
-                    }
                     if (hasQuery)
                     {
                         items = items.Where(t =>
@@ -780,10 +770,6 @@ namespace DailyPlaner.ViewModels
                 else if (ActivePage == PageEvents)
                 {
                     var items = _databaseService.GetEventsByUserId(CurrentUser.Id);
-                    if (_dateFilterActive)
-                    {
-                        items = items.Where(ev => ev.StartDate.Date == date).ToList();
-                    }
                     if (hasQuery)
                     {
                         items = items.Where(ev =>
@@ -820,7 +806,6 @@ namespace DailyPlaner.ViewModels
             }
 
             SearchText = string.Empty;
-            _dateFilterActive = false;
             LoadUserData();
         }
 
