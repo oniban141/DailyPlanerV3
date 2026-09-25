@@ -22,11 +22,11 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="Название" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,4"/>
-        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите название события"/>
+        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag=" Введите название события"/>
 
         <TextBlock Grid.Row="2" Text="Описание" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
         <TextBox Grid.Row="3" x:Name="DescriptionBox" Style="{StaticResource WatermarkTextBoxStyle}"
-                 Tag="Введите описание" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
+                 Tag=" Введите описание" TextWrapping="Wrap" AcceptsReturn="True" Height="60"
                  VerticalContentAlignment="Top"/>
 
         <TextBlock Grid.Row="4" Text="Начало" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
@@ -52,7 +52,7 @@
         </Grid>
 
         <TextBlock Grid.Row="8" Text="Место" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
-        <TextBox Grid.Row="9" x:Name="LocationBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите место проведения"/>
+        <TextBox Grid.Row="9" x:Name="LocationBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag=" Введите место проведения"/>
 
         <StackPanel Grid.Row="10" Orientation="Horizontal" Margin="0,14,0,0">
             <CheckBox x:Name="ReminderCheckBox" Content="Напоминание" FontFamily="Segoe UI" FontSize="14"

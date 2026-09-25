@@ -18,11 +18,11 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="Название" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,4"/>
-        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag="Введите название задачи"/>
+        <TextBox Grid.Row="1" x:Name="TitleBox" Style="{StaticResource WatermarkTextBoxStyle}" Tag=" Введите название задачи"/>
 
         <TextBlock Grid.Row="2" Text="Описание" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
         <TextBox Grid.Row="3" x:Name="DescriptionBox" Style="{StaticResource WatermarkTextBoxStyle}"
-                 Tag="Введите описание" TextWrapping="Wrap" AcceptsReturn="True" Height="70"
+                 Tag=" Введите описание" TextWrapping="Wrap" AcceptsReturn="True" Height="70"
                  VerticalContentAlignment="Top"/>
 
         <TextBlock Grid.Row="4" Text="Срок выполнения" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,4"/>
