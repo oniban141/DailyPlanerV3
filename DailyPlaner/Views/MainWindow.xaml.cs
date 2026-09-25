@@ -95,20 +95,9 @@ namespace DailyPlaner
             bool isCalendar = pageName == "CalendarPage";
 
             ToolbarBorder.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
-            SearchScopeComboBox.Visibility = isOverview ? Visibility.Visible : Visibility.Collapsed;
-            SearchTextBoxHost.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
-            SearchButton.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
-            ClearSearchButton.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
             ToolbarDatePicker.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
-
-            if (isCalendar)
-            {
-                return;
-            }
-
-            SearchTextBox.Tag = isOverview
-                ? "🔍  Поиск..."
-                : "🔍  Поиск по дате (дд.ММ.гггг)...";
+            ToolbarDateHint.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
+            ClearSearchButton.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)
@@ -173,38 +162,17 @@ namespace DailyPlaner
 
         private void ShowNoteDetails(Note note)
         {
-            string content = string.IsNullOrWhiteSpace(note.Content) ? "—" : note.Content;
-            MessageBox.Show(
-                $"Заметка: {note.Title}\n\n" +
-                $"Содержимое:\n{content}\n\n" +
-                $"Создано: {note.CreatedDate:dd.MM.yyyy HH:mm}",
-                "Подробная информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            Views.Dialogs.DetailsDialog.ShowNote(this, note);
         }
 
         private void ShowTaskDetails(Models.Task task)
         {
-            string status = task.IsCompleted ? "Выполнена" : "Ожидает";
-            string description = string.IsNullOrWhiteSpace(task.Description) ? "—" : task.Description;
-            MessageBox.Show(
-                $"Задача: {task.Title}\n\n" +
-                $"Описание: {description}\n" +
-                $"Срок: {task.DueDate:dd.MM.yyyy HH:mm}\n" +
-                $"Приоритет: {task.Priority}\n" +
-                $"Статус: {status}",
-                "Подробная информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            Views.Dialogs.DetailsDialog.ShowTask(this, task);
         }
 
         private void ShowEventDetails(Event ev)
         {
-            string description = string.IsNullOrWhiteSpace(ev.Description) ? "—" : ev.Description;
-            string location = string.IsNullOrWhiteSpace(ev.Location) ? "—" : ev.Location;
-            MessageBox.Show(
-                $"Событие: {ev.Title}\n\n" +
-                $"Описание: {description}\n" +
-                $"Начало: {ev.StartDate:dd.MM.yyyy HH:mm}\n" +
-                $"Окончание: {ev.EndDate:dd.MM.yyyy HH:mm}\n" +
-                $"Место: {location}",
-                "Подробная информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            Views.Dialogs.DetailsDialog.ShowEvent(this, ev);
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)

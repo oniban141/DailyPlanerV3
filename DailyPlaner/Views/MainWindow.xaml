@@ -98,23 +98,15 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Toolbar -->
+            <!-- Toolbar (только фильтр по дате; поиск полностью удалён) -->
             <Border x:Name="ToolbarBorder" Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
                 <DockPanel LastChildFill="True">
                     <DatePicker x:Name="ToolbarDatePicker" DockPanel.Dock="Right" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                                 Style="{StaticResource BaseDatePickerStyle}" Width="170" VerticalAlignment="Center"/>
-                    <Button x:Name="ClearSearchButton" DockPanel.Dock="Right" Content="Очистить" Command="{Binding ClearSearchCommand}"
+                    <Button x:Name="ClearSearchButton" DockPanel.Dock="Right" Content="Показать все" Command="{Binding ClearSearchCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <Button x:Name="SearchButton" DockPanel.Dock="Right" Content="Поиск" Command="{Binding SearchCommand}"
-                            Style="{StaticResource BaseButtonStyle}" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="SearchScopeComboBox" DockPanel.Dock="Right"
-                              ItemsSource="{Binding SearchScopes}" SelectedItem="{Binding SelectedSearchScope}"
-                              Style="{StaticResource BaseComboBoxStyle}" Width="140" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <Border x:Name="SearchTextBoxHost" Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10">
-                        <TextBox x:Name="SearchTextBox" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="🔍  Поиск..."
-                                 Background="Transparent" BorderThickness="0" VerticalAlignment="Center"/>
-                    </Border>
+                    <TextBlock x:Name="ToolbarDateHint" Text="Показ записей на дату:" Style="{StaticResource MutedTextBlockStyle}"
+                               VerticalAlignment="Center" Margin="4,0,0,0"/>
                 </DockPanel>
             </Border>
 

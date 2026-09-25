@@ -22,10 +22,6 @@ namespace DailyPlaner.ViewModels
         public const string PageNotes = "NotesPage";
         public const string PageCalendar = "CalendarPage";
 
-        public const string SearchScopeTasks = "Задачи";
-        public const string SearchScopeEvents = "События";
-        public const string SearchScopeNotes = "Заметки";
-
         private readonly DatabaseService _databaseService;
         private readonly NotificationService _notificationService;
         private ReminderScheduler _reminderScheduler;
@@ -39,7 +35,6 @@ namespace DailyPlaner.ViewModels
         private string _searchText;
         private bool _suppressSearchRefresh;
         private bool _dateFilterActive;
-        private string _selectedSearchScope = SearchScopeEvents;
         private DateTime _selectedDate;
         private bool _isDarkTheme;
 
@@ -90,9 +85,6 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public ObservableCollection<string> SearchScopes { get; } =
-            new ObservableCollection<string> { SearchScopeTasks, SearchScopeEvents, SearchScopeNotes };
-
         public string ActivePage { get; set; }
 
         public Models.Task SelectedTask
@@ -132,21 +124,6 @@ namespace DailyPlaner.ViewModels
             {
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
-                if (!_suppressSearchRefresh)
-                {
-                    ApplyOverviewSearch();
-                }
-            }
-        }
-
-        public string SelectedSearchScope
-        {
-            get => _selectedSearchScope;
-            set
-            {
-                _selectedSearchScope = value;
-                OnPropertyChanged(nameof(SelectedSearchScope));
-                ApplyOverviewSearch();
             }
         }
 
@@ -187,7 +164,6 @@ namespace DailyPlaner.ViewModels
         public ICommand AddNoteCommand { get; }
         public ICommand EditNoteCommand { get; }
         public ICommand DeleteNoteCommand { get; }
-        public ICommand SearchCommand { get; }
         public ICommand ClearSearchCommand { get; }
         public ICommand ToggleThemeCommand { get; }
         public ICommand ExportToJsonCommand { get; }
@@ -214,7 +190,6 @@ namespace DailyPlaner.ViewModels
             AddNoteCommand = new RelayCommand(ExecuteAddNote);
             EditNoteCommand = new RelayCommand(ExecuteEditNote, CanExecuteNoteCommand);
             DeleteNoteCommand = new RelayCommand(ExecuteDeleteNote, CanExecuteNoteCommand);
-            SearchCommand = new RelayCommand(ExecuteSearch);
             ClearSearchCommand = new RelayCommand(ExecuteClearSearch);
             ToggleThemeCommand = new RelayCommand(ExecuteToggleTheme);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
@@ -738,130 +713,12 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        private void ExecuteSearch(object parameter)
-        {
-            if (IsOverviewPage)
-            {
-                ApplyOverviewSearch();
-            }
-            else
-            {
-                ApplyDateSearchForCurrentPage();
-            }
-        }
-
         private void ExecuteClearSearch(object parameter)
         {
-            if (IsOverviewPage)
-            {
-                SearchText = string.Empty;
-            }
-            else
-            {
-                ResetFiltersAndReload();
-            }
+            ResetFiltersAndReload();
         }
 
         private bool IsOverviewPage => ActivePage == PageOverview || string.IsNullOrEmpty(ActivePage);
-
-        private bool TryParseSearchDate(out DateTime date)
-        {
-            date = default(DateTime);
-            string query = SearchText?.Trim();
-            if (string.IsNullOrEmpty(query))
-            {
-                return false;
-            }
-
-            string[] formats = { "dd.MM.yyyy", "d.M.yyyy", "dd.MM.yy", "d.M.yy", "yyyy-MM-dd" };
-            foreach (string format in formats)
-            {
-                if (DateTime.TryParseExact(query, format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
-                {
-                    return true;
-                }
-            }
-            return DateTime.TryParse(query, out date);
-        }
-
-        private void ApplyDateSearchForCurrentPage()
-        {
-            if (CurrentUser == null)
-            {
-                return;
-            }
-
-            if (ActivePage != PageTasks && ActivePage != PageEvents && ActivePage != PageNotes)
-            {
-                return;
-            }
-
-            try
-            {
-                DateTime date;
-                if (!TryParseSearchDate(out date))
-                {
-                    MessageBox.Show("Введите дату в строке поиска (например 01.01.2025) или выберите дату в календаре справа.", "Поиск", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-
-                SelectedDate = date;
-                _dateFilterActive = true;
-                ApplyDateFilterForCurrentPage();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при поиске по дате: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ApplyOverviewSearch()
-        {
-            if (!IsOverviewPage || CurrentUser == null)
-            {
-                return;
-            }
-
-            try
-            {
-                string query = SearchText?.Trim() ?? string.Empty;
-                bool hasQuery = query.Length > 0;
-
-                var allTasks = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                var allEvents = _databaseService.GetEventsByUserId(CurrentUser.Id);
-                var allNotes = _databaseService.GetNotesByUserId(CurrentUser.Id);
-
-                if (hasQuery)
-                {
-                    if (SelectedSearchScope == SearchScopeTasks)
-                    {
-                        allTasks = allTasks.Where(t =>
-                            (t.Title != null && t.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (t.Description != null && t.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-                    }
-                    else if (SelectedSearchScope == SearchScopeEvents)
-                    {
-                        allEvents = allEvents.Where(ev =>
-                            (ev.Title != null && ev.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (ev.Description != null && ev.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-                    }
-                    else
-                    {
-                        allNotes = allNotes.Where(n =>
-                            (n.Title != null && n.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (n.Content != null && n.Content.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-                    }
-                }
-
-                Tasks = new ObservableCollection<Models.Task>(allTasks);
-                Events = new ObservableCollection<Event>(allEvents);
-                Notes = new ObservableCollection<Note>(allNotes);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при фильтрации: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
 
         private void ApplyDateFilterForCurrentPage()
         {
@@ -924,10 +781,6 @@ namespace DailyPlaner.ViewModels
             if (_dateFilterActive && (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes))
             {
                 ApplyDateFilterForCurrentPage();
-            }
-            else if (!string.IsNullOrWhiteSpace(SearchText) && ActivePage == PageOverview)
-            {
-                ApplyOverviewSearch();
             }
             else
             {

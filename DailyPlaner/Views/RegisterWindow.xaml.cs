@@ -23,6 +23,7 @@ namespace DailyPlaner.Views
         public RegisterWindow()
         {
             InitializeComponent();
+            App.SetWindowIcon(this);
             DataContext = new RegisterViewModel(new Services.DatabaseService());
             GenderComboBox.SelectionChanged += GenderComboBox_SelectionChanged;
         }

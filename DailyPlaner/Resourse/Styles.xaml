@@ -338,6 +338,7 @@
                             <ContentPresenter x:Name="ContentSite"
                                              Content="{TemplateBinding SelectionBoxItem}"
                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                             ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
                                              Margin="{TemplateBinding Padding}"
                                              VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"/>
                             <TextBox x:Name="PART_EditableTextBox" Style="{x:Null}"
@@ -557,14 +558,14 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel Orientation="Horizontal" Background="Transparent">
+                        <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                         <Border x:Name="CheckBorder" Width="18" Height="18" CornerRadius="4"
                                 Background="{DynamicResource SoftBeigeBrush}"
                                 BorderBrush="{StaticResource SecondaryBrush}" BorderThickness="1.5"
-                                VerticalAlignment="Center">
+                                VerticalAlignment="Center" Margin="10,0,0,0">
                             <Path x:Name="CheckMark" Data="M 3 8 L 7 12 L 13 4" Stroke="#FFFFFF"
                                   StrokeThickness="2" Visibility="Collapsed" Stretch="Uniform" Margin="2"/>
                         </Border>
-                        <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                     </StackPanel>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
