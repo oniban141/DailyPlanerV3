@@ -59,7 +59,7 @@
                     <CheckBox x:Name="AutoStartSidebarCheckBox" Content="🔁   Автозапуск"
                               Style="{StaticResource SidebarCheckBoxStyle}"
                               Checked="AutoStartSidebar_Changed" Unchecked="AutoStartSidebar_Changed"
-                              HorizontalAlignment="Left" Margin="12,6,12,6"/>
+                              Margin="12,3,12,3" Padding="14,10"/>
                 </StackPanel>
 
                 <!-- 🚪 Выйти -->
@@ -98,15 +98,18 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Toolbar (только фильтр по дате; поиск полностью удалён) -->
+            <!-- Toolbar: поиск по названию + фильтр по дате (только страницы Задач/Событий/Заметок) -->
             <Border x:Name="ToolbarBorder" Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
                 <DockPanel LastChildFill="True">
                     <DatePicker x:Name="ToolbarDatePicker" DockPanel.Dock="Right" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                                 Style="{StaticResource BaseDatePickerStyle}" Width="170" VerticalAlignment="Center"/>
-                    <Button x:Name="ClearSearchButton" DockPanel.Dock="Right" Content="Показать все" Command="{Binding ClearSearchCommand}"
+                    <Button x:Name="ClearSearchButton" DockPanel.Dock="Right" Content="Сбросить" Command="{Binding ClearSearchCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <TextBlock x:Name="ToolbarDateHint" Text="Показ записей на дату:" Style="{StaticResource MutedTextBlockStyle}"
-                               VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    <Border x:Name="SearchTextBoxHost" Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10">
+                        <TextBox x:Name="SearchTextBox" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="🔍  Поиск по названию..."
+                                 Background="Transparent" BorderThickness="0" VerticalAlignment="Center" KeyDown="SearchTextBox_KeyDown"/>
+                    </Border>
                 </DockPanel>
             </Border>
 
@@ -236,7 +239,8 @@
                           SelectionMode="Extended" Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="TasksList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0"
+                                    Opacity="{Binding IsCompleted, Converter={StaticResource BooleanToOpacityConverter}}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="6"/>
@@ -245,7 +249,10 @@
                                     <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}"
                                             CornerRadius="14,0,0,14"/>
                                     <StackPanel Grid.Column="1" Margin="16,12,16,12">
-                                        <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"
+                                                       TextDecorations="{Binding IsCompleted, Converter={StaticResource BooleanToTextDecorationConverter}}"/>
+                                        </StackPanel>
                                         <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}"
                                                    Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0"
                                                    TextWrapping="Wrap"/>
@@ -264,6 +271,11 @@
                                                     <TextBlock Text="⚡ " Style="{StaticResource MutedTextBlockStyle}"/>
                                                     <TextBlock Text="{Binding Priority}" Style="{StaticResource MutedTextBlockStyle}"/>
                                                 </StackPanel>
+                                            </Border>
+                                            <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
+                                                    Padding="8,3" Margin="8,0,0,0">
+                                                <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BooleanToStatusBadgeConverter}}"
+                                                           Style="{StaticResource MutedTextBlockStyle}"/>
                                             </Border>
                                         </StackPanel>
                                     </StackPanel>
@@ -287,6 +299,8 @@
                     <Button Content="Изменить" Command="{Binding EditEventCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="Удалить" Command="{Binding DeleteEventCommand}" CommandParameter="{Binding SelectedItems, ElementName=EventsList}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="✔ Завершить" Command="{Binding CompleteEventCommand}"
                             Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
 
@@ -294,7 +308,8 @@
                           SelectionMode="Extended" Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="EventsList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0"
+                                    Opacity="{Binding IsCompleted, Converter={StaticResource BooleanToOpacityConverter}}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="6"/>
@@ -303,7 +318,10 @@
                                     <Border Grid.Column="0" Background="{DynamicResource SecondaryBrush}"
                                             CornerRadius="14,0,0,14"/>
                                     <StackPanel Grid.Column="1" Margin="16,12,16,12">
-                                        <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SectionTitleStyle}"
+                                                       TextDecorations="{Binding IsCompleted, Converter={StaticResource BooleanToTextDecorationConverter}}"/>
+                                        </StackPanel>
                                         <TextBlock Text="{Binding Description}" Style="{StaticResource BaseTextBlockStyle}"
                                                    Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0"
                                                    TextWrapping="Wrap"/>
@@ -325,6 +343,11 @@
                                                     <TextBlock Text="📍 " Style="{StaticResource MutedTextBlockStyle}"/>
                                                     <TextBlock Text="{Binding Location}" Style="{StaticResource MutedTextBlockStyle}"/>
                                                 </StackPanel>
+                                            </Border>
+                                            <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="8"
+                                                    Padding="8,3" Margin="8,0,0,0">
+                                                <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BooleanToStatusBadgeConverter}}"
+                                                           Style="{StaticResource MutedTextBlockStyle}"/>
                                             </Border>
                                         </StackPanel>
                                     </StackPanel>
@@ -387,52 +410,63 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,10,16,10" Width="460">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Календарь" Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
-                        <Calendar Grid.Row="1" x:Name="MainCalendar" Width="420" Height="460"
-                                  HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="15"
-                                  SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
-                                  Background="{DynamicResource LightCardBrush}"
-                                  BorderBrush="Transparent" BorderThickness="0"/>
-                    </Grid>
-                </Border>
+                <Grid Grid.Column="0" Margin="0,10,16,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Padding="12" Width="460">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Календарь" Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,8"/>
+                            <Calendar Grid.Row="1" x:Name="MainCalendar" Width="420" Height="340"
+                                      HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14"
+                                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                      Background="{DynamicResource LightCardBrush}"
+                                      BorderBrush="Transparent" BorderThickness="0"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,12,0,0" Padding="14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Все события на выбранный день" Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,8"/>
+                            <ListView Grid.Row="1" x:Name="DayEventsList" Style="{StaticResource BaseListViewStyle}"
+                                      MouseDoubleClick="DayItem_MouseDoubleClick">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8" Padding="12">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="🕐" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding StartDate, StringFormat='HH:mm'}" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding Title}" Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </Border>
+                </Grid>
 
                 <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,10,0,10">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}"
-                                   Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,12"/>
+                                   Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
 
-                        <TextBlock Grid.Row="1" Text="События на этот день" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,0,6"/>
-                        <ListView Grid.Row="2" x:Name="DayEventsList" Style="{StaticResource BaseListViewStyle}"
-                                  MouseDoubleClick="DayItem_MouseDoubleClick">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8" Padding="12">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="🕰" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
-                                            <TextBlock Text="{Binding StartDate, StringFormat='HH:mm'}" Style="{StaticResource MutedTextBlockStyle}" Margin="0,0,8,0"/>
-                                            <TextBlock Text="{Binding Title}" Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"/>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-                        <TextBlock Grid.Row="3" Text="Задачи на этот день" Style="{StaticResource MutedTextBlockStyle}" Margin="0,12,0,6"/>
-                        <ListView Grid.Row="4" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
+                        <ListView Grid.Row="1" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
                                   MouseDoubleClick="DayItem_MouseDoubleClick">
                             <ListView.ItemTemplate>
                                 <DataTemplate>

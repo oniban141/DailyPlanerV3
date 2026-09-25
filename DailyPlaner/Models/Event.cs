@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DailyPlaner.Models
 {
-    public class Event
+    public class Event : INotifyPropertyChanged
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -16,5 +17,30 @@ namespace DailyPlaner.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Location { get; set; }
+
+        private string _status;
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(IsCompleted));
+            }
+        }
+
+        public bool IsCompleted
+        {
+            get => Status == "Завершено" || Status == "Completed";
+            set => Status = value ? "Завершено" : "Запланировано";
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

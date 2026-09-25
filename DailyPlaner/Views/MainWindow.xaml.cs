@@ -91,13 +91,20 @@ namespace DailyPlaner
 
         private void UpdateToolbarForPage(string pageName)
         {
-            bool isOverview = pageName == "OverviewPage";
-            bool isCalendar = pageName == "CalendarPage";
+            bool isListPage = pageName == "TasksPage" || pageName == "EventsPage" || pageName == "NotesPage";
+            ToolbarBorder.Visibility = isListPage ? Visibility.Visible : Visibility.Collapsed;
+        }
 
-            ToolbarBorder.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
-            ToolbarDatePicker.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
-            ToolbarDateHint.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
-            ClearSearchButton.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
+        private void SearchTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (DataContext is MainViewModel vm)
+                {
+                    vm.ApplyNameSearch();
+                }
+                e.Handled = true;
+            }
         }
 
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)

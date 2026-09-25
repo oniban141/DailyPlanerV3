@@ -12,6 +12,9 @@
             
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:BooleanToStatusConverter x:Key="BooleanToStatusConverter"/>
+            <converters:BooleanToTextDecorationConverter x:Key="BooleanToTextDecorationConverter"/>
+            <converters:BooleanToStatusBadgeConverter x:Key="BooleanToStatusBadgeConverter"/>
+            <converters:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
 
             <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#E8D8C9"/>
             <SolidColorBrush x:Key="WindowForegroundBrush" Color="#2E3949"/>
