@@ -44,8 +44,10 @@ namespace DailyPlaner.Views.Dialogs
             dialog.TimeText.Text = $"{ev.StartDate:dd.MM.yyyy HH:mm} — {ev.EndDate:dd.MM.yyyy HH:mm}";
             dialog.ExtraLabel.Text = "Место";
             dialog.ExtraText.Text = string.IsNullOrWhiteSpace(ev.Location) ? "—" : ev.Location;
-            dialog.StatusLabel.Visibility = System.Windows.Visibility.Collapsed;
-            dialog.StatusText.Visibility = System.Windows.Visibility.Collapsed;
+            dialog.StatusLabel.Text = "Статус";
+            dialog.StatusText.Text = ev.IsCompleted ? "✅ Завершено" : "🕒 Запланировано";
+            dialog.StatusLabel.Visibility = System.Windows.Visibility.Visible;
+            dialog.StatusText.Visibility = System.Windows.Visibility.Visible;
             dialog.ShowDialog();
         }
 

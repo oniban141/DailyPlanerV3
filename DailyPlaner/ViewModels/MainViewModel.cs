@@ -33,7 +33,6 @@ namespace DailyPlaner.ViewModels
         private Event _selectedEvent;
         private Note _selectedNote;
         private string _searchText;
-        private bool _suppressSearchRefresh;
         private bool _dateFilterActive;
         private DateTime _selectedDate;
         private bool _isDarkTheme;
@@ -124,6 +123,7 @@ namespace DailyPlaner.ViewModels
             {
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
+                ApplyNameSearch();
             }
         }
 
@@ -137,7 +137,7 @@ namespace DailyPlaner.ViewModels
                 if (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes)
                 {
                     _dateFilterActive = true;
-                    ApplyDateFilterForCurrentPage();
+                    ApplyNameSearch();
                 }
             }
         }
@@ -161,6 +161,7 @@ namespace DailyPlaner.ViewModels
         public ICommand AddEventCommand { get; }
         public ICommand EditEventCommand { get; }
         public ICommand DeleteEventCommand { get; }
+        public ICommand CompleteEventCommand { get; }
         public ICommand AddNoteCommand { get; }
         public ICommand EditNoteCommand { get; }
         public ICommand DeleteNoteCommand { get; }
@@ -187,6 +188,7 @@ namespace DailyPlaner.ViewModels
             AddEventCommand = new RelayCommand(ExecuteAddEvent);
             EditEventCommand = new RelayCommand(ExecuteEditEvent, CanExecuteEventCommand);
             DeleteEventCommand = new RelayCommand(ExecuteDeleteEvent, CanExecuteEventCommand);
+            CompleteEventCommand = new RelayCommand(ExecuteCompleteEvent, CanExecuteEventCommand);
             AddNoteCommand = new RelayCommand(ExecuteAddNote);
             EditNoteCommand = new RelayCommand(ExecuteEditNote, CanExecuteNoteCommand);
             DeleteNoteCommand = new RelayCommand(ExecuteDeleteNote, CanExecuteNoteCommand);
@@ -479,6 +481,30 @@ namespace DailyPlaner.ViewModels
             }
         }
 
+        private void ExecuteCompleteEvent(object parameter)
+        {
+            try
+            {
+                var ev = SelectedEvent;
+                if (ev != null)
+                {
+                    ev.IsCompleted = !ev.IsCompleted;
+                    bool result = _databaseService.UpdateEvent(ev);
+                    if (result)
+                    {
+                        string eventTitle = ev.Title;
+                        bool isCompleted = ev.IsCompleted;
+                        RefreshDataForCurrentPage();
+                        _notificationService.ShowNotification("Событие обновлено", $"Событие '{eventTitle}' отмечено как {(isCompleted ? "завершённое" : "незавершённое")}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при завершении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void ExecuteAddEvent(object parameter)
         {
             try
@@ -718,11 +744,9 @@ namespace DailyPlaner.ViewModels
             ResetFiltersAndReload();
         }
 
-        private bool IsOverviewPage => ActivePage == PageOverview || string.IsNullOrEmpty(ActivePage);
-
-        private void ApplyDateFilterForCurrentPage()
+        public void ApplyNameSearch()
         {
-            if (CurrentUser == null || string.IsNullOrEmpty(ActivePage))
+            if (CurrentUser == null)
             {
                 return;
             }
@@ -734,27 +758,59 @@ namespace DailyPlaner.ViewModels
 
             try
             {
+                string query = SearchText?.Trim() ?? string.Empty;
+                bool hasQuery = query.Length > 0;
+                var date = SelectedDate.Date;
+
                 if (ActivePage == PageTasks)
                 {
-                    Tasks = new ObservableCollection<Models.Task>(
-                        _databaseService.GetTasksByUserId(CurrentUser.Id).Where(t => t.DueDate.Date == SelectedDate.Date));
+                    var items = _databaseService.GetTasksByUserId(CurrentUser.Id);
+                    if (_dateFilterActive)
+                    {
+                        items = items.Where(t => t.DueDate.Date == date).ToList();
+                    }
+                    if (hasQuery)
+                    {
+                        items = items.Where(t =>
+                            (t.Title != null && t.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                            (t.Description != null && t.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
+                    }
+                    Tasks = new ObservableCollection<Models.Task>(items);
                 }
                 else if (ActivePage == PageEvents)
                 {
-                    Events = new ObservableCollection<Event>(
-                        _databaseService.GetEventsByUserId(CurrentUser.Id).Where(ev => ev.StartDate.Date == SelectedDate.Date));
+                    var items = _databaseService.GetEventsByUserId(CurrentUser.Id);
+                    if (_dateFilterActive)
+                    {
+                        items = items.Where(ev => ev.StartDate.Date == date).ToList();
+                    }
+                    if (hasQuery)
+                    {
+                        items = items.Where(ev =>
+                            (ev.Title != null && ev.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                            (ev.Description != null && ev.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
+                    }
+                    Events = new ObservableCollection<Event>(items);
                 }
                 else
                 {
-                    Notes = new ObservableCollection<Note>(
-                        _databaseService.GetNotesByUserId(CurrentUser.Id).Where(n => n.CreatedDate.Date == SelectedDate.Date));
+                    var items = _databaseService.GetNotesByUserId(CurrentUser.Id);
+                    if (hasQuery)
+                    {
+                        items = items.Where(n =>
+                            (n.Title != null && n.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                            (n.Content != null && n.Content.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
+                    }
+                    Notes = new ObservableCollection<Note>(items);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при фильтрации по дате: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при поиске: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private bool IsOverviewPage => ActivePage == PageOverview || string.IsNullOrEmpty(ActivePage);
 
         public void ResetFiltersAndReload()
         {
@@ -763,11 +819,8 @@ namespace DailyPlaner.ViewModels
                 return;
             }
 
-            _suppressSearchRefresh = true;
             SearchText = string.Empty;
-            _suppressSearchRefresh = false;
             _dateFilterActive = false;
-
             LoadUserData();
         }
 
@@ -778,9 +831,9 @@ namespace DailyPlaner.ViewModels
                 return;
             }
 
-            if (_dateFilterActive && (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes))
+            if (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes)
             {
-                ApplyDateFilterForCurrentPage();
+                ApplyNameSearch();
             }
             else
             {

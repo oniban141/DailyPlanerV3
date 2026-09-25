@@ -80,6 +80,12 @@ namespace DailyPlaner.Services
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = @"
+IF COL_LENGTH('dbo.Events', 'Status') IS NULL
+    ALTER TABLE dbo.Events ADD Status NVARCHAR(50) NULL;
+IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Events_Status')
+    ALTER TABLE dbo.Events DROP CONSTRAINT CHK_Events_Status;
+UPDATE Events SET Status = N'Запланировано' WHERE Status IS NULL OR Status NOT IN (N'Запланировано', N'Завершено');
+ALTER TABLE dbo.Events ADD CONSTRAINT CHK_Events_Status CHECK (Status IN (N'Запланировано', N'Завершено'));
 IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Priority')
     ALTER TABLE dbo.Tasks DROP CONSTRAINT CHK_Tasks_Priority;
 IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Status')
@@ -589,7 +595,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     StartDate = Convert.ToDateTime(reader["StartDate"]),
                                     EndDate = Convert.ToDateTime(reader["EndDate"]),
-                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty
+                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
+                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
                                 };
                                 events.Add(ev);
                             }
@@ -628,7 +635,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     StartDate = Convert.ToDateTime(reader["StartDate"]),
                                     EndDate = Convert.ToDateTime(reader["EndDate"]),
-                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty
+                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
+                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
                                 };
                                 events.Add(ev);
                             }
@@ -667,7 +675,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                                     Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
                                     StartDate = Convert.ToDateTime(reader["StartDate"]),
                                     EndDate = Convert.ToDateTime(reader["EndDate"]),
-                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty
+                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
+                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
                                 };
                             }
                         }
@@ -688,8 +697,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Events (UserId, Title, Description, StartDate, EndDate, Location) " +
-                                   "VALUES (@UserId, @Title, @Description, @StartDate, @EndDate, @Location)";
+                    string query = "INSERT INTO Events (UserId, Title, Description, StartDate, EndDate, Location, Status) " +
+                                   "VALUES (@UserId, @Title, @Description, @StartDate, @EndDate, @Location, @Status)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserId", ev.UserId);
@@ -698,6 +707,7 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                         command.Parameters.AddWithValue("@StartDate", ev.StartDate);
                         command.Parameters.AddWithValue("@EndDate", ev.EndDate);
                         command.Parameters.AddWithValue("@Location", ev.Location ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Status", ev.IsCompleted ? "Завершено" : "Запланировано");
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
@@ -718,7 +728,7 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                 {
                     connection.Open();
                     string query = "UPDATE Events SET UserId = @UserId, Title = @Title, Description = @Description, " +
-                                   "StartDate = @StartDate, EndDate = @EndDate, Location = @Location " +
+                                   "StartDate = @StartDate, EndDate = @EndDate, Location = @Location, Status = @Status " +
                                    "WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -729,6 +739,7 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                         command.Parameters.AddWithValue("@StartDate", ev.StartDate);
                         command.Parameters.AddWithValue("@EndDate", ev.EndDate);
                         command.Parameters.AddWithValue("@Location", ev.Location ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Status", ev.IsCompleted ? "Завершено" : "Запланировано");
                         int result = command.ExecuteNonQuery();
                         return result > 0;
                     }
