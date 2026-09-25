@@ -1,62 +1,55 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- ============================================================
-         ПАЛИТРА (референс: American vintage palette)
-         Бежевый  #E8D8C9  — фон приложения
-         Серо-синий #4B607F — сайдбар, заголовки
-         Оранжевый #F3701E — акцент, кнопки, активные элементы
-         ============================================================ -->
+    
 
     <Color x:Key="PrimaryColor">#F3701E</Color>
     <Color x:Key="SecondaryColor">#4B607F</Color>
     <Color x:Key="AccentColor">#E8D8C9</Color>
 
-    <!-- Light Theme Colors -->
+    
     <Color x:Key="LightBackground">#E8D8C9</Color>
     <Color x:Key="LightForeground">#2E3949</Color>
     <Color x:Key="LightCardBackground">#FDFBF8</Color>
     <Color x:Key="LightBorder">#DCc9b6</Color>
 
-    <!-- Dark Theme Colors (тёмная тема на базе серо-синего) -->
+    
     <Color x:Key="DarkBackground">#34445D</Color>
     <Color x:Key="DarkForeground">#E8D8C9</Color>
     <Color x:Key="DarkCardBackground">#4B607F</Color>
     <Color x:Key="DarkBorder">#F3701E</Color>
 
-    <!-- Дополнительные оттенки -->
+    
     <Color x:Key="NavyDarkColor">#3D4F6B</Color>
     <Color x:Key="OrangeDarkColor">#D95F10</Color>
     <Color x:Key="MutedTextColor">#8B93A3</Color>
     <Color x:Key="SoftBeigeColor">#F3EAE0</Color>
 
-    <!-- Brushes -->
+    
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
 
-    <!-- Light Theme Brushes -->
+    
     <SolidColorBrush x:Key="LightBackgroundBrush" Color="{StaticResource LightBackground}"/>
     <SolidColorBrush x:Key="LightForegroundBrush" Color="{StaticResource LightForeground}"/>
     <SolidColorBrush x:Key="LightCardBrush" Color="{StaticResource LightCardBackground}"/>
     <SolidColorBrush x:Key="LightBorderBrush" Color="{StaticResource LightBorder}"/>
 
-    <!-- Dark Theme Brushes -->
+    
     <SolidColorBrush x:Key="DarkBackgroundBrush" Color="{StaticResource DarkBackground}"/>
     <SolidColorBrush x:Key="DarkForegroundBrush" Color="{StaticResource DarkForeground}"/>
     <SolidColorBrush x:Key="DarkCardBrush" Color="{StaticResource DarkCardBackground}"/>
     <SolidColorBrush x:Key="DarkBorderBrush" Color="{StaticResource DarkBorder}"/>
 
-    <!-- Extra Brushes -->
+    
     <SolidColorBrush x:Key="NavyDarkBrush" Color="{StaticResource NavyDarkColor}"/>
     <SolidColorBrush x:Key="OrangeDarkBrush" Color="{StaticResource OrangeDarkColor}"/>
     <SolidColorBrush x:Key="MutedTextBrush" Color="{StaticResource MutedTextColor}"/>
     <SolidColorBrush x:Key="SoftBeigeBrush" Color="{StaticResource SoftBeigeColor}"/>
     <SolidColorBrush x:Key="SidebarTextBrush" Color="#EFE6DA"/>
 
-    <!-- ============================================================
-         ТИПОГРАФИКА
-         ============================================================ -->
+    
 
     <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
@@ -83,9 +76,7 @@
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
-    <!-- ============================================================
-         КАРТОЧКИ
-         ============================================================ -->
+    
 
     <Style x:Key="CardStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource LightCardBrush}"/>
@@ -95,11 +86,9 @@
         <Setter Property="Padding" Value="16"/>
     </Style>
 
-    <!-- ============================================================
-         КНОПКИ
-         ============================================================ -->
+    
 
-    <!-- Главная оранжевая кнопка (pill) -->
+    
     <Style x:Key="BaseButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -134,7 +123,7 @@
         </Setter>
     </Style>
 
-    <!-- Второстепенная (ghost) кнопка -->
+    
     <Style x:Key="SecondaryButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
@@ -167,7 +156,7 @@
         </Setter>
     </Style>
 
-    <!-- Кнопки навигации в сайдбаре -->
+    
     <Style x:Key="SidebarButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource SidebarTextBrush}"/>
@@ -195,7 +184,7 @@
         </Setter>
     </Style>
 
-    <!-- Активный пункт сайдбара -->
+    
     <Style x:Key="SidebarActiveButtonStyle" TargetType="Button" BasedOn="{StaticResource SidebarButtonStyle}">
         <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -218,9 +207,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         ПОЛЯ ВВОДА
-         ============================================================ -->
+    
 
     <Style x:Key="WatermarkTextBoxStyle" TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource SoftBeigeBrush}"/>
@@ -287,9 +274,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         COMBOBOX
-         ============================================================ -->
+    
 
     <ControlTemplate x:Key="ComboBoxToggleButtonTemplate" TargetType="ToggleButton">
         <Border x:Name="Bd" Background="Transparent" CornerRadius="0,10,10,0" Width="34">
@@ -371,9 +356,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- ============================================================
-         LISTVIEW
-         ============================================================ -->
+    
 
     <Style x:Key="BaseListViewStyle" TargetType="ListView">
         <Setter Property="Background" Value="Transparent"/>
@@ -430,9 +413,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         DATEPICKER
-         ============================================================ -->
+    
 
     <Style x:Key="BaseDatePickerStyle" TargetType="DatePicker">
         <Setter Property="Background" Value="{DynamicResource SoftBeigeBrush}"/>
@@ -488,9 +469,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         ВКЛАДКИ (pill-табы, как в референсе)
-         ============================================================ -->
+    
 
     <Style x:Key="TabControlStyle" TargetType="TabControl">
         <Setter Property="Background" Value="Transparent"/>
@@ -543,9 +522,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         CHECKBOX (галочка слева от текста)
-         ============================================================ -->
+    
 
     <Style x:Key="SidebarCheckBoxStyle" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource SidebarTextBrush}"/>
@@ -584,9 +561,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         Dark Theme Styles (совместимость с ToggleTheme)
-         ============================================================ -->
+    
 
     <Style x:Key="DarkBaseTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource DarkForegroundBrush}"/>

@@ -16,10 +16,7 @@ namespace DailyPlaner.Services
             _databaseService = new DatabaseService();
             _notificationService = new NotificationService();
             _shownReminderIds = new HashSet<int>();
-            _timer = new System.Windows.Threading.DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(30)
-            };
+            _timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
             _timer.Tick += (s, e) => CheckReminders();
         }
 
@@ -40,14 +37,12 @@ namespace DailyPlaner.Services
             {
                 var reminders = _databaseService.GetAllReminders();
                 var now = DateTime.Now;
-
                 foreach (var reminder in reminders)
                 {
                     if (reminder == null || !reminder.IsShown || _shownReminderIds.Contains(reminder.Id))
                     {
                         continue;
                     }
-
                     if (reminder.ReminderDate <= now && reminder.ReminderDate > now.AddHours(-12))
                     {
                         _shownReminderIds.Add(reminder.Id);
@@ -92,9 +87,8 @@ namespace DailyPlaner.Services
         {
             try
             {
-                var reminders = _databaseService.GetAllReminders();
                 DateTime? next = null;
-                foreach (var reminder in reminders)
+                foreach (var reminder in _databaseService.GetAllReminders())
                 {
                     if (reminder != null && reminder.IsShown && reminder.ReminderDate > DateTime.Now
                         && (next == null || reminder.ReminderDate < next.Value))

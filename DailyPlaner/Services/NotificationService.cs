@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace DailyPlaner.Services
 {
     public class NotificationService
     {
-        private static readonly List<System.Threading.Timer> Timers = new List<System.Threading.Timer>();
+        private static readonly List<System.Threading.Timer> _timers = new List<System.Threading.Timer>();
 
         public void ShowNotification(string title, string message)
         {
@@ -21,13 +18,9 @@ namespace DailyPlaner.Services
                     dispatcher.BeginInvoke((Action)(() => ShowNotification(title, message)));
                     return;
                 }
-
                 try
                 {
-                    new ToastContentBuilder()
-                        .AddText(title)
-                        .AddText(message)
-                        .Show();
+                    new ToastContentBuilder().AddText(title).AddText(message).Show();
                 }
                 catch
                 {
@@ -38,6 +31,55 @@ namespace DailyPlaner.Services
             {
                 ShowTrayFallback(title, message);
                 Console.WriteLine($"Error showing notification: {ex.Message}");
+            }
+        }
+
+        public void ShowReminderNotification(string title, string message, DateTime dueDate)
+        {
+            try
+            {
+                ShowNotification(title, $"{message}\n\nDue: {dueDate:yyyy-MM-dd HH:mm}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error showing reminder: {ex.Message}");
+            }
+        }
+
+        public void ScheduleNotification(string title, string message, DateTime scheduleTime)
+        {
+            try
+            {
+                var delay = scheduleTime - DateTime.Now;
+                if (delay < TimeSpan.Zero)
+                {
+                    ShowNotification(title, message);
+                    return;
+                }
+                System.Threading.Timer timer = null;
+                timer = new System.Threading.Timer(_ =>
+                {
+                    try
+                    {
+                        ShowNotification(title, message);
+                    }
+                    finally
+                    {
+                        lock (_timers)
+                        {
+                            _timers.Remove(timer);
+                        }
+                        timer?.Dispose();
+                    }
+                }, null, delay, TimeSpan.FromMilliseconds(-1));
+                lock (_timers)
+                {
+                    _timers.Add(timer);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error scheduling notification: {ex.Message}");
             }
         }
 
@@ -58,58 +100,6 @@ namespace DailyPlaner.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error showing tray notification: {ex.Message}");
-            }
-        }
-
-        public void ShowReminderNotification(string title, string message, DateTime dueDate)
-        {
-            try
-            {
-                string fullMessage = $"{message}\n\nDue: {dueDate:yyyy-MM-dd HH:mm}";
-                ShowNotification(title, fullMessage);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error showing reminder: {ex.Message}");
-            }
-        }
-
-        public void ScheduleNotification(string title, string message, DateTime scheduleTime)
-        {
-            try
-            {
-                var delay = scheduleTime - DateTime.Now;
-                if (delay < TimeSpan.Zero)
-                {
-                    ShowNotification(title, message);
-                    return;
-                }
-
-                System.Threading.Timer timer = null;
-                timer = new System.Threading.Timer(_ =>
-                {
-                    try
-                    {
-                        ShowNotification(title, message);
-                    }
-                    finally
-                    {
-                        lock (Timers)
-                        {
-                            Timers.Remove(timer);
-                        }
-                        timer?.Dispose();
-                    }
-                }, null, delay, TimeSpan.FromMilliseconds(-1));
-
-                lock (Timers)
-                {
-                    Timers.Add(timer);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error scheduling notification: {ex.Message}");
             }
         }
     }

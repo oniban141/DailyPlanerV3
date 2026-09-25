@@ -1,9 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using DailyPlaner.Models;
@@ -18,16 +16,12 @@ namespace DailyPlaner.ViewModels
         private string _password;
         private string _confirmPassword;
         private string _email;
-        private string _firstName;
-        private string _lastName;
         private int _selectedGenderId;
         private List<Gender> _genders;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public string Username
         {
-            get => _username;
+            get { return _username; }
             set
             {
                 _username = value;
@@ -37,7 +31,7 @@ namespace DailyPlaner.ViewModels
 
         public string Password
         {
-            get => _password;
+            get { return _password; }
             set
             {
                 _password = value;
@@ -47,7 +41,7 @@ namespace DailyPlaner.ViewModels
 
         public string ConfirmPassword
         {
-            get => _confirmPassword;
+            get { return _confirmPassword; }
             set
             {
                 _confirmPassword = value;
@@ -57,7 +51,7 @@ namespace DailyPlaner.ViewModels
 
         public string Email
         {
-            get => _email;
+            get { return _email; }
             set
             {
                 _email = value;
@@ -65,29 +59,9 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public string FirstName
-        {
-            get => _firstName;
-            set
-            {
-                _firstName = value;
-                OnPropertyChanged(nameof(FirstName));
-            }
-        }
-
-        public string LastName
-        {
-            get => _lastName;
-            set
-            {
-                _lastName = value;
-                OnPropertyChanged(nameof(LastName));
-            }
-        }
-
         public int SelectedGenderId
         {
-            get => _selectedGenderId;
+            get { return _selectedGenderId; }
             set
             {
                 _selectedGenderId = value;
@@ -97,7 +71,7 @@ namespace DailyPlaner.ViewModels
 
         public List<Gender> Genders
         {
-            get => _genders;
+            get { return _genders; }
             set
             {
                 _genders = value;
@@ -107,6 +81,8 @@ namespace DailyPlaner.ViewModels
 
         public ICommand RegisterCommand { get; }
         public ICommand CancelCommand { get; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public RegisterViewModel(DatabaseService databaseService)
         {
@@ -175,19 +151,11 @@ namespace DailyPlaner.ViewModels
                     MessageBox.Show("Пароль должен содержать не менее 6 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
-                if (SelectedGenderId <= 0)
-                {
-                    MessageBox.Show("Выберите пол.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 if (_databaseService.UsernameExists(Username))
                 {
                     MessageBox.Show($"Имя пользователя \"{Username}\" уже занято. Выберите другое.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
                 var user = new User
                 {
                     Username = Username,
@@ -197,9 +165,7 @@ namespace DailyPlaner.ViewModels
                     RoleId = 1,
                     CreatedAt = DateTime.Now
                 };
-
-                bool result = _databaseService.CreateUser(user);
-                if (result)
+                if (_databaseService.CreateUser(user))
                 {
                     MessageBox.Show("Вы успешно зарегистрировались!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     CloseRegisterWindow();
@@ -241,8 +207,7 @@ namespace DailyPlaner.ViewModels
 
         private void CloseRegisterWindow()
         {
-            var registerWindow = Application.Current.Windows.OfType<Views.RegisterWindow>().FirstOrDefault();
-            registerWindow?.Close();
+            Application.Current.Windows.OfType<Views.RegisterWindow>().FirstOrDefault()?.Close();
         }
 
         protected virtual void OnPropertyChanged(string propertyName)

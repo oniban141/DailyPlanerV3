@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using Newtonsoft.Json;
@@ -40,7 +39,7 @@ namespace DailyPlaner.ViewModels
 
         public User CurrentUser
         {
-            get => _currentUser;
+            get { return _currentUser; }
             set
             {
                 _currentUser = value;
@@ -55,7 +54,7 @@ namespace DailyPlaner.ViewModels
 
         public ObservableCollection<Models.Task> Tasks
         {
-            get => _tasks;
+            get { return _tasks; }
             set
             {
                 _tasks = value;
@@ -66,7 +65,7 @@ namespace DailyPlaner.ViewModels
 
         public ObservableCollection<Event> Events
         {
-            get => _events;
+            get { return _events; }
             set
             {
                 _events = value;
@@ -76,7 +75,7 @@ namespace DailyPlaner.ViewModels
 
         public ObservableCollection<Note> Notes
         {
-            get => _notes;
+            get { return _notes; }
             set
             {
                 _notes = value;
@@ -88,7 +87,7 @@ namespace DailyPlaner.ViewModels
 
         public Models.Task SelectedTask
         {
-            get => _selectedTask;
+            get { return _selectedTask; }
             set
             {
                 _selectedTask = value;
@@ -98,7 +97,7 @@ namespace DailyPlaner.ViewModels
 
         public Event SelectedEvent
         {
-            get => _selectedEvent;
+            get { return _selectedEvent; }
             set
             {
                 _selectedEvent = value;
@@ -108,7 +107,7 @@ namespace DailyPlaner.ViewModels
 
         public Note SelectedNote
         {
-            get => _selectedNote;
+            get { return _selectedNote; }
             set
             {
                 _selectedNote = value;
@@ -118,7 +117,7 @@ namespace DailyPlaner.ViewModels
 
         public string SearchText
         {
-            get => _searchText;
+            get { return _searchText; }
             set
             {
                 _searchText = value;
@@ -129,7 +128,7 @@ namespace DailyPlaner.ViewModels
 
         public DateTime SelectedDate
         {
-            get => _selectedDate;
+            get { return _selectedDate; }
             set
             {
                 _selectedDate = value;
@@ -139,7 +138,7 @@ namespace DailyPlaner.ViewModels
 
         public bool IsDarkTheme
         {
-            get => _isDarkTheme;
+            get { return _isDarkTheme; }
             set
             {
                 _isDarkTheme = value;
@@ -147,7 +146,10 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public int CompletedTasksCount => Tasks.Count(t => t.IsCompleted);
+        public int CompletedTasksCount
+        {
+            get { return Tasks.Count(t => t.IsCompleted); }
+        }
 
         public ICommand AddTaskCommand { get; }
         public ICommand EditTaskCommand { get; }
@@ -175,7 +177,6 @@ namespace DailyPlaner.ViewModels
             Events = new ObservableCollection<Event>();
             Notes = new ObservableCollection<Note>();
             SelectedDate = DateTime.Today;
-
             AddTaskCommand = new RelayCommand(ExecuteAddTask);
             EditTaskCommand = new RelayCommand(ExecuteEditTask, CanExecuteTaskCommand);
             DeleteTaskCommand = new RelayCommand(ExecuteDeleteTask, CanExecuteTaskCommand);
@@ -202,42 +203,6 @@ namespace DailyPlaner.ViewModels
                 _reminderScheduler = new ReminderScheduler();
             }
             _reminderScheduler.Start();
-        }
-
-        private void ExecuteTestNotification(object parameter)
-        {
-            try
-            {
-                if (_reminderScheduler == null)
-                {
-                    StartReminderScheduler();
-                }
-
-                int pending = _reminderScheduler != null ? _reminderScheduler.GetPendingReminderCount() : -1;
-                DateTime? next = _reminderScheduler != null ? _reminderScheduler.GetNextReminderTime() : null;
-                string schedulerInfo;
-                if (pending < 0)
-                {
-                    schedulerInfo = "Не удалось получить данные о напоминаниях из базы (проверьте подключение к базе данных).";
-                }
-                else if (pending == 0)
-                {
-                    schedulerInfo = "Активных напоминаний в базе нет — напоминания показываются только для существующих записей.";
-                }
-                else
-                {
-                    schedulerInfo = $"Активных напоминаний в базе: {pending}. Ближайшее: {next:dd.MM.yyyy HH:mm}.";
-                }
-
-                _notificationService.ShowReminderNotification(
-                    "Проверка напоминаний",
-                    $"Если вы видите это уведомление — напоминания работают.\n\n{schedulerInfo}",
-                    DateTime.Now);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при проверке напоминаний: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private void LoadUserData()
@@ -328,13 +293,14 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                var dialog = new Views.Dialogs.TaskDialog(string.Empty, string.Empty, DateTime.Today.AddDays(1));
-                dialog.Owner = Application.Current.MainWindow;
+                var dialog = new Views.Dialogs.TaskDialog(string.Empty, string.Empty, DateTime.Today.AddDays(1))
+                {
+                    Owner = Application.Current.MainWindow
+                };
                 if (dialog.ShowDialog() != true)
                 {
                     return;
                 }
-
                 var task = new Models.Task
                 {
                     UserId = CurrentUser.Id,
@@ -344,21 +310,18 @@ namespace DailyPlaner.ViewModels
                     IsCompleted = false,
                     Priority = dialog.TaskPriority
                 };
-
-                bool result = _databaseService.CreateTask(task);
-                if (result)
+                if (_databaseService.CreateTask(task))
                 {
                     if (dialog.ReminderEnabled && dialog.ReminderTime.HasValue)
                     {
-                        var reminder = new Reminder
+                        _databaseService.CreateReminder(new Reminder
                         {
                             UserId = CurrentUser.Id,
                             TaskId = task.Id,
                             ReminderDate = dialog.ReminderTime.Value,
                             Message = $"Задача '{task.Title}' — срок {dialog.TaskDueDate:dd.MM.yyyy HH:mm}",
                             IsShown = true
-                        };
-                        _databaseService.CreateReminder(reminder);
+                        });
                     }
                     RefreshDataForCurrentPage();
                     _notificationService.ShowNotification("Задача создана", $"Задача '{task.Title}' успешно добавлена");
@@ -378,21 +341,19 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-
-                var dialog = new Views.Dialogs.TaskDialog(SelectedTask.Title, SelectedTask.Description, SelectedTask.DueDate, SelectedTask.Priority);
-                dialog.Owner = Application.Current.MainWindow;
+                var dialog = new Views.Dialogs.TaskDialog(SelectedTask.Title, SelectedTask.Description, SelectedTask.DueDate, SelectedTask.Priority)
+                {
+                    Owner = Application.Current.MainWindow
+                };
                 if (dialog.ShowDialog() != true)
                 {
                     return;
                 }
-
                 SelectedTask.Title = dialog.TaskTitle;
                 SelectedTask.Description = dialog.TaskDescription;
                 SelectedTask.DueDate = dialog.TaskDueDate;
                 SelectedTask.Priority = dialog.TaskPriority;
-
-                bool result = _databaseService.UpdateTask(SelectedTask);
-                if (result)
+                if (_databaseService.UpdateTask(SelectedTask))
                 {
                     RefreshDataForCurrentPage();
                 }
@@ -412,21 +373,10 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-
-                string word = PluralForms(tasks.Count, "задачу", "задачи", "задач");
-                if (tasks.Count > 1)
-                {
-                    var answer = MessageBox.Show($"Вы точно хотите удалить {tasks.Count} {word}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (answer != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-                }
-                else if (MessageBox.Show("Вы уверены, что хотите удалить эту задачу?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                if (!ConfirmDelete(tasks.Count, PluralForms(tasks.Count, "задачу", "задачи", "задач"), "эту задачу"))
                 {
                     return;
                 }
-
                 int deleted = 0;
                 foreach (var task in tasks)
                 {
@@ -435,7 +385,6 @@ namespace DailyPlaner.ViewModels
                         deleted++;
                     }
                 }
-
                 if (deleted > 0)
                 {
                     RefreshDataForCurrentPage();
@@ -457,17 +406,17 @@ namespace DailyPlaner.ViewModels
             try
             {
                 var task = SelectedTask;
-                if (task != null)
+                if (task == null)
                 {
-                    task.IsCompleted = !task.IsCompleted;
-                    bool result = _databaseService.UpdateTask(task);
-                    if (result)
-                    {
-                        string taskTitle = task.Title;
-                        bool isCompleted = task.IsCompleted;
-                        RefreshDataForCurrentPage();
-                        _notificationService.ShowNotification("Задача обновлена", $"Задача '{taskTitle}' отмечена как {(isCompleted ? "выполненная" : "невыполненная")}");
-                    }
+                    return;
+                }
+                task.IsCompleted = !task.IsCompleted;
+                if (_databaseService.UpdateTask(task))
+                {
+                    string taskTitle = task.Title;
+                    bool isCompleted = task.IsCompleted;
+                    RefreshDataForCurrentPage();
+                    _notificationService.ShowNotification("Задача обновлена", $"Задача '{taskTitle}' отмечена как {(isCompleted ? "выполненная" : "невыполненная")}");
                 }
             }
             catch (Exception ex)
@@ -476,41 +425,18 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        private void ExecuteCompleteEvent(object parameter)
-        {
-            try
-            {
-                var ev = SelectedEvent;
-                if (ev != null)
-                {
-                    ev.IsCompleted = !ev.IsCompleted;
-                    bool result = _databaseService.UpdateEvent(ev);
-                    if (result)
-                    {
-                        string eventTitle = ev.Title;
-                        bool isCompleted = ev.IsCompleted;
-                        RefreshDataForCurrentPage();
-                        _notificationService.ShowNotification("Событие обновлено", $"Событие '{eventTitle}' отмечено как {(isCompleted ? "завершённое" : "незавершённое")}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при завершении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void ExecuteAddEvent(object parameter)
         {
             try
             {
-                var dialog = new Views.Dialogs.EventDialog(string.Empty, string.Empty, string.Empty, DateTime.Today);
-                dialog.Owner = Application.Current.MainWindow;
+                var dialog = new Views.Dialogs.EventDialog(string.Empty, string.Empty, string.Empty, DateTime.Today)
+                {
+                    Owner = Application.Current.MainWindow
+                };
                 if (dialog.ShowDialog() != true)
                 {
                     return;
                 }
-
                 var ev = new Event
                 {
                     UserId = CurrentUser.Id,
@@ -520,9 +446,7 @@ namespace DailyPlaner.ViewModels
                     EndDate = dialog.EventEnd,
                     Location = dialog.EventLocation
                 };
-
-                bool result = _databaseService.CreateEvent(ev);
-                if (result)
+                if (_databaseService.CreateEvent(ev))
                 {
                     if (dialog.ReminderEnabled && dialog.ReminderTime.HasValue)
                     {
@@ -547,22 +471,20 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-
-                var dialog = new Views.Dialogs.EventDialog(SelectedEvent.Title, SelectedEvent.Description, SelectedEvent.Location, SelectedEvent.StartDate, SelectedEvent.EndDate);
-                dialog.Owner = Application.Current.MainWindow;
+                var dialog = new Views.Dialogs.EventDialog(SelectedEvent.Title, SelectedEvent.Description, SelectedEvent.Location, SelectedEvent.StartDate, SelectedEvent.EndDate)
+                {
+                    Owner = Application.Current.MainWindow
+                };
                 if (dialog.ShowDialog() != true)
                 {
                     return;
                 }
-
                 SelectedEvent.Title = dialog.EventTitle;
                 SelectedEvent.Description = dialog.EventDescription;
                 SelectedEvent.Location = dialog.EventLocation;
                 SelectedEvent.StartDate = dialog.EventStart;
                 SelectedEvent.EndDate = dialog.EventEnd;
-
-                bool result = _databaseService.UpdateEvent(SelectedEvent);
-                if (result)
+                if (_databaseService.UpdateEvent(SelectedEvent))
                 {
                     RefreshDataForCurrentPage();
                 }
@@ -582,21 +504,10 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-
-                string word = PluralForms(events.Count, "событие", "события", "событий");
-                if (events.Count > 1)
-                {
-                    var answer = MessageBox.Show($"Вы точно хотите удалить {events.Count} {word}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (answer != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-                }
-                else if (MessageBox.Show("Вы уверены, что хотите удалить это событие?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                if (!ConfirmDelete(events.Count, PluralForms(events.Count, "событие", "события", "событий"), "это событие"))
                 {
                     return;
                 }
-
                 int deleted = 0;
                 foreach (var ev in events)
                 {
@@ -605,7 +516,6 @@ namespace DailyPlaner.ViewModels
                         deleted++;
                     }
                 }
-
                 if (deleted > 0)
                 {
                     RefreshDataForCurrentPage();
@@ -622,17 +532,42 @@ namespace DailyPlaner.ViewModels
             }
         }
 
+        private void ExecuteCompleteEvent(object parameter)
+        {
+            try
+            {
+                var ev = SelectedEvent;
+                if (ev == null)
+                {
+                    return;
+                }
+                ev.IsCompleted = !ev.IsCompleted;
+                if (_databaseService.UpdateEvent(ev))
+                {
+                    string eventTitle = ev.Title;
+                    bool isCompleted = ev.IsCompleted;
+                    RefreshDataForCurrentPage();
+                    _notificationService.ShowNotification("Событие обновлено", $"Событие '{eventTitle}' отмечено как {(isCompleted ? "завершённое" : "незавершённое")}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при завершении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void ExecuteAddNote(object parameter)
         {
             try
             {
-                var dialog = new Views.Dialogs.NoteDialog(string.Empty, string.Empty);
-                dialog.Owner = Application.Current.MainWindow;
+                var dialog = new Views.Dialogs.NoteDialog(string.Empty, string.Empty)
+                {
+                    Owner = Application.Current.MainWindow
+                };
                 if (dialog.ShowDialog() != true)
                 {
                     return;
                 }
-
                 var note = new Note
                 {
                     UserId = CurrentUser.Id,
@@ -640,9 +575,7 @@ namespace DailyPlaner.ViewModels
                     Content = dialog.NoteContent,
                     CreatedDate = DateTime.Now
                 };
-
-                bool result = _databaseService.CreateNote(note);
-                if (result)
+                if (_databaseService.CreateNote(note))
                 {
                     RefreshDataForCurrentPage();
                     _notificationService.ShowNotification("Заметка создана", $"Заметка '{note.Title}' успешно добавлена");
@@ -662,19 +595,17 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-
-                var dialog = new Views.Dialogs.NoteDialog(SelectedNote.Title, SelectedNote.Content);
-                dialog.Owner = Application.Current.MainWindow;
+                var dialog = new Views.Dialogs.NoteDialog(SelectedNote.Title, SelectedNote.Content)
+                {
+                    Owner = Application.Current.MainWindow
+                };
                 if (dialog.ShowDialog() != true)
                 {
                     return;
                 }
-
                 SelectedNote.Title = dialog.NoteTitle;
                 SelectedNote.Content = dialog.NoteContent;
-
-                bool result = _databaseService.UpdateNote(SelectedNote);
-                if (result)
+                if (_databaseService.UpdateNote(SelectedNote))
                 {
                     RefreshDataForCurrentPage();
                 }
@@ -694,21 +625,10 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-
-                string word = PluralForms(notes.Count, "заметку", "заметки", "заметок");
-                if (notes.Count > 1)
-                {
-                    var answer = MessageBox.Show($"Вы точно хотите удалить {notes.Count} {word}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (answer != MessageBoxResult.Yes)
-                    {
-                        return;
-                    }
-                }
-                else if (MessageBox.Show("Вы уверены, что хотите удалить эту заметку?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                if (!ConfirmDelete(notes.Count, PluralForms(notes.Count, "заметку", "заметки", "заметок"), "эту заметку"))
                 {
                     return;
                 }
-
                 int deleted = 0;
                 foreach (var note in notes)
                 {
@@ -717,7 +637,6 @@ namespace DailyPlaner.ViewModels
                         deleted++;
                     }
                 }
-
                 if (deleted > 0)
                 {
                     RefreshDataForCurrentPage();
@@ -734,6 +653,15 @@ namespace DailyPlaner.ViewModels
             }
         }
 
+        private bool ConfirmDelete(int count, string word, string singleText)
+        {
+            if (count > 1)
+            {
+                return MessageBox.Show($"Вы точно хотите удалить {count} {word}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+            }
+            return MessageBox.Show($"Вы уверены, что хотите удалить {singleText}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        }
+
         private void ExecuteClearSearch(object parameter)
         {
             ResetFiltersAndReload();
@@ -745,17 +673,14 @@ namespace DailyPlaner.ViewModels
             {
                 return;
             }
-
             if (ActivePage != PageTasks && ActivePage != PageEvents && ActivePage != PageNotes)
             {
                 return;
             }
-
             try
             {
                 string query = SearchText?.Trim() ?? string.Empty;
                 bool hasQuery = query.Length > 0;
-
                 if (ActivePage == PageTasks)
                 {
                     var items = _databaseService.GetTasksByUserId(CurrentUser.Id);
@@ -796,15 +721,12 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        private bool IsOverviewPage => ActivePage == PageOverview || string.IsNullOrEmpty(ActivePage);
-
         public void ResetFiltersAndReload()
         {
             if (CurrentUser == null)
             {
                 return;
             }
-
             SearchText = string.Empty;
             LoadUserData();
         }
@@ -815,7 +737,6 @@ namespace DailyPlaner.ViewModels
             {
                 return;
             }
-
             if (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes)
             {
                 ApplyNameSearch();
@@ -844,13 +765,11 @@ namespace DailyPlaner.ViewModels
                 }
                 string json = JsonConvert.SerializeObject(tasks, Formatting.Indented,
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
                 var saveFileDialog = new Microsoft.Win32.SaveFileDialog
                 {
                     Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
                     DefaultExt = ".json"
                 };
-
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     File.WriteAllText(saveFileDialog.FileName, json);
@@ -871,27 +790,26 @@ namespace DailyPlaner.ViewModels
                 {
                     Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"
                 };
-
-                if (openFileDialog.ShowDialog() == true)
+                if (openFileDialog.ShowDialog() != true)
                 {
-                    string json = File.ReadAllText(openFileDialog.FileName);
-                    if (string.IsNullOrWhiteSpace(json))
+                    return;
+                }
+                string json = File.ReadAllText(openFileDialog.FileName);
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    MessageBox.Show("Файл пуст — нечего импортировать.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                var tasks = JsonConvert.DeserializeObject<List<Models.Task>>(json);
+                if (tasks != null)
+                {
+                    foreach (var task in tasks)
                     {
-                        MessageBox.Show("Файл пуст — нечего импортировать.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
+                        task.UserId = CurrentUser.Id;
+                        _databaseService.CreateTask(task);
                     }
-                    var tasks = JsonConvert.DeserializeObject<List<Models.Task>>(json);
-
-                    if (tasks != null)
-                    {
-                        foreach (var task in tasks)
-                        {
-                            task.UserId = CurrentUser.Id;
-                            _databaseService.CreateTask(task);
-                        }
-                        RefreshDataForCurrentPage();
-                        MessageBox.Show("Задачи успешно импортированы из JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
+                    RefreshDataForCurrentPage();
+                    MessageBox.Show("Задачи успешно импортированы из JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -900,7 +818,41 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-                        private void ExecuteLogout(object parameter)
+        private void ExecuteTestNotification(object parameter)
+        {
+            try
+            {
+                if (_reminderScheduler == null)
+                {
+                    StartReminderScheduler();
+                }
+                int pending = _reminderScheduler != null ? _reminderScheduler.GetPendingReminderCount() : -1;
+                DateTime? next = _reminderScheduler != null ? _reminderScheduler.GetNextReminderTime() : null;
+                string schedulerInfo;
+                if (pending < 0)
+                {
+                    schedulerInfo = "Не удалось получить данные о напоминаниях из базы (проверьте подключение к базе данных).";
+                }
+                else if (pending == 0)
+                {
+                    schedulerInfo = "Активных напоминаний в базе нет — напоминания показываются только для существующих записей.";
+                }
+                else
+                {
+                    schedulerInfo = $"Активных напоминаний в базе: {pending}. Ближайшее: {next:dd.MM.yyyy HH:mm}.";
+                }
+                _notificationService.ShowReminderNotification(
+                    "Проверка напоминаний",
+                    $"Если вы видите это уведомление — напоминания работают.\n\n{schedulerInfo}",
+                    DateTime.Now);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при проверке напоминаний: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ExecuteLogout(object parameter)
         {
             try
             {
@@ -909,11 +861,9 @@ namespace DailyPlaner.ViewModels
                 Tasks.Clear();
                 Events.Clear();
                 Notes.Clear();
-
-                var loginPage = new Views.LoginWindow();
                 var loginHost = new System.Windows.Navigation.NavigationWindow
                 {
-                    Content = loginPage,
+                    Content = new Views.LoginWindow(),
                     ShowsNavigationUI = false,
                     Title = "Ежедневник — вход",
                     Width = 1000,
@@ -922,7 +872,6 @@ namespace DailyPlaner.ViewModels
                 };
                 loginHost.Show();
                 Application.Current.MainWindow = loginHost;
-
                 foreach (System.Windows.Window window in Application.Current.Windows)
                 {
                     if (window != loginHost)

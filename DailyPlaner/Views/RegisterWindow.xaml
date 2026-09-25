@@ -24,7 +24,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Шапка карточки (серо-синяя полоса) -->
+                
                 <Border Grid.Row="0" Background="{DynamicResource SecondaryBrush}" CornerRadius="14,14,0,0" Padding="24,20">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
@@ -41,7 +41,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Форма -->
+                
                 <StackPanel Grid.Row="1" Margin="28,24,28,24">
                     <TextBlock Text="Имя пользователя" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
                     <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">

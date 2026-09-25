@@ -5,8 +5,15 @@ namespace DailyPlaner.Views.Dialogs
 {
     public partial class NoteDialog : Window
     {
-        public string NoteTitle => TitleBox.Text.Trim();
-        public string NoteContent => ContentBox.Text.Trim();
+        public string NoteTitle
+        {
+            get { return TitleBox.Text.Trim(); }
+        }
+
+        public string NoteContent
+        {
+            get { return ContentBox.Text.Trim(); }
+        }
 
         public NoteDialog(string title, string content)
         {
@@ -20,8 +27,7 @@ namespace DailyPlaner.Views.Dialogs
         {
             if (string.IsNullOrWhiteSpace(NoteTitle))
             {
-                MessageBox.Show("Введите название заметки.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите название заметки.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             DialogResult = true;
