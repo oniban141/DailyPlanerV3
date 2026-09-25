@@ -227,7 +227,7 @@
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="10,9"/>
+        <Setter Property="Padding" Value="6,9"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CaretBrush" Value="{StaticResource PrimaryBrush}"/>
@@ -242,7 +242,7 @@
                             <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
                             <TextBlock x:Name="PART_Watermark" Text="{TemplateBinding Tag}"
                                        Foreground="{DynamicResource MutedTextBrush}"
-                                       Margin="10,0,0,0" VerticalAlignment="Center"
+                                       Margin="6,0,0,0" VerticalAlignment="Center"
                                        Visibility="Collapsed" IsHitTestVisible="False"/>
                         </Grid>
                     </Border>
@@ -264,7 +264,7 @@
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="10,9"/>
+        <Setter Property="Padding" Value="6,9"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CaretBrush" Value="{StaticResource PrimaryBrush}"/>
@@ -315,7 +315,7 @@
         <Setter Property="Foreground" Value="{DynamicResource LightForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="14,9"/>
+        <Setter Property="Padding" Value="6,9"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">

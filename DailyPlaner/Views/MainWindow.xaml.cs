@@ -25,6 +25,7 @@ namespace DailyPlaner
         {
             InitializeComponent();
             App.SetWindowIcon(this);
+            LoadHeaderIcon();
             DataContext = new MainViewModel();
             ((MainViewModel)DataContext).ActivePage = "OverviewPage";
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
@@ -36,6 +37,7 @@ namespace DailyPlaner
         {
             InitializeComponent();
             App.SetWindowIcon(this);
+            LoadHeaderIcon();
             var viewModel = new MainViewModel();
             DataContext = viewModel;
             viewModel.CurrentUser = user;
@@ -111,6 +113,27 @@ namespace DailyPlaner
         {
             bool enabled = AutoStartSidebarCheckBox.IsChecked == true;
             App.SetAutoStart(enabled);
+        }
+
+        private void LoadHeaderIcon()
+        {
+            try
+            {
+                if (HeaderIcon.Source != null)
+                {
+                    return;
+                }
+                string iconPath = App.FindIconFile();
+                if (iconPath != null)
+                {
+                    var bitmap = new BitmapImage(new Uri(iconPath));
+                    bitmap.Freeze();
+                    HeaderIcon.Source = bitmap;
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void RefreshDayLists()
