@@ -55,7 +55,7 @@
                             <PasswordBox x:Name="PasswordBox" Style="{StaticResource BasePasswordBoxStyle}"
                                         PasswordChanged="PasswordBox_PasswordChanged"/>
                             <TextBlock x:Name="PasswordWatermark" Text="Введите пароль"
-                                       Foreground="{DynamicResource MutedTextBrush}" Margin="14,0,0,0"
+                                       Foreground="{DynamicResource MutedTextBrush}" Margin="6,0,0,0"
                                        VerticalAlignment="Center" IsHitTestVisible="False"/>
                         </Grid>
                     </Border>
@@ -66,7 +66,7 @@
                             <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource BasePasswordBoxStyle}"
                                         PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
                             <TextBlock x:Name="ConfirmPasswordWatermark" Text="Повторите пароль"
-                                       Foreground="{DynamicResource MutedTextBrush}" Margin="14,0,0,0"
+                                       Foreground="{DynamicResource MutedTextBrush}" Margin="6,0,0,0"
                                        VerticalAlignment="Center" IsHitTestVisible="False"/>
                         </Grid>
                     </Border>
@@ -90,7 +90,7 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                             <TextBlock x:Name="GenderWatermark" Text="Выберите пол" IsHitTestVisible="False"
-                                       Foreground="{DynamicResource MutedTextBrush}" Margin="14,0,0,0" VerticalAlignment="Center"/>
+                                       Foreground="{DynamicResource MutedTextBrush}" Margin="6,0,0,0" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
 
