@@ -57,9 +57,9 @@
                     <Button Content="🔔   Проверить напоминания" Command="{Binding TestNotificationCommand}"
                             Style="{StaticResource SidebarButtonStyle}"/>
                     <CheckBox x:Name="AutoStartSidebarCheckBox" Content="🔁   Автозапуск"
-                              Foreground="#EFE6DA" FontFamily="Segoe UI" FontSize="14"
+                              Style="{StaticResource SidebarCheckBoxStyle}"
                               Checked="AutoStartSidebar_Changed" Unchecked="AutoStartSidebar_Changed"
-                              Margin="20,6,20,6"/>
+                              HorizontalAlignment="Left" Margin="12,6,12,6"/>
                 </StackPanel>
 
                 <!-- 🚪 Выйти -->
@@ -99,25 +99,23 @@
             </Grid>
 
             <!-- Toolbar -->
-            <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
-                <StackPanel Orientation="Horizontal">
-                    <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,10,0" Width="260">
-                        <Grid>
-                            <TextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource WatermarkTextBoxStyle}" Tag="🔍  Поиск..."
-                                     Background="Transparent" BorderThickness="0"/>
-                        </Grid>
-                    </Border>
-                    <Button Content="Поиск" Command="{Binding SearchCommand}"
-                            Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Очистить" Command="{Binding ClearSearchCommand}"
-                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,16,0"/>
-                    <ComboBox ItemsSource="{Binding Tags}" SelectedItem="{Binding SelectedTag}"
-                              DisplayMemberPath="Name" Style="{StaticResource BaseComboBoxStyle}"
-                              Width="160" Margin="0,0,16,0" VerticalAlignment="Center"/>
-                    <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+            <Border x:Name="ToolbarBorder" Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
+                <DockPanel LastChildFill="True">
+                    <DatePicker x:Name="ToolbarDatePicker" DockPanel.Dock="Right" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                                 Style="{StaticResource BaseDatePickerStyle}" Width="170" VerticalAlignment="Center"/>
-                </StackPanel>
+                    <Button x:Name="ClearSearchButton" DockPanel.Dock="Right" Content="Очистить" Command="{Binding ClearSearchCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    <Button x:Name="SearchButton" DockPanel.Dock="Right" Content="Поиск" Command="{Binding SearchCommand}"
+                            Style="{StaticResource BaseButtonStyle}" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="SearchScopeComboBox" DockPanel.Dock="Right"
+                              ItemsSource="{Binding SearchScopes}" SelectedItem="{Binding SelectedSearchScope}"
+                              Style="{StaticResource BaseComboBoxStyle}" Width="140" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    <Border x:Name="SearchTextBoxHost" Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10">
+                        <TextBox x:Name="SearchTextBox" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource WatermarkTextBoxStyle}" Tag="🔍  Поиск..."
+                                 Background="Transparent" BorderThickness="0" VerticalAlignment="Center"/>
+                    </Border>
+                </DockPanel>
             </Border>
 
             <!-- ================= PAGE: ОБЗОР ================= -->
@@ -236,14 +234,14 @@
                             Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="Изменить" Command="{Binding EditTaskCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Удалить" Command="{Binding DeleteTaskCommand}"
+                    <Button Content="Удалить" Command="{Binding DeleteTaskCommand}" CommandParameter="{Binding SelectedItems, ElementName=TasksList}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="✔ Выполнено" Command="{Binding CompleteTaskCommand}"
                             Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
 
-                <ListView Grid.Row="1" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}"
-                          Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="TasksList_MouseDoubleClick">
+                <ListView Grid.Row="1" x:Name="TasksList" ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}"
+                          SelectionMode="Extended" Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="TasksList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -296,12 +294,12 @@
                             Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="Изменить" Command="{Binding EditEventCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Удалить" Command="{Binding DeleteEventCommand}"
+                    <Button Content="Удалить" Command="{Binding DeleteEventCommand}" CommandParameter="{Binding SelectedItems, ElementName=EventsList}"
                             Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
 
-                <ListView Grid.Row="1" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}"
-                          Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="EventsList_MouseDoubleClick">
+                <ListView Grid.Row="1" x:Name="EventsList" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}"
+                          SelectionMode="Extended" Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="EventsList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -357,12 +355,12 @@
                             Style="{StaticResource BaseButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="Изменить" Command="{Binding EditNoteCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
-                    <Button Content="Удалить" Command="{Binding DeleteNoteCommand}"
+                    <Button Content="Удалить" Command="{Binding DeleteNoteCommand}" CommandParameter="{Binding SelectedItems, ElementName=NotesList}"
                             Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
 
-                <ListView Grid.Row="1" ItemsSource="{Binding Notes}" SelectedItem="{Binding SelectedNote}"
-                          Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="NotesList_MouseDoubleClick">
+                <ListView Grid.Row="1" x:Name="NotesList" ItemsSource="{Binding Notes}" SelectedItem="{Binding SelectedNote}"
+                          SelectionMode="Extended" Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="NotesList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">

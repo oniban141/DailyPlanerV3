@@ -543,6 +543,45 @@
     </Style>
 
     <!-- ============================================================
+         CHECKBOX (галочка слева от текста)
+         ============================================================ -->
+
+    <Style x:Key="SidebarCheckBoxStyle" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource SidebarTextBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FlowDirection" Value="LeftToRight"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                        <Border x:Name="CheckBorder" Width="18" Height="18" CornerRadius="4"
+                                Background="{DynamicResource SoftBeigeBrush}"
+                                BorderBrush="{StaticResource SecondaryBrush}" BorderThickness="1.5"
+                                VerticalAlignment="Center">
+                            <Path x:Name="CheckMark" Data="M 3 8 L 7 12 L 13 4" Stroke="#FFFFFF"
+                                  StrokeThickness="2" Visibility="Collapsed" Stretch="Uniform" Margin="2"/>
+                        </Border>
+                        <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================
          Dark Theme Styles (совместимость с ToggleTheme)
          ============================================================ -->
 

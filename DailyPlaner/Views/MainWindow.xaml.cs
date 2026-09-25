@@ -26,7 +26,9 @@ namespace DailyPlaner
             InitializeComponent();
             App.SetWindowIcon(this);
             DataContext = new MainViewModel();
+            ((MainViewModel)DataContext).ActivePage = "OverviewPage";
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
+            UpdateToolbarForPage("OverviewPage");
             Loaded += (s, e) => RefreshDayLists();
         }
 
@@ -37,7 +39,9 @@ namespace DailyPlaner
             var viewModel = new MainViewModel();
             DataContext = viewModel;
             viewModel.CurrentUser = user;
+            viewModel.ActivePage = "OverviewPage";
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
+            UpdateToolbarForPage("OverviewPage");
             viewModel.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(MainViewModel.SelectedDate) || e.PropertyName == nameof(MainViewModel.Tasks) || e.PropertyName == nameof(MainViewModel.Events))
@@ -64,6 +68,12 @@ namespace DailyPlaner
 
         private void ShowPage(string pageName)
         {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.ActivePage = pageName;
+                vm.ResetFiltersAndReload();
+            }
+
             OverviewPage.Visibility = pageName == "OverviewPage" ? Visibility.Visible : Visibility.Collapsed;
             TasksPage.Visibility = pageName == "TasksPage" ? Visibility.Visible : Visibility.Collapsed;
             EventsPage.Visibility = pageName == "EventsPage" ? Visibility.Visible : Visibility.Collapsed;
@@ -75,6 +85,30 @@ namespace DailyPlaner
             NavEventsButton.Style = (Style)FindResource(pageName == "EventsPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             NavNotesButton.Style = (Style)FindResource(pageName == "NotesPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             NavCalendarButton.Style = (Style)FindResource(pageName == "CalendarPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+
+            UpdateToolbarForPage(pageName);
+        }
+
+        private void UpdateToolbarForPage(string pageName)
+        {
+            bool isOverview = pageName == "OverviewPage";
+            bool isCalendar = pageName == "CalendarPage";
+
+            ToolbarBorder.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
+            SearchScopeComboBox.Visibility = isOverview ? Visibility.Visible : Visibility.Collapsed;
+            SearchTextBoxHost.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
+            SearchButton.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
+            ClearSearchButton.Visibility = isCalendar ? Visibility.Collapsed : Visibility.Visible;
+            ToolbarDatePicker.Visibility = isOverview ? Visibility.Collapsed : Visibility.Visible;
+
+            if (isCalendar)
+            {
+                return;
+            }
+
+            SearchTextBox.Tag = isOverview
+                ? "🔍  Поиск..."
+                : "🔍  Поиск по дате (дд.ММ.гггг)...";
         }
 
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)

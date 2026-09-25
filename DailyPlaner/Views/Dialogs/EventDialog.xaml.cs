@@ -12,17 +12,25 @@ namespace DailyPlaner.Views.Dialogs
         public string EventDescription => DescriptionBox.Text.Trim();
         public string EventLocation => LocationBox.Text.Trim();
         public DateTime EventStart { get; private set; }
+        public DateTime EventEnd { get; private set; }
         public bool ReminderEnabled => ReminderCheckBox.IsChecked == true;
         public DateTime? ReminderTime { get; private set; }
 
-        public EventDialog(string title, string description, string location, DateTime start)
+        public EventDialog(string title, string description, string location, DateTime start, DateTime? end = null)
         {
             InitializeComponent();
 
             EventStart = start;
-            FillTimeItems(start);
-            StartDatePicker.SelectedDate = start.Date;
-            SelectTime(start.TimeOfDay);
+            EventEnd = end ?? start.AddHours(1);
+
+            FillTimeItems(TimeComboBox);
+            StartDatePicker.SelectedDate = EventStart.Date;
+            SelectTime(TimeComboBox, EventStart.TimeOfDay);
+            StartDatePicker.SelectedDateChanged += (s, e) => SyncEndDateToStart();
+
+            FillTimeItems(EndTimeComboBox);
+            EndDatePicker.SelectedDate = EventEnd.Date;
+            SelectTime(EndTimeComboBox, EventEnd.TimeOfDay);
 
             ReminderOffsetComboBox.ItemsSource = new[]
             {
@@ -36,33 +44,41 @@ namespace DailyPlaner.Views.Dialogs
             Loaded += (s, e) => TitleBox.Focus();
         }
 
-        private void FillTimeItems(DateTime baseTime)
+        private void SyncEndDateToStart()
+        {
+            if (EndDatePicker.SelectedDate == null)
+            {
+                EndDatePicker.SelectedDate = StartDatePicker.SelectedDate;
+            }
+        }
+
+        private void FillTimeItems(System.Windows.Controls.ComboBox comboBox)
         {
             var items = new List<string>();
-            var start = baseTime.Date;
+            var start = DateTime.Today;
             for (int i = 0; i < 48; i++)
             {
                 items.Add(start.ToString("HH:mm"));
                 start = start.AddMinutes(30);
             }
-            TimeComboBox.ItemsSource = items;
+            comboBox.ItemsSource = items;
         }
 
-        private void SelectTime(TimeSpan time)
+        private void SelectTime(System.Windows.Controls.ComboBox comboBox, TimeSpan time)
         {
             var rounded = new TimeSpan(time.Hours, time.Minutes >= 30 ? 30 : 0, 0);
             string target = ((int)rounded.TotalHours).ToString("00") + ":" + rounded.Minutes.ToString("00");
-            foreach (var item in TimeComboBox.Items)
+            foreach (var item in comboBox.Items)
             {
                 if (item.ToString() == target)
                 {
-                    TimeComboBox.SelectedItem = item;
+                    comboBox.SelectedItem = item;
                     return;
                 }
             }
-            if (TimeComboBox.Items.Count > 0)
+            if (comboBox.Items.Count > 0)
             {
-                TimeComboBox.SelectedIndex = 0;
+                comboBox.SelectedIndex = 0;
             }
         }
 
@@ -84,6 +100,17 @@ namespace DailyPlaner.Views.Dialogs
             var date = StartDatePicker.SelectedDate ?? DateTime.Today;
             var time = TimeSpan.Zero;
             if (TimeComboBox.SelectedItem != null && TimeSpan.TryParse(TimeComboBox.SelectedItem.ToString(), out var parsed))
+            {
+                time = parsed;
+            }
+            return date.Date + time;
+        }
+
+        private DateTime GetEndFromControls()
+        {
+            var date = EndDatePicker.SelectedDate ?? (StartDatePicker.SelectedDate ?? DateTime.Today);
+            var time = TimeSpan.Zero;
+            if (EndTimeComboBox.SelectedItem != null && TimeSpan.TryParse(EndTimeComboBox.SelectedItem.ToString(), out var parsed))
             {
                 time = parsed;
             }
@@ -122,6 +149,14 @@ namespace DailyPlaner.Views.Dialogs
             }
 
             EventStart = GetStartFromControls();
+            EventEnd = GetEndFromControls();
+
+            if (EventEnd < EventStart)
+            {
+                MessageBox.Show("Окончание события не может быть раньше начала.", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             if (ReminderEnabled)
             {
