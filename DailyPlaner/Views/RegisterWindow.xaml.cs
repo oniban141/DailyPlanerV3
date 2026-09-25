@@ -85,5 +85,15 @@ namespace DailyPlaner.Views
                     : Visibility.Collapsed;
             }
         }
+
+        private void TextBox_TextChanged()
+        {
+
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
