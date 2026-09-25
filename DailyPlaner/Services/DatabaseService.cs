@@ -79,14 +79,15 @@ namespace DailyPlaner.Services
             {
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"
-IF COL_LENGTH('dbo.Events', 'Status') IS NULL
-    ALTER TABLE dbo.Events ADD Status NVARCHAR(50) NULL;
-IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Events_Status')
-    ALTER TABLE dbo.Events DROP CONSTRAINT CHK_Events_Status;
-UPDATE Events SET Status = N'Запланировано' WHERE Status IS NULL OR Status NOT IN (N'Запланировано', N'Завершено');
-ALTER TABLE dbo.Events ADD CONSTRAINT CHK_Events_Status CHECK (Status IN (N'Запланировано', N'Завершено'));
-IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Priority')
+                    command.CommandText = "IF COL_LENGTH('dbo.Events', 'Status') IS NULL ALTER TABLE dbo.Events ADD Status NVARCHAR(50) NULL";
+                    command.ExecuteNonQuery();
+                    command.CommandText = "IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Events_Status') ALTER TABLE dbo.Events DROP CONSTRAINT CHK_Events_Status";
+                    command.ExecuteNonQuery();
+                    command.CommandText = "UPDATE Events SET Status = N'Запланировано' WHERE Status IS NULL OR Status NOT IN (N'Запланировано', N'Завершено')";
+                    command.ExecuteNonQuery();
+                    command.CommandText = "ALTER TABLE dbo.Events ADD CONSTRAINT CHK_Events_Status CHECK (Status IN (N'Запланировано', N'Завершено'))";
+                    command.ExecuteNonQuery();
+                    command.CommandText = @"IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Priority')
     ALTER TABLE dbo.Tasks DROP CONSTRAINT CHK_Tasks_Priority;
 IF EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CHK_Tasks_Status')
     ALTER TABLE dbo.Tasks DROP CONSTRAINT CHK_Tasks_Status;

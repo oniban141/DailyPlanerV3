@@ -66,7 +66,7 @@ namespace DailyPlaner
         }
 
 
-        private static string FindIconFile()
+        public static string FindIconFile()
         {
             var candidates = new List<string>
             {
