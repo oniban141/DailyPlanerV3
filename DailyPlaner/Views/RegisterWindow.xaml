@@ -45,7 +45,7 @@
                 <StackPanel Grid.Row="1" Margin="28,24,28,24">
                     <TextBlock Text="Имя пользователя" Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="2,0,0,6"/>
                     <Border Background="{DynamicResource SoftBeigeBrush}" CornerRadius="10" Margin="0,0,0,14">
-                        <TextBox
+                        <TextBox Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource WatermarkTextBoxStyle}" Tag="  Введите имя пользователя" TextChanged="TextBox_TextChanged"/>
                     </Border>
 
