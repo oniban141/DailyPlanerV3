@@ -51,9 +51,6 @@
                     <Button x:Name="NavAdminButton" Content="🛡   Администрирование" Style="{StaticResource SidebarButtonStyle}" Tag="AdminPage" Click="SidebarNav_Click" Visibility="Collapsed"/>
 
                     <Border Background="#5B6F92" Height="1" Margin="20,14,20,14" CornerRadius="1"/>
-
-                    <Button Content="🙃   Сменить тему" Command="{Binding ToggleThemeCommand}"
-                            Style="{StaticResource SidebarButtonStyle}"/>
                     <Button Content="🔔   Проверить напоминания" Command="{Binding TestNotificationCommand}"
                             Style="{StaticResource SidebarButtonStyle}"/>
                     <CheckBox x:Name="AutoStartSidebarCheckBox" Content="🔁   Автозапуск"
