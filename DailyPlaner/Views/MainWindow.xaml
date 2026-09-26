@@ -431,12 +431,16 @@
                         </Grid>
                     </Border>
                     <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="10">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Дата регистрации: " Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center"/>
-                            <DatePicker SelectedDate="{Binding AdminSearchDate, Mode=TwoWay}" Width="140" VerticalAlignment="Center"/>
-                            <Button Content="✕" Padding="8,6" Margin="6,0,0,0" Style="{StaticResource SecondaryButtonStyle}"
-                                    Click="AdminClearDateButton_Click" VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <Grid>
+                            <DatePicker x:Name="AdminSearchDatePicker" SelectedDate="{Binding AdminSearchDate, Mode=TwoWay}"
+                                        Width="140" VerticalAlignment="Center"/>
+                            <Button x:Name="AdminCalendarToggleButton" Content="📅" Padding="10,6" HorizontalAlignment="Left"
+                                    Style="{StaticResource SecondaryButtonStyle}" Click="AdminCalendarToggleButton_Click"
+                                    ToolTip="Выбрать дату регистрации"/>
+                            <Button Content="✕" Padding="10,6" Margin="6,0,0,0" HorizontalAlignment="Right"
+                                    Style="{StaticResource SecondaryButtonStyle}" Click="AdminClearDateButton_Click"
+                                    ToolTip="Сбросить дату"/>
+                        </Grid>
                     </Border>
                 </Grid>
 

@@ -203,6 +203,11 @@ namespace DailyPlaner
             }
         }
 
+        private void AdminCalendarToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            AdminSearchDatePicker.IsDropDownOpen = true;
+        }
+
         private void ShowTaskDetails(Task task)
         {
             Views.Dialogs.DetailsDialog.ShowTask(this, task);

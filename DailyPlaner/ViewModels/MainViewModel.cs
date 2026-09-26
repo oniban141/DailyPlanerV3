@@ -990,14 +990,14 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-                var answer = MessageBox.Show($"Сбросить пароль пользователя \"{user.Username}\" на стандартный (admin123)?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var answer = MessageBox.Show($"Сбросить пароль пользователя \"{user.Username}\" на стандартный (user123)?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (answer != MessageBoxResult.Yes)
                 {
                     return;
                 }
-                if (_databaseService.ResetUserPassword(user.Id, DatabaseService.HashPassword("admin123")))
+                if (_databaseService.ResetUserPassword(user.Id, DatabaseService.HashPassword("user123")))
                 {
-                    MessageBox.Show($"Пароль пользователя \"{user.Username}\" сброшен на admin123.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Пароль пользователя \"{user.Username}\" сброшен на user123.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
