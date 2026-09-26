@@ -20,6 +20,7 @@ namespace DailyPlaner.ViewModels
         public const string PageEvents = "EventsPage";
         public const string PageNotes = "NotesPage";
         public const string PageCalendar = "CalendarPage";
+        public const string PageAdmin = "AdminPage";
 
         private readonly DatabaseService _databaseService;
         private readonly NotificationService _notificationService;
@@ -34,6 +35,14 @@ namespace DailyPlaner.ViewModels
         private string _searchText;
         private DateTime _selectedDate;
         private bool _isDarkTheme;
+        private ObservableCollection<User> _users;
+        private User _selectedAdminUser;
+        private bool _isAdmin;
+        private int _totalTasks;
+        private int _totalEvents;
+        private int _totalNotes;
+        private int _totalReminders;
+        private int _totalUsers;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -46,6 +55,7 @@ namespace DailyPlaner.ViewModels
                 OnPropertyChanged(nameof(CurrentUser));
                 if (_currentUser != null)
                 {
+                    IsAdmin = _currentUser.RoleId == 2;
                     LoadUserData();
                     StartReminderScheduler();
                 }
@@ -151,6 +161,86 @@ namespace DailyPlaner.ViewModels
             get { return Tasks.Count(t => t.IsCompleted); }
         }
 
+        public bool IsAdmin
+        {
+            get { return _isAdmin; }
+            set
+            {
+                _isAdmin = value;
+                OnPropertyChanged(nameof(IsAdmin));
+            }
+        }
+
+        public ObservableCollection<User> Users
+        {
+            get { return _users; }
+            set
+            {
+                _users = value;
+                OnPropertyChanged(nameof(Users));
+            }
+        }
+
+        public User SelectedAdminUser
+        {
+            get { return _selectedAdminUser; }
+            set
+            {
+                _selectedAdminUser = value;
+                OnPropertyChanged(nameof(SelectedAdminUser));
+            }
+        }
+
+        public int TotalTasks
+        {
+            get { return _totalTasks; }
+            set
+            {
+                _totalTasks = value;
+                OnPropertyChanged(nameof(TotalTasks));
+            }
+        }
+
+        public int TotalEvents
+        {
+            get { return _totalEvents; }
+            set
+            {
+                _totalEvents = value;
+                OnPropertyChanged(nameof(TotalEvents));
+            }
+        }
+
+        public int TotalNotes
+        {
+            get { return _totalNotes; }
+            set
+            {
+                _totalNotes = value;
+                OnPropertyChanged(nameof(TotalNotes));
+            }
+        }
+
+        public int TotalReminders
+        {
+            get { return _totalReminders; }
+            set
+            {
+                _totalReminders = value;
+                OnPropertyChanged(nameof(TotalReminders));
+            }
+        }
+
+        public int TotalUsers
+        {
+            get { return _totalUsers; }
+            set
+            {
+                _totalUsers = value;
+                OnPropertyChanged(nameof(TotalUsers));
+            }
+        }
+
         public ICommand AddTaskCommand { get; }
         public ICommand EditTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
@@ -168,6 +258,8 @@ namespace DailyPlaner.ViewModels
         public ICommand ImportFromJsonCommand { get; }
         public ICommand TestNotificationCommand { get; }
         public ICommand LogoutCommand { get; }
+        public ICommand DeleteUserCommand { get; }
+        public ICommand ResetUserPasswordCommand { get; }
 
         public MainViewModel()
         {
@@ -194,6 +286,8 @@ namespace DailyPlaner.ViewModels
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
             TestNotificationCommand = new RelayCommand(ExecuteTestNotification);
             LogoutCommand = new RelayCommand(ExecuteLogout);
+            DeleteUserCommand = new RelayCommand(ExecuteDeleteUser, CanExecuteAdminCommand);
+            ResetUserPasswordCommand = new RelayCommand(ExecuteResetUserPassword, CanExecuteAdminCommand);
         }
 
         private void StartReminderScheduler()
@@ -728,7 +822,14 @@ namespace DailyPlaner.ViewModels
                 return;
             }
             SearchText = string.Empty;
-            LoadUserData();
+            if (ActivePage == PageAdmin)
+            {
+                LoadAdminData();
+            }
+            else
+            {
+                LoadUserData();
+            }
         }
 
         private void RefreshDataForCurrentPage()
@@ -741,9 +842,95 @@ namespace DailyPlaner.ViewModels
             {
                 ApplyNameSearch();
             }
+            else if (ActivePage == PageAdmin)
+            {
+                LoadAdminData();
+            }
             else
             {
                 LoadUserData();
+            }
+        }
+
+        private void LoadAdminData()
+        {
+            try
+            {
+                Users = new ObservableCollection<User>(_databaseService.GetAllUsers());
+                TotalUsers = _databaseService.CountRows("Users");
+                TotalTasks = _databaseService.CountRows("Tasks");
+                TotalEvents = _databaseService.CountRows("Events");
+                TotalNotes = _databaseService.CountRows("Notes");
+                TotalReminders = _databaseService.CountRows("Reminders");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных администрирования: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private bool CanExecuteAdminCommand(object parameter)
+        {
+            return SelectedAdminUser != null && SelectedAdminUser.Id != CurrentUser?.Id;
+        }
+
+        private void ExecuteDeleteUser(object parameter)
+        {
+            try
+            {
+                var user = SelectedAdminUser;
+                if (user == null || user.Id == CurrentUser.Id)
+                {
+                    return;
+                }
+                var answer = MessageBox.Show($"Вы точно хотите удалить пользователя \"{user.Username}\" со всеми его задачами, событиями, заметками и напоминаниями?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (answer != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+                if (_databaseService.DeleteUserWithAllData(user.Id))
+                {
+                    SelectedAdminUser = null;
+                    LoadAdminData();
+                    MessageBox.Show($"Пользователь \"{user.Username}\" удалён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось удалить пользователя. Попробуйте ещё раз.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении пользователя: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ExecuteResetUserPassword(object parameter)
+        {
+            try
+            {
+                var user = SelectedAdminUser;
+                if (user == null || user.Id == CurrentUser.Id)
+                {
+                    return;
+                }
+                var answer = MessageBox.Show($"Сбросить пароль пользователя \"{user.Username}\" на стандартный (admin123)?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (answer != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+                if (_databaseService.ResetUserPassword(user.Id, DatabaseService.HashPassword("admin123")))
+                {
+                    MessageBox.Show($"Пароль пользователя \"{user.Username}\" сброшен на admin123.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось сбросить пароль. Попробуйте ещё раз.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сбросе пароля: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

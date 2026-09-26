@@ -157,6 +157,13 @@
 - `Scalar(string, Action<SqlCommand>, bool showError) : object` — INSERT + `SELECT CAST(SCOPE_IDENTITY() AS INT)` одним подключением.
 - `ReadUser/ReadTask/ReadEvent/ReadNote/ReadReminder(SqlDataReader)` — `static` — мапперы строк БД в модели.
 
+#### Методы администратора
+
+- `GetAllUsers() : List<User>` — все пользователи (для страницы «Администрирование»; видна только при `RoleId = 2`).
+- `ResetUserPassword(int userId, string passwordHash) : bool` — сброс пароля пользователя.
+- `DeleteUserWithAllData(int userId) : bool` — удаляет пользователя и все его напоминания, задачи, события и заметки.
+- `CountRows(string table) : int` — количество записей таблицы (статистика администратора).
+
 ### Класс `NotificationService` — DailyPlaner/Services/NotificationService.cs
 
 Toast-уведомления Windows с резервным показом через балун трея.

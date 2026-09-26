@@ -298,6 +298,40 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                 command => command.Parameters.AddWithValue("@Id", id));
         }
 
+        public List<User> GetAllUsers()
+        {
+            return Query("SELECT * FROM Users ORDER BY CreatedAt", null, ReadUser);
+        }
+
+        public bool ResetUserPassword(int userId, string passwordHash)
+        {
+            return Execute("UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @Id", command =>
+            {
+                command.Parameters.AddWithValue("@Id", userId);
+                command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+            }, true);
+        }
+
+        public bool DeleteUserWithAllData(int userId)
+        {
+            Execute("DELETE FROM Reminders WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            Execute("DELETE FROM Tasks WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            Execute("DELETE FROM Events WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            Execute("DELETE FROM Notes WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            return Execute("DELETE FROM Users WHERE Id = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId), true);
+        }
+
+        public int CountRows(string table)
+        {
+            var result = Scalar($"SELECT COUNT(1) FROM {table}", null);
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
         public List<Reminder> GetAllReminders()
         {
             return Query("SELECT * FROM Reminders", null, ReadReminder);

@@ -34,6 +34,7 @@ namespace DailyPlaner
             DataContext = viewModel;
             viewModel.CurrentUser = user;
             viewModel.ActivePage = MainViewModel.PageOverview;
+            NavAdminButton.Visibility = viewModel.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
             UpdateToolbarForPage(MainViewModel.PageOverview);
             viewModel.PropertyChanged += (s, e) =>
@@ -71,11 +72,13 @@ namespace DailyPlaner
             EventsPage.Visibility = pageName == MainViewModel.PageEvents ? Visibility.Visible : Visibility.Collapsed;
             NotesPage.Visibility = pageName == MainViewModel.PageNotes ? Visibility.Visible : Visibility.Collapsed;
             CalendarPage.Visibility = pageName == MainViewModel.PageCalendar ? Visibility.Visible : Visibility.Collapsed;
+            AdminPage.Visibility = pageName == MainViewModel.PageAdmin ? Visibility.Visible : Visibility.Collapsed;
             NavOverviewButton.Style = (Style)FindResource(pageName == MainViewModel.PageOverview ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             NavTasksButton.Style = (Style)FindResource(pageName == MainViewModel.PageTasks ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             NavEventsButton.Style = (Style)FindResource(pageName == MainViewModel.PageEvents ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             NavNotesButton.Style = (Style)FindResource(pageName == MainViewModel.PageNotes ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             NavCalendarButton.Style = (Style)FindResource(pageName == MainViewModel.PageCalendar ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+            NavAdminButton.Style = (Style)FindResource(pageName == MainViewModel.PageAdmin ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             UpdateToolbarForPage(pageName);
         }
 

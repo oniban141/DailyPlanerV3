@@ -48,6 +48,7 @@
                     <Button x:Name="NavTasksButton" Content="📋   Задачи" Style="{StaticResource SidebarButtonStyle}" Tag="TasksPage" Click="SidebarNav_Click"/>
                     <Button x:Name="NavEventsButton" Content="📅   События" Style="{StaticResource SidebarButtonStyle}" Tag="EventsPage" Click="SidebarNav_Click"/>
                     <Button x:Name="NavNotesButton" Content="📝   Заметки" Style="{StaticResource SidebarButtonStyle}" Tag="NotesPage" Click="SidebarNav_Click"/>
+                    <Button x:Name="NavAdminButton" Content="🛡   Администрирование" Style="{StaticResource SidebarButtonStyle}" Tag="AdminPage" Click="SidebarNav_Click" Visibility="Collapsed"/>
 
                     <Border Background="#5B6F92" Height="1" Margin="20,14,20,14" CornerRadius="1"/>
 
@@ -401,6 +402,83 @@
             </Grid>
 
             
+            <Grid x:Name="AdminPage" Grid.Row="2" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,14">
+                    <Border Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👥 Пользователей: " Style="{StaticResource BaseTextBlockStyle}"/>
+                            <TextBlock Text="{Binding TotalUsers}" Style="{StaticResource SectionTitleStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📋 Задач: " Style="{StaticResource BaseTextBlockStyle}"/>
+                            <TextBlock Text="{Binding TotalTasks}" Style="{StaticResource SectionTitleStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📅 Событий: " Style="{StaticResource BaseTextBlockStyle}"/>
+                            <TextBlock Text="{Binding TotalEvents}" Style="{StaticResource SectionTitleStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📝 Заметок: " Style="{StaticResource BaseTextBlockStyle}"/>
+                            <TextBlock Text="{Binding TotalNotes}" Style="{StaticResource SectionTitleStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource CardStyle}" Padding="14,10">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔔 Напоминаний: " Style="{StaticResource BaseTextBlockStyle}"/>
+                            <TextBlock Text="{Binding TotalReminders}" Style="{StaticResource SectionTitleStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,14">
+                    <Button Content="🔑 Сбросить пароль" Command="{Binding ResetUserPasswordCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
+                    <Button Content="🗑 Удалить пользователя" Command="{Binding DeleteUserCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+
+                <ListView Grid.Row="2" x:Name="AdminUsersList" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedAdminUser}"
+                          SelectionMode="Single" Style="{StaticResource BaseListViewStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="6"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Background="#C9A27E" CornerRadius="14,0,0,14"/>
+                                    <StackPanel Grid.Column="1" Margin="16,12,16,12">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Username}" Style="{StaticResource SectionTitleStyle}"/>
+                                            <TextBlock Text=" 👤" Style="{StaticResource MutedTextBlockStyle}" Margin="6,0,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                            <TextBlock Text="✉ " Style="{StaticResource MutedTextBlockStyle}"/>
+                                            <TextBlock Text="{Binding Email}" Style="{StaticResource MutedTextBlockStyle}" Margin="2,0,12,0"/>
+                                            <TextBlock Text="Registration: " Style="{StaticResource MutedTextBlockStyle}"/>
+                                            <TextBlock Text="{Binding CreatedAt, StringFormat='dd.MM.yyyy HH:mm'}" Style="{StaticResource MutedTextBlockStyle}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
             <Grid x:Name="CalendarPage" Grid.Row="2" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
