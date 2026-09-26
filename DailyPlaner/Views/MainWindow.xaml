@@ -568,30 +568,33 @@
                     </Border>
                 </Grid>
 
-                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,10,0,10">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                <Grid Grid.Column="1" Margin="0,10,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <!-- Большая дата, как на образце -->
-                        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,28,0,24">
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='dd'}"
-                                       FontSize="96" FontWeight="Bold" HorizontalAlignment="Center"
-                                       Foreground="{StaticResource OrangeDarkBrush}"/>
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='dddd'}"
-                                       FontSize="22" HorizontalAlignment="Center" Margin="0,8,0,0"
-                                       Style="{StaticResource BaseTextBlockStyle}"/>
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='MMMM'}"
-                                       FontSize="18" HorizontalAlignment="Center" Margin="0,2,0,0"
-                                       Style="{StaticResource MutedTextBlockStyle}"/>
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='yyyy'}"
-                                       FontSize="16" HorizontalAlignment="Center" Margin="0,2,0,0"
-                                       Style="{StaticResource MutedTextBlockStyle}"/>
+                    <Border Grid.Column="0" Width="66" Height="66" Background="{DynamicResource AccentBrush}" CornerRadius="10"
+                            VerticalAlignment="Top" Margin="-16,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding SelectedDate, StringFormat='%dd'}" FontSize="26" FontWeight="Bold"
+                                       Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding SelectedDate, StringFormat='MMMM'}" FontSize="11"
+                                       Foreground="White" HorizontalAlignment="Center"/>
                         </StackPanel>
+                    </Border>
 
-                        <ListView Grid.Row="1" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}"
+                                       Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
+
+                            <ListView Grid.Row="1" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
                                   MouseDoubleClick="DayItem_MouseDoubleClick">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -607,6 +610,7 @@
                             </ListView>
                         </Grid>
                     </Border>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
