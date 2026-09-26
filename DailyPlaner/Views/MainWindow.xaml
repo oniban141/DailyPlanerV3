@@ -434,12 +434,14 @@
                         <Grid>
                             <DatePicker x:Name="AdminSearchDatePicker" SelectedDate="{Binding AdminSearchDate, Mode=TwoWay}"
                                         Width="140" VerticalAlignment="Center" Opacity="0" IsHitTestVisible="False"/>
-                            <Button x:Name="AdminCalendarToggleButton" Content="📅" Padding="10,6" HorizontalAlignment="Left"
-                                    Style="{StaticResource SecondaryButtonStyle}" Click="AdminCalendarToggleButton_Click"
-                                    ToolTip="Выбрать дату регистрации"/>
-                            <Button Content="✕" Padding="10,6" Margin="6,0,0,0" HorizontalAlignment="Right"
-                                    Style="{StaticResource SecondaryButtonStyle}" Click="AdminClearDateButton_Click"
-                                    ToolTip="Сбросить дату"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button x:Name="AdminCalendarToggleButton" Content="📅" Padding="10,6"
+                                        Style="{StaticResource SecondaryButtonStyle}" Click="AdminCalendarToggleButton_Click"
+                                        ToolTip="Выбрать дату регистрации"/>
+                                <Button Content="✕" Padding="10,6" Margin="4,0,0,0"
+                                        Style="{StaticResource SecondaryButtonStyle}" Click="AdminClearDateButton_Click"
+                                        ToolTip="Сбросить дату"/>
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </Grid>
