@@ -22,7 +22,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        
+
         <Border Grid.Column="0" Background="{DynamicResource SecondaryBrush}"
                 CornerRadius="0,24,24,0" Margin="0,12,0,12">
             <Grid>
@@ -32,7 +32,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                
+
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,24">
                     <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource PrimaryBrush}">
                         <Image x:Name="HeaderIcon" Stretch="UniformToFill"/>
@@ -41,7 +41,7 @@
                                FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Margin="10,0,0,0"/>
                 </StackPanel>
 
-                
+
                 <StackPanel Grid.Row="1">
                     <Button x:Name="NavOverviewButton" Content="🏠   Обзор" Style="{StaticResource SidebarActiveButtonStyle}" Tag="OverviewPage" Click="SidebarNav_Click"/>
                     <Button x:Name="NavCalendarButton" Content="🗓   Календарь" Style="{StaticResource SidebarButtonStyle}" Tag="CalendarPage" Click="SidebarNav_Click"/>
@@ -62,13 +62,13 @@
                               Margin="12,3,12,3" Padding="14,10"/>
                 </StackPanel>
 
-                
+
                 <Button Grid.Row="2" Content="🚪 Выйти" Command="{Binding LogoutCommand}"
                         Style="{StaticResource SidebarButtonStyle}" Margin="14,0,14,14" HorizontalAlignment="Center"/>
             </Grid>
         </Border>
 
-        
+
         <Grid Grid.Column="1" Margin="24,12,24,12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -76,7 +76,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            
+
             <Grid Grid.Row="0" Margin="0,4,0,18">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -98,7 +98,7 @@
                 </StackPanel>
             </Grid>
 
-            
+
             <Border x:Name="ToolbarBorder" Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="14">
                 <DockPanel LastChildFill="True">
                     <Button x:Name="ClearSearchButton" DockPanel.Dock="Right" Content="Сбросить" Command="{Binding ClearSearchCommand}"
@@ -111,7 +111,7 @@
                 </DockPanel>
             </Border>
 
-            
+
             <Grid x:Name="OverviewPage" Grid.Row="2" Visibility="Visible">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -215,7 +215,7 @@
                 </Grid>
             </Grid>
 
-            
+
             <Grid x:Name="TasksPage" Grid.Row="2" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -284,7 +284,7 @@
                 </ListView>
             </Grid>
 
-            
+
             <Grid x:Name="EventsPage" Grid.Row="2" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -356,7 +356,7 @@
                 </ListView>
             </Grid>
 
-            
+
             <Grid x:Name="NotesPage" Grid.Row="2" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -401,7 +401,7 @@
                 </ListView>
             </Grid>
 
-            
+
             <Grid x:Name="AdminPage" Grid.Row="2" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -575,21 +575,30 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Большая дата, как на образце -->
-                        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,28,0,24">
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='dd'}"
-                                       FontSize="96" FontWeight="Bold" HorizontalAlignment="Center"
-                                       Foreground="{StaticResource OrangeDarkBrush}"/>
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='dddd'}"
-                                       FontSize="22" HorizontalAlignment="Center" Margin="0,8,0,0"
-                                       Style="{StaticResource BaseTextBlockStyle}"/>
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='MMMM'}"
-                                       FontSize="18" HorizontalAlignment="Center" Margin="0,2,0,0"
-                                       Style="{StaticResource MutedTextBlockStyle}"/>
-                            <TextBlock Text="{Binding SelectedDate, StringFormat='yyyy'}"
-                                       FontSize="16" HorizontalAlignment="Center" Margin="0,2,0,0"
-                                       Style="{StaticResource MutedTextBlockStyle}"/>
-                        </StackPanel>
+                        <!-- Бейдж с датой сверху слева (выступ), как на образце -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Width="112" Height="112" Background="{DynamicResource SoftBeigeBrush}"
+                                    CornerRadius="14" VerticalAlignment="Top" Margin="-24,0,20,0">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat='%dd'}" FontSize="46" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat='dddd'}" FontSize="13" Margin="0,4,0,0"
+                                               HorizontalAlignment="Center" Style="{StaticResource MutedTextBlockStyle}"/>
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat='MMMM'}" FontSize="12" Margin="0,1,0,0"
+                                               HorizontalAlignment="Center" Style="{StaticResource MutedTextBlockStyle}"/>
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat='yyyy'}" FontSize="11" Margin="0,1,0,0"
+                                               HorizontalAlignment="Center" Style="{StaticResource MutedTextBlockStyle}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Grid.Column="1" Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}"
+                                       Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Top" Margin="0,2,0,0"/>
+                        </Grid>
 
                         <ListView Grid.Row="1" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
                                   MouseDoubleClick="DayItem_MouseDoubleClick">
