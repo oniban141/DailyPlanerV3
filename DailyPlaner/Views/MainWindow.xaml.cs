@@ -1,19 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using DailyPlaner.ViewModels;
 using DailyPlaner.Models;
+using DailyPlaner.ViewModels;
 
 namespace DailyPlaner
 {
@@ -26,14 +19,13 @@ namespace DailyPlaner
             InitializeComponent();
             App.SetWindowIcon(this);
             LoadHeaderIcon();
-            DataContext = new MainViewModel();
-            ((MainViewModel)DataContext).ActivePage = "OverviewPage";
+            DataContext = new MainViewModel { ActivePage = MainViewModel.PageOverview };
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
-            UpdateToolbarForPage("OverviewPage");
+            UpdateToolbarForPage(MainViewModel.PageOverview);
             Loaded += (s, e) => RefreshDayLists();
         }
 
-        public MainWindow(Models.User user)
+        public MainWindow(User user)
         {
             InitializeComponent();
             App.SetWindowIcon(this);
@@ -41,9 +33,10 @@ namespace DailyPlaner
             var viewModel = new MainViewModel();
             DataContext = viewModel;
             viewModel.CurrentUser = user;
-            viewModel.ActivePage = "OverviewPage";
+            viewModel.ActivePage = MainViewModel.PageOverview;
+            NavAdminButton.Visibility = viewModel.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
-            UpdateToolbarForPage("OverviewPage");
+            UpdateToolbarForPage(MainViewModel.PageOverview);
             viewModel.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(MainViewModel.SelectedDate) || e.PropertyName == nameof(MainViewModel.Tasks) || e.PropertyName == nameof(MainViewModel.Events))
@@ -60,9 +53,8 @@ namespace DailyPlaner
             {
                 return;
             }
-
             ShowPage(pageName);
-            if (pageName == "CalendarPage")
+            if (pageName == MainViewModel.PageCalendar)
             {
                 RefreshDayLists();
             }
@@ -75,25 +67,24 @@ namespace DailyPlaner
                 vm.ActivePage = pageName;
                 vm.ResetFiltersAndReload();
             }
-
-            OverviewPage.Visibility = pageName == "OverviewPage" ? Visibility.Visible : Visibility.Collapsed;
-            TasksPage.Visibility = pageName == "TasksPage" ? Visibility.Visible : Visibility.Collapsed;
-            EventsPage.Visibility = pageName == "EventsPage" ? Visibility.Visible : Visibility.Collapsed;
-            NotesPage.Visibility = pageName == "NotesPage" ? Visibility.Visible : Visibility.Collapsed;
-            CalendarPage.Visibility = pageName == "CalendarPage" ? Visibility.Visible : Visibility.Collapsed;
-
-            NavOverviewButton.Style = (Style)FindResource(pageName == "OverviewPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavTasksButton.Style = (Style)FindResource(pageName == "TasksPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavEventsButton.Style = (Style)FindResource(pageName == "EventsPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavNotesButton.Style = (Style)FindResource(pageName == "NotesPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavCalendarButton.Style = (Style)FindResource(pageName == "CalendarPage" ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-
+            OverviewPage.Visibility = pageName == MainViewModel.PageOverview ? Visibility.Visible : Visibility.Collapsed;
+            TasksPage.Visibility = pageName == MainViewModel.PageTasks ? Visibility.Visible : Visibility.Collapsed;
+            EventsPage.Visibility = pageName == MainViewModel.PageEvents ? Visibility.Visible : Visibility.Collapsed;
+            NotesPage.Visibility = pageName == MainViewModel.PageNotes ? Visibility.Visible : Visibility.Collapsed;
+            CalendarPage.Visibility = pageName == MainViewModel.PageCalendar ? Visibility.Visible : Visibility.Collapsed;
+            AdminPage.Visibility = pageName == MainViewModel.PageAdmin ? Visibility.Visible : Visibility.Collapsed;
+            NavOverviewButton.Style = (Style)FindResource(pageName == MainViewModel.PageOverview ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+            NavTasksButton.Style = (Style)FindResource(pageName == MainViewModel.PageTasks ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+            NavEventsButton.Style = (Style)FindResource(pageName == MainViewModel.PageEvents ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+            NavNotesButton.Style = (Style)FindResource(pageName == MainViewModel.PageNotes ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+            NavCalendarButton.Style = (Style)FindResource(pageName == MainViewModel.PageCalendar ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
+            NavAdminButton.Style = (Style)FindResource(pageName == MainViewModel.PageAdmin ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             UpdateToolbarForPage(pageName);
         }
 
         private void UpdateToolbarForPage(string pageName)
         {
-            bool isListPage = pageName == "TasksPage" || pageName == "EventsPage" || pageName == "NotesPage";
+            bool isListPage = pageName == MainViewModel.PageTasks || pageName == MainViewModel.PageEvents || pageName == MainViewModel.PageNotes;
             ToolbarBorder.Visibility = isListPage ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -111,8 +102,7 @@ namespace DailyPlaner
 
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)
         {
-            bool enabled = AutoStartSidebarCheckBox.IsChecked == true;
-            App.SetAutoStart(enabled);
+            App.SetAutoStart(AutoStartSidebarCheckBox.IsChecked == true);
         }
 
         private void LoadHeaderIcon()
@@ -142,7 +132,6 @@ namespace DailyPlaner
             {
                 return;
             }
-
             var date = vm.SelectedDate.Date;
             DayEventsList.ItemsSource = vm.Events.Where(ev => ev.StartDate.Date == date).OrderBy(ev => ev.StartDate).ToList();
             DayTasksList.ItemsSource = vm.Tasks.Where(t => t.DueDate.Date == date).OrderBy(t => t.DueDate).ToList();
@@ -151,16 +140,11 @@ namespace DailyPlaner
         private void DayItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             object item = (sender as ListView)?.SelectedItem;
-            if (item == null)
-            {
-                return;
-            }
-
             if (item is Event ev)
             {
                 ShowEventDetails(ev);
             }
-            else if (item is Models.Task task)
+            else if (item is Task task)
             {
                 ShowTaskDetails(task);
             }
@@ -168,7 +152,7 @@ namespace DailyPlaner
 
         private void TasksList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if ((sender as ListView)?.SelectedItem is Models.Task task)
+            if ((sender as ListView)?.SelectedItem is Task task)
             {
                 ShowTaskDetails(task);
             }
@@ -195,7 +179,36 @@ namespace DailyPlaner
             Views.Dialogs.DetailsDialog.ShowNote(this, note);
         }
 
-        private void ShowTaskDetails(Models.Task task)
+        private void AdminUsersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender as ListView)?.SelectedItem is User user && DataContext is MainViewModel vm)
+            {
+                vm.ShowAdminUserDetails(user);
+            }
+        }
+
+        private void AdminClearSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.AdminSearchText = string.Empty;
+            }
+        }
+
+        private void AdminClearDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.AdminSearchDate = null;
+            }
+        }
+
+        private void AdminCalendarToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            AdminSearchDatePicker.IsDropDownOpen = true;
+        }
+
+        private void ShowTaskDetails(Task task)
         {
             Views.Dialogs.DetailsDialog.ShowTask(this, task);
         }

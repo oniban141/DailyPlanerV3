@@ -8,36 +8,48 @@ namespace DailyPlaner.Views.Dialogs
     {
         private static readonly int[] ReminderOffsetMinutes = { 5, 10, 15, 30, 60, 120, 1440 };
 
-        public string EventTitle => TitleBox.Text.Trim();
-        public string EventDescription => DescriptionBox.Text.Trim();
-        public string EventLocation => LocationBox.Text.Trim();
+        public string EventTitle
+        {
+            get { return TitleBox.Text.Trim(); }
+        }
+
+        public string EventDescription
+        {
+            get { return DescriptionBox.Text.Trim(); }
+        }
+
+        public string EventLocation
+        {
+            get { return LocationBox.Text.Trim(); }
+        }
+
         public DateTime EventStart { get; private set; }
         public DateTime EventEnd { get; private set; }
-        public bool ReminderEnabled => ReminderCheckBox.IsChecked == true;
+
+        public bool ReminderEnabled
+        {
+            get { return ReminderCheckBox.IsChecked == true; }
+        }
+
         public DateTime? ReminderTime { get; private set; }
 
         public EventDialog(string title, string description, string location, DateTime start, DateTime? end = null)
         {
             InitializeComponent();
-
             EventStart = start;
             EventEnd = end ?? start.AddHours(1);
-
             FillTimeItems(TimeComboBox);
             StartDatePicker.SelectedDate = EventStart.Date;
             SelectTime(TimeComboBox, EventStart.TimeOfDay);
             StartDatePicker.SelectedDateChanged += (s, e) => SyncEndDateToStart();
-
             FillTimeItems(EndTimeComboBox);
             EndDatePicker.SelectedDate = EventEnd.Date;
             SelectTime(EndTimeComboBox, EventEnd.TimeOfDay);
-
             ReminderOffsetComboBox.ItemsSource = new[]
             {
                 "5 минут", "10 минут", "15 минут", "30 минут", "1 час", "2 часа", "За день"
             };
             ReminderOffsetComboBox.SelectedIndex = 3;
-
             TitleBox.Text = title ?? string.Empty;
             DescriptionBox.Text = description ?? string.Empty;
             LocationBox.Text = location ?? string.Empty;
@@ -124,13 +136,11 @@ namespace DailyPlaner.Views.Dialogs
             {
                 return;
             }
-
             int index = ReminderOffsetComboBox.SelectedIndex;
             if (index < 0 || index >= ReminderOffsetMinutes.Length)
             {
                 return;
             }
-
             var start = GetStartFromControls();
             if (start < DateTime.MinValue.AddMinutes(ReminderOffsetMinutes[index]))
             {
@@ -143,21 +153,16 @@ namespace DailyPlaner.Views.Dialogs
         {
             if (string.IsNullOrWhiteSpace(EventTitle))
             {
-                MessageBox.Show("Введите название события.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите название события.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
             EventStart = GetStartFromControls();
             EventEnd = GetEndFromControls();
-
             if (EventEnd < EventStart)
             {
-                MessageBox.Show("Окончание события не может быть раньше начала.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Окончание события не может быть раньше начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
             if (ReminderEnabled)
             {
                 UpdateReminderTime();
@@ -166,7 +171,6 @@ namespace DailyPlaner.Views.Dialogs
             {
                 ReminderTime = null;
             }
-
             DialogResult = true;
         }
 
@@ -177,7 +181,6 @@ namespace DailyPlaner.Views.Dialogs
 
         private void TitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-
         }
     }
 }

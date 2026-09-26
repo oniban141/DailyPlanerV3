@@ -8,10 +8,22 @@ namespace DailyPlaner.Views.Dialogs
     {
         private static readonly int[] ReminderOffsetMinutes = { 5, 10, 15, 30, 60, 120, 1440 };
 
-        public string TaskTitle => TitleBox.Text.Trim();
-        public string TaskDescription => DescriptionBox.Text.Trim();
+        public string TaskTitle
+        {
+            get { return TitleBox.Text.Trim(); }
+        }
+
+        public string TaskDescription
+        {
+            get { return DescriptionBox.Text.Trim(); }
+        }
+
         public DateTime TaskDueDate { get; private set; }
-        public bool ReminderEnabled => ReminderCheckBox.IsChecked == true;
+        public bool ReminderEnabled
+        {
+            get { return ReminderCheckBox.IsChecked == true; }
+        }
+
         public DateTime? ReminderTime { get; private set; }
         public string TaskPriority { get; private set; }
 
@@ -23,7 +35,6 @@ namespace DailyPlaner.Views.Dialogs
         public TaskDialog(string title, string description, DateTime dueDate, string priority)
         {
             InitializeComponent();
-
             TaskDueDate = dueDate;
             var priorityItems = new[] { "Низкий", "Средний", "Высокий" };
             PriorityComboBox.ItemsSource = priorityItems;
@@ -32,13 +43,11 @@ namespace DailyPlaner.Views.Dialogs
             FillTimeItems(dueDate);
             DueDatePicker.SelectedDate = dueDate.Date;
             SelectTime(dueDate.TimeOfDay);
-
             ReminderOffsetComboBox.ItemsSource = new[]
             {
                 "5 минут", "10 минут", "15 минут", "30 минут", "1 час", "2 часа", "За день"
             };
             ReminderOffsetComboBox.SelectedIndex = 3;
-
             TitleBox.Text = title ?? string.Empty;
             DescriptionBox.Text = description ?? string.Empty;
             Loaded += (s, e) => TitleBox.Focus();
@@ -105,13 +114,11 @@ namespace DailyPlaner.Views.Dialogs
             {
                 return;
             }
-
             int index = ReminderOffsetComboBox.SelectedIndex;
             if (index < 0 || index >= ReminderOffsetMinutes.Length)
             {
                 return;
             }
-
             var dueDate = GetDueDateFromControls();
             if (dueDate < DateTime.MinValue.AddMinutes(ReminderOffsetMinutes[index]))
             {
@@ -124,14 +131,11 @@ namespace DailyPlaner.Views.Dialogs
         {
             if (string.IsNullOrWhiteSpace(TaskTitle))
             {
-                MessageBox.Show("Введите название задачи.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Введите название задачи.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
             TaskDueDate = GetDueDateFromControls();
             TaskPriority = PriorityComboBox.SelectedItem?.ToString() ?? "Средний";
-
             if (ReminderEnabled)
             {
                 UpdateReminderTime();
@@ -140,7 +144,6 @@ namespace DailyPlaner.Views.Dialogs
             {
                 ReminderTime = null;
             }
-
             DialogResult = true;
         }
 

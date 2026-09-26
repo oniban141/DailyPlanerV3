@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 using DailyPlaner.Models;
 
@@ -11,13 +10,10 @@ namespace DailyPlaner.Views.Dialogs
             InitializeComponent();
         }
 
-        public static void ShowTask(System.Windows.Window owner, Models.Task task)
+        public static void ShowTask(Window owner, Task task)
         {
-            var dialog = new DetailsDialog
-            {
-                Owner = owner
-            };
-            dialog.KindIcon.Text = "📋";
+            var dialog = new DetailsDialog { Owner = owner };
+            dialog.KindIcon.Text = "\U0001F4CB";
             dialog.KindLabel.Text = "Задача";
             dialog.TitleText.Text = string.IsNullOrWhiteSpace(task.Title) ? "—" : task.Title;
             dialog.DescriptionText.Text = string.IsNullOrWhiteSpace(task.Description) ? "—" : task.Description;
@@ -26,17 +22,14 @@ namespace DailyPlaner.Views.Dialogs
             dialog.ExtraLabel.Text = "Приоритет";
             dialog.ExtraText.Text = string.IsNullOrWhiteSpace(task.Priority) ? "—" : task.Priority;
             dialog.StatusLabel.Text = "Статус";
-            dialog.StatusText.Text = task.IsCompleted ? "✅ Выполнена" : "🕒 Ожидает выполнения";
+            dialog.StatusText.Text = task.IsCompleted ? "\u2705 Выполнена" : "\U0001F552 Ожидает выполнения";
             dialog.ShowDialog();
         }
 
-        public static void ShowEvent(System.Windows.Window owner, Event ev)
+        public static void ShowEvent(Window owner, Event ev)
         {
-            var dialog = new DetailsDialog
-            {
-                Owner = owner
-            };
-            dialog.KindIcon.Text = "📅";
+            var dialog = new DetailsDialog { Owner = owner };
+            dialog.KindIcon.Text = "\U0001F4C5";
             dialog.KindLabel.Text = "Событие";
             dialog.TitleText.Text = string.IsNullOrWhiteSpace(ev.Title) ? "—" : ev.Title;
             dialog.DescriptionText.Text = string.IsNullOrWhiteSpace(ev.Description) ? "—" : ev.Description;
@@ -45,32 +38,27 @@ namespace DailyPlaner.Views.Dialogs
             dialog.ExtraLabel.Text = "Место";
             dialog.ExtraText.Text = string.IsNullOrWhiteSpace(ev.Location) ? "—" : ev.Location;
             dialog.StatusLabel.Text = "Статус";
-            dialog.StatusText.Text = ev.IsCompleted ? "✅ Завершено" : "🕒 Запланировано";
-            dialog.StatusLabel.Visibility = System.Windows.Visibility.Visible;
-            dialog.StatusText.Visibility = System.Windows.Visibility.Visible;
+            dialog.StatusText.Text = ev.IsCompleted ? "\u2705 Завершено" : "\U0001F552 Запланировано";
             dialog.ShowDialog();
         }
 
-        public static void ShowNote(System.Windows.Window owner, Note note)
+        public static void ShowNote(Window owner, Note note)
         {
-            var dialog = new DetailsDialog
-            {
-                Owner = owner
-            };
-            dialog.KindIcon.Text = "📝";
+            var dialog = new DetailsDialog { Owner = owner };
+            dialog.KindIcon.Text = "\U0001F4DD";
             dialog.KindLabel.Text = "Заметка";
             dialog.TitleText.Text = string.IsNullOrWhiteSpace(note.Title) ? "—" : note.Title;
             dialog.DescriptionText.Text = string.IsNullOrWhiteSpace(note.Content) ? "—" : note.Content;
             dialog.TimeLabel.Text = "Создано";
             dialog.TimeText.Text = note.CreatedDate.ToString("dd.MM.yyyy HH:mm");
-            dialog.ExtraLabel.Visibility = System.Windows.Visibility.Collapsed;
-            dialog.ExtraText.Visibility = System.Windows.Visibility.Collapsed;
-            dialog.StatusLabel.Visibility = System.Windows.Visibility.Collapsed;
-            dialog.StatusText.Visibility = System.Windows.Visibility.Collapsed;
+            dialog.ExtraLabel.Visibility = Visibility.Collapsed;
+            dialog.ExtraText.Visibility = Visibility.Collapsed;
+            dialog.StatusLabel.Visibility = Visibility.Collapsed;
+            dialog.StatusText.Visibility = Visibility.Collapsed;
             dialog.ShowDialog();
         }
 
-        private void Close_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }

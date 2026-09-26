@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using DailyPlaner.Models;
 
@@ -8,26 +7,19 @@ namespace DailyPlaner.Services
 {
     public class DatabaseService
     {
-        private readonly string connectionString = "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        private readonly string connectionString;
 
         public DatabaseService()
         {
-            connectionString = GetConnectionString();
+            string configured = System.Configuration.ConfigurationManager.ConnectionStrings["DailyPlannerConnection"]?.ConnectionString;
+            connectionString = string.IsNullOrWhiteSpace(configured)
+                ? "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;"
+                : configured;
         }
 
         public DatabaseService(string customConnectionString)
         {
             connectionString = customConnectionString;
-        }
-
-        private static string GetConnectionString()
-        {
-            string configured = System.Configuration.ConfigurationManager.ConnectionStrings["DailyPlannerConnection"]?.ConnectionString;
-            if (!string.IsNullOrWhiteSpace(configured))
-            {
-                return configured;
-            }
-            return "Server=PCGl1tch;Database=DailyPlannerDB;Trusted_Connection=True;TrustServerCertificate=True;";
         }
 
         public static string GetFriendlyDatabaseError(Exception exception)
@@ -37,9 +29,7 @@ namespace DailyPlaner.Services
             {
                 return $"Ошибка базы данных: {exception.Message}";
             }
-
-            var ex = sqlEx;
-            switch (ex.Number)
+            switch (sqlEx.Number)
             {
                 case -1:
                 case 2:
@@ -52,7 +42,21 @@ namespace DailyPlaner.Services
                 case 18452:
                     return "Неудачная попытка входа. Проверьте режим аутентификации SQL Server (Windows Authentication).";
                 default:
-                    return $"Ошибка базы данных (код {ex.Number}): {ex.Message}";
+                    return $"Ошибка базы данных (код {sqlEx.Number}): {sqlEx.Message}";
+            }
+        }
+
+        public static string HashPassword(string password)
+        {
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var builder = new System.Text.StringBuilder();
+                foreach (byte b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
             }
         }
 
@@ -63,7 +67,7 @@ namespace DailyPlaner.Services
                 try
                 {
                     connection.Open();
-                    EnsureTasksConstraints(connection);
+                    EnsureDatabaseIsReady(connection);
                     return true;
                 }
                 catch (SqlException ex)
@@ -73,7 +77,7 @@ namespace DailyPlaner.Services
             }
         }
 
-        private void EnsureTasksConstraints(SqlConnection connection)
+        private void EnsureDatabaseIsReady(SqlConnection connection)
         {
             try
             {
@@ -112,159 +116,15 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Constraints check warning: {ex.Message}");
+                Console.WriteLine($"Проверка базы данных: {ex.Message}");
             }
-        }
-
-        #region User Methods
-
-        public List<User> GetAllUsers()
-        {
-            var users = new List<User>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Users";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var user = new User
-                                {
-                                    Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
-                                    Username = reader["Username"] != DBNull.Value ? reader["Username"].ToString() : string.Empty,
-                                    PasswordHash = reader["PasswordHash"] != DBNull.Value ? reader["PasswordHash"].ToString() : string.Empty,
-                                    Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
-                                    GenderId = reader["GenderId"] != DBNull.Value ? Convert.ToInt32(reader["GenderId"]) : 0,
-                                    RoleId = reader["RoleId"] != DBNull.Value ? Convert.ToInt32(reader["RoleId"]) : 0,
-                                    CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
-                                };
-                                users.Add(user);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return users;
-        }
-
-        public User GetUserById(int id)
-        {
-            User user = null;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Users WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                user = new User
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    Username = reader["Username"].ToString(),
-                                    PasswordHash = reader["PasswordHash"].ToString(),
-                                    Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
-                                    GenderId = Convert.ToInt32(reader["GenderId"]),
-                                    RoleId = Convert.ToInt32(reader["RoleId"]),
-                                    CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
-                                };
-                            }
-                        }
-                    }
-                }
-                catch (SqlException ex)
-                {
-                    Console.WriteLine($"Database error getting user: {ex.Message}");
-                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
-                }
-            }
-            return user;
         }
 
         public User GetUserByUsername(string username)
         {
-            User user = null;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Users WHERE Username = @Username";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Username", username);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                user = new User
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    Username = reader["Username"].ToString(),
-                                    PasswordHash = reader["PasswordHash"].ToString(),
-                                    Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
-                                    GenderId = Convert.ToInt32(reader["GenderId"]),
-                                    RoleId = Convert.ToInt32(reader["RoleId"]),
-                                    CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
-                                };
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return user;
-        }
-
-        public bool CreateUser(User user)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Users (Username, PasswordHash, Email, GenderId, RoleId, CreatedAt) " +
-                                   "VALUES (@Username, @PasswordHash, @Email, @GenderId, @RoleId, @CreatedAt)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Username", user.Username);
-                        command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
-                        command.Parameters.AddWithValue("@Email", user.Email ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@GenderId", user.GenderId);
-                        command.Parameters.AddWithValue("@RoleId", user.RoleId);
-                        command.Parameters.AddWithValue("@CreatedAt", user.CreatedAt);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (SqlException ex)
-                {
-                    Console.WriteLine($"Database error creating user: {ex.Message}");
-                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    throw;
-                }
-            }
+            var users = Query("SELECT * FROM Users WHERE Username = @Username",
+                command => command.Parameters.AddWithValue("@Username", username), ReadUser);
+            return users.Count > 0 ? users[0] : null;
         }
 
         public bool UsernameExists(string username)
@@ -274,62 +134,12 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                 try
                 {
                     connection.Open();
-                    string query = "SELECT COUNT(1) FROM Users WHERE Username = @Username";
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using (SqlCommand command = new SqlCommand("SELECT COUNT(1) FROM Users WHERE Username = @Username", connection))
                     {
                         command.Parameters.AddWithValue("@Username", username);
                         return Convert.ToInt32(command.ExecuteScalar()) > 0;
                     }
                 }
-                catch (SqlException ex)
-                {
-                    Console.WriteLine($"Database error checking username: {ex.Message}");
-                    throw new InvalidOperationException(GetFriendlyDatabaseError(ex), ex);
-                }
-            }
-        }
-
-        public static string HashPassword(string password)
-        {
-            if (string.IsNullOrEmpty(password))
-            {
-                return string.Empty;
-            }
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(password);
-                byte[] hash = sha256.ComputeHash(bytes);
-                var stringBuilder = new System.Text.StringBuilder(hash.Length * 2);
-                foreach (byte b in hash)
-                {
-                    stringBuilder.Append(b.ToString("x2"));
-                }
-                return stringBuilder.ToString();
-            }
-        }
-
-        public bool UpdateUser(User user)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Users SET Username = @Username, PasswordHash = @PasswordHash, Email = @Email, " +
-                                   "GenderId = @GenderId, RoleId = @RoleId " +
-                                   "WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", user.Id);
-                        command.Parameters.AddWithValue("@Username", user.Username);
-                        command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
-                        command.Parameters.AddWithValue("@Email", user.Email ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@GenderId", user.GenderId);
-                        command.Parameters.AddWithValue("@RoleId", user.RoleId);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
@@ -338,954 +148,245 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
             }
         }
 
-        public bool DeleteUser(int id)
+        public bool CreateUser(User user)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("INSERT INTO Users (Username, PasswordHash, Email, GenderId, RoleId, CreatedAt) " +
+                           "VALUES (@Username, @PasswordHash, @Email, @GenderId, @RoleId, @CreatedAt)", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "DELETE FROM Users WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@Username", user.Username);
+                command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
+                command.Parameters.AddWithValue("@Email", user.Email ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@GenderId", user.GenderId);
+                command.Parameters.AddWithValue("@RoleId", user.RoleId);
+                command.Parameters.AddWithValue("@CreatedAt", user.CreatedAt);
+            }, true);
         }
-        #endregion
 
-        #region Task Methods
-        public List<Models.Task> GetAllTasks()
+        public List<Gender> GetAllGenders()
         {
-            var tasks = new List<Models.Task>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Query("SELECT * FROM Genders", null, reader => new Gender
             {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Tasks";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var task = new Models.Task
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    DueDate = reader["DueDate"] != DBNull.Value ? Convert.ToDateTime(reader["DueDate"]) : DateTime.Today,
-                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
-                                    Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
-                                };
-                                tasks.Add(task);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return tasks;
+                Id = Convert.ToInt32(reader["Id"]),
+                Name = reader["Name"].ToString()
+            });
         }
 
         public List<Models.Task> GetTasksByUserId(int userId)
         {
-            var tasks = new List<Models.Task>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Tasks WHERE UserId = @UserId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", userId);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var task = new Models.Task
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    DueDate = Convert.ToDateTime(reader["DueDate"]),
-                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
-                                    Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
-                                };
-                                tasks.Add(task);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return tasks;
-        }
-
-        public Models.Task GetTaskById(int id)
-        {
-            Models.Task task = null;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Tasks WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                task = new Models.Task
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    DueDate = Convert.ToDateTime(reader["DueDate"]),
-                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
-                                    Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
-                                };
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return task;
+            return Query("SELECT * FROM Tasks WHERE UserId = @UserId",
+                command => command.Parameters.AddWithValue("@UserId", userId), ReadTask);
         }
 
         public bool CreateTask(Models.Task task)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            var result = Scalar("INSERT INTO Tasks (UserId, Title, Description, DueDate, Priority, Status) " +
+                                "VALUES (@UserId, @Title, @Description, @DueDate, @Priority, @Status); SELECT CAST(SCOPE_IDENTITY() AS INT);", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Tasks (UserId, Title, Description, DueDate, Priority, Status) " +
-                                   "VALUES (@UserId, @Title, @Description, @DueDate, @Priority, @Status); SELECT CAST(SCOPE_IDENTITY() AS INT);";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", task.UserId);
-                        command.Parameters.AddWithValue("@Title", task.Title);
-                        command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                        command.Parameters.AddWithValue("@Priority", (object)task.Priority ?? "Средний");
-                        command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
-                        var scalar = command.ExecuteScalar();
-                        if (scalar != null && int.TryParse(scalar.ToString(), out int newId))
-                        {
-                            task.Id = newId;
-                        }
-                        return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                    return false;
-                }
+                command.Parameters.AddWithValue("@UserId", task.UserId);
+                command.Parameters.AddWithValue("@Title", task.Title);
+                command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@DueDate", task.DueDate);
+                command.Parameters.AddWithValue("@Priority", (object)task.Priority ?? "Средний");
+                command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
+            }, true);
+            if (result == null || !int.TryParse(result.ToString(), out int newId))
+            {
+                return false;
             }
+            task.Id = newId;
+            return true;
         }
 
         public bool UpdateTask(Models.Task task)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("UPDATE Tasks SET UserId = @UserId, Title = @Title, Description = @Description, " +
+                           "DueDate = @DueDate, Priority = @Priority, Status = @Status WHERE Id = @Id", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Tasks SET UserId = @UserId, Title = @Title, Description = @Description, " +
-                                   "DueDate = @DueDate, Priority = @Priority, Status = @Status " +
-                                   "WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", task.Id);
-                        command.Parameters.AddWithValue("@UserId", task.UserId);
-                        command.Parameters.AddWithValue("@Title", task.Title);
-                        command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@DueDate", task.DueDate);
-                        command.Parameters.AddWithValue("@Priority", (object)task.Priority ?? "Средний");
-                        command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@Id", task.Id);
+                command.Parameters.AddWithValue("@UserId", task.UserId);
+                command.Parameters.AddWithValue("@Title", task.Title);
+                command.Parameters.AddWithValue("@Description", task.Description ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@DueDate", task.DueDate);
+                command.Parameters.AddWithValue("@Priority", (object)task.Priority ?? "Средний");
+                command.Parameters.AddWithValue("@Status", task.IsCompleted ? "Выполнена" : "Ожидает");
+            });
         }
 
         public bool DeleteTask(int id)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string cleanupQuery = "DELETE FROM Reminders WHERE TaskId = @Id; DELETE FROM TaskTags WHERE TaskId = @Id";
-                    using (SqlCommand cleanupCommand = new SqlCommand(cleanupQuery, connection))
-                    {
-                        cleanupCommand.Parameters.AddWithValue("@Id", id);
-                        cleanupCommand.ExecuteNonQuery();
-                    }
-                    string query = "DELETE FROM Tasks WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
-        }
-        #endregion
-
-        #region Event Methods
-        public List<Event> GetAllEvents()
-        {
-            var events = new List<Event>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Events";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var ev = new Event
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    StartDate = Convert.ToDateTime(reader["StartDate"]),
-                                    EndDate = Convert.ToDateTime(reader["EndDate"]),
-                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
-                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
-                                };
-                                events.Add(ev);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return events;
+            Execute("DELETE FROM Reminders WHERE TaskId = @Id",
+                command => command.Parameters.AddWithValue("@Id", id));
+            return Execute("DELETE FROM Tasks WHERE Id = @Id",
+                command => command.Parameters.AddWithValue("@Id", id));
         }
 
         public List<Event> GetEventsByUserId(int userId)
         {
-            var events = new List<Event>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Events WHERE UserId = @UserId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", userId);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var ev = new Event
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    StartDate = Convert.ToDateTime(reader["StartDate"]),
-                                    EndDate = Convert.ToDateTime(reader["EndDate"]),
-                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
-                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
-                                };
-                                events.Add(ev);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return events;
-        }
-
-        public Event GetEventById(int id)
-        {
-            Event ev = null;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Events WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                ev = new Event
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
-                                    StartDate = Convert.ToDateTime(reader["StartDate"]),
-                                    EndDate = Convert.ToDateTime(reader["EndDate"]),
-                                    Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
-                                    Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
-                                };
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return ev;
+            return Query("SELECT * FROM Events WHERE UserId = @UserId",
+                command => command.Parameters.AddWithValue("@UserId", userId), ReadEvent);
         }
 
         public bool CreateEvent(Event ev)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("INSERT INTO Events (UserId, Title, Description, StartDate, EndDate, Location, Status) " +
+                           "VALUES (@UserId, @Title, @Description, @StartDate, @EndDate, @Location, @Status)", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Events (UserId, Title, Description, StartDate, EndDate, Location, Status) " +
-                                   "VALUES (@UserId, @Title, @Description, @StartDate, @EndDate, @Location, @Status)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", ev.UserId);
-                        command.Parameters.AddWithValue("@Title", ev.Title);
-                        command.Parameters.AddWithValue("@Description", ev.Description ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@StartDate", ev.StartDate);
-                        command.Parameters.AddWithValue("@EndDate", ev.EndDate);
-                        command.Parameters.AddWithValue("@Location", ev.Location ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@Status", ev.IsCompleted ? "Завершено" : "Запланировано");
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@UserId", ev.UserId);
+                command.Parameters.AddWithValue("@Title", ev.Title);
+                command.Parameters.AddWithValue("@Description", ev.Description ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@StartDate", ev.StartDate);
+                command.Parameters.AddWithValue("@EndDate", ev.EndDate);
+                command.Parameters.AddWithValue("@Location", ev.Location ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@Status", ev.IsCompleted ? "Завершено" : "Запланировано");
+            }, true);
         }
 
         public bool UpdateEvent(Event ev)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("UPDATE Events SET UserId = @UserId, Title = @Title, Description = @Description, " +
+                           "StartDate = @StartDate, EndDate = @EndDate, Location = @Location, Status = @Status WHERE Id = @Id", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Events SET UserId = @UserId, Title = @Title, Description = @Description, " +
-                                   "StartDate = @StartDate, EndDate = @EndDate, Location = @Location, Status = @Status " +
-                                   "WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", ev.Id);
-                        command.Parameters.AddWithValue("@UserId", ev.UserId);
-                        command.Parameters.AddWithValue("@Title", ev.Title);
-                        command.Parameters.AddWithValue("@Description", ev.Description ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@StartDate", ev.StartDate);
-                        command.Parameters.AddWithValue("@EndDate", ev.EndDate);
-                        command.Parameters.AddWithValue("@Location", ev.Location ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@Status", ev.IsCompleted ? "Завершено" : "Запланировано");
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@Id", ev.Id);
+                command.Parameters.AddWithValue("@UserId", ev.UserId);
+                command.Parameters.AddWithValue("@Title", ev.Title);
+                command.Parameters.AddWithValue("@Description", ev.Description ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@StartDate", ev.StartDate);
+                command.Parameters.AddWithValue("@EndDate", ev.EndDate);
+                command.Parameters.AddWithValue("@Location", ev.Location ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@Status", ev.IsCompleted ? "Завершено" : "Запланировано");
+            });
         }
 
         public bool DeleteEvent(int id)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "DELETE FROM Events WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
-        }
-        #endregion
-
-        #region Note Methods
-        public List<Note> GetAllNotes()
-        {
-            var notes = new List<Note>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Notes";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var note = new Note
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Content = reader["Content"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
-                                };
-                                notes.Add(note);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return notes;
+            return Execute("DELETE FROM Events WHERE Id = @Id",
+                command => command.Parameters.AddWithValue("@Id", id));
         }
 
         public List<Note> GetNotesByUserId(int userId)
         {
-            var notes = new List<Note>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Notes WHERE UserId = @UserId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", userId);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var note = new Note
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Content = reader["Content"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
-                                };
-                                notes.Add(note);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return notes;
-        }
-
-        public Note GetNoteById(int id)
-        {
-            Note note = null;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Notes WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                note = new Note
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    Title = reader["Title"].ToString(),
-                                    Content = reader["Content"].ToString(),
-                                    CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
-                                };
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return note;
+            return Query("SELECT * FROM Notes WHERE UserId = @UserId",
+                command => command.Parameters.AddWithValue("@UserId", userId), ReadNote);
         }
 
         public bool CreateNote(Note note)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("INSERT INTO Notes (UserId, Title, Content, CreatedAt) " +
+                           "VALUES (@UserId, @Title, @Content, @CreatedAt)", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Notes (UserId, Title, Content, CreatedAt) " +
-                                   "VALUES (@UserId, @Title, @Content, @CreatedAt)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", note.UserId);
-                        command.Parameters.AddWithValue("@Title", note.Title);
-                        command.Parameters.AddWithValue("@Content", note.Content);
-                        command.Parameters.AddWithValue("@CreatedAt", note.CreatedDate);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@UserId", note.UserId);
+                command.Parameters.AddWithValue("@Title", note.Title);
+                command.Parameters.AddWithValue("@Content", note.Content);
+                command.Parameters.AddWithValue("@CreatedAt", note.CreatedDate);
+            }, true);
         }
 
         public bool UpdateNote(Note note)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("UPDATE Notes SET UserId = @UserId, Title = @Title, Content = @Content WHERE Id = @Id", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Notes SET UserId = @UserId, Title = @Title, Content = @Content " +
-                                   "WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", note.Id);
-                        command.Parameters.AddWithValue("@UserId", note.UserId);
-                        command.Parameters.AddWithValue("@Title", note.Title);
-                        command.Parameters.AddWithValue("@Content", note.Content);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@Id", note.Id);
+                command.Parameters.AddWithValue("@UserId", note.UserId);
+                command.Parameters.AddWithValue("@Title", note.Title);
+                command.Parameters.AddWithValue("@Content", note.Content);
+            });
         }
 
         public bool DeleteNote(int id)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "DELETE FROM Notes WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+            return Execute("DELETE FROM Notes WHERE Id = @Id",
+                command => command.Parameters.AddWithValue("@Id", id));
         }
-        #endregion
 
-        #region Tag Methods
-        public List<Tag> GetAllTags()
+        public List<User> GetAllUsers()
         {
-            var tags = new List<Tag>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Tags";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var tag = new Tag
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    Name = reader["Name"].ToString(),
-                                    Color = reader["Color"] != DBNull.Value ? reader["Color"].ToString() : string.Empty
-                                };
-                                tags.Add(tag);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return tags;
+            return Query("SELECT * FROM Users ORDER BY CreatedAt", null, ReadUser);
         }
 
-        public Tag GetTagById(int id)
+        public bool ResetUserPassword(int userId, string passwordHash)
         {
-            Tag tag = null;
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @Id", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Tags WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                tag = new Tag
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    Name = reader["Name"].ToString(),
-                                    Color = reader["Color"] != DBNull.Value ? reader["Color"].ToString() : string.Empty
-                                };
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return tag;
+                command.Parameters.AddWithValue("@Id", userId);
+                command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+            }, true);
         }
 
-        public bool CreateTag(Tag tag)
+        public bool DeleteUserWithAllData(int userId)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Tags (Name, Color) VALUES (@Name, @Color)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Name", tag.Name);
-                        command.Parameters.AddWithValue("@Color", tag.Color ?? (object)DBNull.Value);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+            Execute("DELETE FROM Reminders WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            Execute("DELETE FROM Tasks WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            Execute("DELETE FROM Events WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            Execute("DELETE FROM Notes WHERE UserId = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId));
+            return Execute("DELETE FROM Users WHERE Id = @Id",
+                command => command.Parameters.AddWithValue("@Id", userId), true);
         }
 
-        public bool UpdateTag(Tag tag)
+        public int CountRows(string table)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Tags SET Name = @Name, Color = @Color WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", tag.Id);
-                        command.Parameters.AddWithValue("@Name", tag.Name);
-                        command.Parameters.AddWithValue("@Color", tag.Color ?? (object)DBNull.Value);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+            var result = Scalar($"SELECT COUNT(1) FROM {table}", null);
+            return result != null ? Convert.ToInt32(result) : 0;
         }
 
-        public bool DeleteTag(int id)
+        public int CountUserRows(string table, int userId)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "DELETE FROM Tags WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+            var result = Scalar($"SELECT COUNT(1) FROM {table} WHERE UserId = @UserId",
+                command => command.Parameters.AddWithValue("@UserId", userId));
+            return result != null ? Convert.ToInt32(result) : 0;
         }
-        #endregion
 
-        #region Reminder Methods
         public List<Reminder> GetAllReminders()
         {
-            var reminders = new List<Reminder>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Reminders";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var reminder = new Reminder
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    TaskId = reader["TaskId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TaskId"]),
-                                    ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
-                                    Message = reader["Message"] == DBNull.Value ? string.Empty : reader["Message"].ToString(),
-                                    IsShown = reader["IsActive"] == DBNull.Value || Convert.ToBoolean(reader["IsActive"])
-                                };
-                                reminders.Add(reminder);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return reminders;
-        }
-
-        public List<Reminder> GetRemindersByUserId(int userId)
-        {
-            var reminders = new List<Reminder>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Reminders WHERE UserId = @UserId";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", userId);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var reminder = new Reminder
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    UserId = Convert.ToInt32(reader["UserId"]),
-                                    TaskId = reader["TaskId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TaskId"]),
-                                    ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
-                                    Message = reader["Message"] == DBNull.Value ? string.Empty : reader["Message"].ToString(),
-                                    IsShown = reader["IsActive"] == DBNull.Value || Convert.ToBoolean(reader["IsActive"])
-                                };
-                                reminders.Add(reminder);
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            return reminders;
+            return Query("SELECT * FROM Reminders", null, ReadReminder);
         }
 
         public bool CreateReminder(Reminder reminder)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("INSERT INTO Reminders (UserId, TaskId, ReminderTime, Message, IsActive) " +
+                           "VALUES (@UserId, @TaskId, @ReminderTime, @Message, @IsActive)", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Reminders (UserId, TaskId, ReminderTime, Message, IsActive) " +
-                                   "VALUES (@UserId, @TaskId, @ReminderTime, @Message, @IsActive)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@UserId", reminder.UserId);
-                        command.Parameters.AddWithValue("@TaskId", reminder.TaskId);
-                        command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderDate);
-                        command.Parameters.AddWithValue("@Message", reminder.Message);
-                        command.Parameters.AddWithValue("@IsActive", reminder.IsShown);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@UserId", reminder.UserId);
+                command.Parameters.AddWithValue("@TaskId", reminder.TaskId);
+                command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderDate);
+                command.Parameters.AddWithValue("@Message", reminder.Message);
+                command.Parameters.AddWithValue("@IsActive", reminder.IsShown);
+            }, true);
         }
 
         public bool UpdateReminder(Reminder reminder)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            return Execute("UPDATE Reminders SET UserId = @UserId, TaskId = @TaskId, ReminderTime = @ReminderTime, " +
+                           "Message = @Message, IsActive = @IsActive WHERE Id = @Id", command =>
             {
-                try
-                {
-                    connection.Open();
-                    string query = "UPDATE Reminders SET UserId = @UserId, TaskId = @TaskId, ReminderTime = @ReminderTime, " +
-                                   "Message = @Message, IsActive = @IsActive WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", reminder.Id);
-                        command.Parameters.AddWithValue("@UserId", reminder.UserId);
-                        command.Parameters.AddWithValue("@TaskId", reminder.TaskId);
-                        command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderDate);
-                        command.Parameters.AddWithValue("@Message", reminder.Message);
-                        command.Parameters.AddWithValue("@IsActive", reminder.IsShown);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
+                command.Parameters.AddWithValue("@Id", reminder.Id);
+                command.Parameters.AddWithValue("@UserId", reminder.UserId);
+                command.Parameters.AddWithValue("@TaskId", reminder.TaskId);
+                command.Parameters.AddWithValue("@ReminderTime", reminder.ReminderDate);
+                command.Parameters.AddWithValue("@Message", reminder.Message);
+                command.Parameters.AddWithValue("@IsActive", reminder.IsShown);
+            });
         }
 
-        public bool DeleteReminder(int id)
+        private List<T> Query<T>(string query, Action<SqlCommand> setup, Func<SqlDataReader, T> read)
         {
+            var items = new List<T>();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    string query = "DELETE FROM Reminders WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
-                        return result > 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                    return false;
-                }
-            }
-        }
-        #endregion
-
-        #region Gender Methods
-        public List<Gender> GetAllGenders()
-        {
-            var genders = new List<Gender>();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "SELECT * FROM Genders";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
+                        setup?.Invoke(command);
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                var gender = new Gender
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    Name = reader["Name"].ToString()
-                                };
-                                genders.Add(gender);
+                                items.Add(read(reader));
                             }
                         }
                     }
@@ -1295,43 +396,133 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                     Console.WriteLine($"Error: {ex.Message}");
                 }
             }
-            return genders;
+            return items;
         }
-        #endregion
 
-        #region Role Methods
-        public List<Role> GetAllRoles()
+        private bool Execute(string query, Action<SqlCommand> setup, bool showError = false)
         {
-            var roles = new List<Role>();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Roles";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                var role = new Role
-                                {
-                                    Id = Convert.ToInt32(reader["Id"]),
-                                    Name = reader["Name"].ToString()
-                                };
-                                roles.Add(role);
-                            }
-                        }
+                        setup?.Invoke(command);
+                        return command.ExecuteNonQuery() > 0;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    if (showError)
+                    {
+                        System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных",
+                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                    }
+                    return false;
                 }
             }
-            return roles;
         }
-        #endregion
+
+        private object Scalar(string query, Action<SqlCommand> setup, bool showError = false)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        setup?.Invoke(command);
+                        return command.ExecuteScalar();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (showError)
+                    {
+                        System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных",
+                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                    }
+                    return null;
+                }
+            }
+        }
+
+        private static User ReadUser(SqlDataReader reader)
+        {
+            return new User
+            {
+                Id = Convert.ToInt32(reader["Id"]),
+                Username = reader["Username"].ToString(),
+                PasswordHash = reader["PasswordHash"].ToString(),
+                Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
+                GenderId = Convert.ToInt32(reader["GenderId"]),
+                RoleId = Convert.ToInt32(reader["RoleId"]),
+                CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]) : DateTime.Now
+            };
+        }
+
+        private static Models.Task ReadTask(SqlDataReader reader)
+        {
+            return new Models.Task
+            {
+                Id = Convert.ToInt32(reader["Id"]),
+                UserId = Convert.ToInt32(reader["UserId"]),
+                Title = reader["Title"].ToString(),
+                Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
+                DueDate = Convert.ToDateTime(reader["DueDate"]),
+                Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Ожидает",
+                Priority = reader["Priority"] != DBNull.Value ? reader["Priority"].ToString() : "Средний"
+            };
+        }
+
+        private static Event ReadEvent(SqlDataReader reader)
+        {
+            return new Event
+            {
+                Id = Convert.ToInt32(reader["Id"]),
+                UserId = Convert.ToInt32(reader["UserId"]),
+                Title = reader["Title"].ToString(),
+                Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : string.Empty,
+                StartDate = Convert.ToDateTime(reader["StartDate"]),
+                EndDate = Convert.ToDateTime(reader["EndDate"]),
+                Location = reader["Location"] != DBNull.Value ? reader["Location"].ToString() : string.Empty,
+                Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : "Запланировано"
+            };
+        }
+
+        private static Note ReadNote(SqlDataReader reader)
+        {
+            return new Note
+            {
+                Id = Convert.ToInt32(reader["Id"]),
+                UserId = Convert.ToInt32(reader["UserId"]),
+                Title = reader["Title"].ToString(),
+                Content = reader["Content"].ToString(),
+                CreatedDate = Convert.ToDateTime(reader["CreatedAt"])
+            };
+        }
+
+        private static Reminder ReadReminder(SqlDataReader reader)
+        {
+            return new Reminder
+            {
+                Id = Convert.ToInt32(reader["Id"]),
+                UserId = Convert.ToInt32(reader["UserId"]),
+                TaskId = reader["TaskId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TaskId"]),
+                ReminderDate = Convert.ToDateTime(reader["ReminderTime"]),
+                Message = reader["Message"] == DBNull.Value ? string.Empty : reader["Message"].ToString(),
+                IsShown = reader["IsActive"] == DBNull.Value || Convert.ToBoolean(reader["IsActive"])
+            };
+        }
     }
 }

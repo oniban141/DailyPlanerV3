@@ -23,10 +23,10 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ============ Левая панель (серо-синяя, как сайдбар референса) ============ -->
+        
         <Border Grid.Column="0" Background="{DynamicResource SecondaryBrush}" CornerRadius="0,28,28,0">
             <StackPanel VerticalAlignment="Center" Margin="48,40">
-                <!-- Логотип -->
+                
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,48">
                     <Border Width="44" Height="44" CornerRadius="12" Background="{StaticResource PrimaryBrush}">
                         <Image x:Name="HeaderIcon" Stretch="UniformToFill"/>
@@ -46,7 +46,7 @@
             </StackPanel>
         </Border>
 
-        <!-- ============ Правая часть — форма входа ============ -->
+        
         <Grid Grid.Column="1">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="340">
                 <TextBlock Text="С возвращением! 👋" Style="{StaticResource PageTitleStyle}" Margin="0,0,0,6"/>

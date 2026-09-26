@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using System.IO;
-using System.Reflection;
 
 namespace DailyPlaner
 {
@@ -26,12 +22,10 @@ namespace DailyPlaner
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
             SetupTrayIcon();
             ApplyTheme(LoadDarkThemeSetting());
             CheckAndCreateDatabase();
             SetAutoStart(LoadAutoStartSetting());
-
             var loginHost = new System.Windows.Navigation.NavigationWindow
             {
                 Content = new Views.LoginWindow(),
@@ -43,6 +37,143 @@ namespace DailyPlaner
             };
             SetWindowIcon(loginHost);
             loginHost.Show();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            if (TrayIcon != null)
+            {
+                TrayIcon.Visible = false;
+                TrayIcon.Dispose();
+                TrayIcon = null;
+            }
+            base.OnExit(e);
+        }
+
+        public static string FindIconFile()
+        {
+            var candidates = new List<string>
+            {
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Icon.jpg"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Icon.jpg"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "Icon.jpg")
+            };
+            foreach (var path in candidates)
+            {
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+            return null;
+        }
+
+        public static void SetWindowIcon(Window window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+            try
+            {
+                string iconPath = FindIconFile();
+                if (iconPath != null)
+                {
+                    var bitmap = new BitmapImage(new Uri(iconPath));
+                    bitmap.Freeze();
+                    window.Icon = bitmap;
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public static void RestoreFromTray()
+        {
+            var window = Current.MainWindow;
+            if (window == null)
+            {
+                return;
+            }
+            window.Show();
+            if (window.WindowState == WindowState.Minimized)
+            {
+                window.WindowState = WindowState.Normal;
+            }
+            window.Activate();
+        }
+
+        public static void ExitApp()
+        {
+            IsExiting = true;
+            Current.Shutdown();
+        }
+
+        public static bool LoadDarkThemeSetting()
+        {
+            return LoadSetting("DarkTheme") == 1;
+        }
+
+        public static bool LoadAutoStartSetting()
+        {
+            return LoadSetting("AutoStart") == 1;
+        }
+
+        public static void SetAutoStart(bool enabled)
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(AutoStartRegistryKey, true))
+                {
+                    if (key != null)
+                    {
+                        if (enabled)
+                        {
+                            key.SetValue(AppName, Assembly.GetEntryAssembly().Location);
+                        }
+                        else if (key.GetValue(AppName) != null)
+                        {
+                            key.DeleteValue(AppName);
+                        }
+                    }
+                }
+                SaveSetting("AutoStart", enabled);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Не удалось изменить настройки автозапуска: {ex.Message}", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        public static void ApplyTheme(bool isDark)
+        {
+            IsDarkTheme = isDark;
+            SaveSetting("DarkTheme", isDark);
+            try
+            {
+                SetThemeBrushes(Current.Resources, isDark);
+                foreach (var dict in Current.Resources.MergedDictionaries)
+                {
+                    SetThemeBrushes(dict, isDark);
+                }
+                foreach (var windowObject in Current.Windows)
+                {
+                    var window = windowObject as Window;
+                    if (window == null)
+                    {
+                        continue;
+                    }
+                    SetThemeBrushes(window.Resources, isDark);
+                    foreach (var dict in window.Resources.MergedDictionaries)
+                    {
+                        SetThemeBrushes(dict, isDark);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void SetupTrayIcon()
@@ -63,25 +194,6 @@ namespace DailyPlaner
                 Visible = true
             };
             TrayIcon.DoubleClick += (s, args) => RestoreFromTray();
-        }
-
-
-        public static string FindIconFile()
-        {
-            var candidates = new List<string>
-            {
-                System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Icon.jpg"),
-                System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Icon.jpg"),
-                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", "Icon.jpg")
-            };
-            foreach (var path in candidates)
-            {
-                if (System.IO.File.Exists(path))
-                {
-                    return path;
-                }
-            }
-            return null;
         }
 
         private static System.Drawing.Icon LoadTrayIcon()
@@ -107,99 +219,34 @@ namespace DailyPlaner
             return System.Drawing.SystemIcons.Application;
         }
 
-        public static void SetWindowIcon(Window window)
+        private void CheckAndCreateDatabase()
         {
-            if (window == null)
-            {
-                return;
-            }
             try
             {
-                string iconPath = FindIconFile();
-                if (iconPath != null)
-                {
-                    var bitmap = new BitmapImage(new Uri(iconPath));
-                    bitmap.Freeze();
-                    window.Icon = bitmap;
-                }
+                new Services.DatabaseService().TestConnection();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show($"Не удалось подключиться к базе данных:\n{ex.Message}\n\nПроверьте, что SQL Server (PCGl1tch) запущен и база DailyPlannerDB создана.", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        internal static class Win32
-        {
-            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool DestroyIcon(IntPtr hIcon);
-        }
-
-        public static void RestoreFromTray()
-        {
-            var window = Current.MainWindow;
-            if (window == null)
-            {
-                return;
-            }
-            window.Show();
-            if (window.WindowState == WindowState.Minimized)
-            {
-                window.WindowState = WindowState.Normal;
-            }
-            window.Activate();
-        }
-
-        public static void ExitApp()
-        {
-            IsExiting = true;
-            Current.Shutdown();
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            if (TrayIcon != null)
-            {
-                TrayIcon.Visible = false;
-                TrayIcon.Dispose();
-                TrayIcon = null;
-            }
-            base.OnExit(e);
-        }
-
-        public static bool LoadDarkThemeSetting()
+        private static int LoadSetting(string name)
         {
             try
             {
                 using (var key = Registry.CurrentUser.OpenSubKey(SettingsRegistryKey, false))
                 {
-                    if (key != null && key.GetValue("DarkTheme") is int value)
+                    if (key != null && key.GetValue(name) is int value)
                     {
-                        return value == 1;
+                        return value;
                     }
                 }
             }
             catch (Exception)
             {
             }
-            return false;
-        }
-
-        public static bool LoadAutoStartSetting()
-        {
-            try
-            {
-                using (var key = Registry.CurrentUser.OpenSubKey(SettingsRegistryKey, false))
-                {
-                    if (key != null && key.GetValue("AutoStart") is int value)
-                    {
-                        return value == 1;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-            return false;
+            return 0;
         }
 
         private static void SaveSetting(string name, bool value)
@@ -219,71 +266,12 @@ namespace DailyPlaner
             }
         }
 
-        public static void SetAutoStart(bool enabled)
-        {
-            try
-            {
-                using (var key = Registry.CurrentUser.OpenSubKey(AutoStartRegistryKey, true))
-                {
-                    if (key != null)
-                    {
-                        if (enabled)
-                        {
-                            string exePath = Assembly.GetEntryAssembly().Location;
-                            key.SetValue(AppName, exePath);
-                        }
-                        else if (key.GetValue(AppName) != null)
-                        {
-                            key.DeleteValue(AppName);
-                        }
-                    }
-                }
-                SaveSetting("AutoStart", enabled);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось изменить настройки автозапуска: {ex.Message}", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        public static void ApplyTheme(bool isDark)
-        {
-            IsDarkTheme = isDark;
-            SaveSetting("DarkTheme", isDark);
-            try
-            {
-                var res = Current.Resources;
-                SetThemeBrushes(res, isDark);
-                foreach (var dict in res.MergedDictionaries)
-                {
-                    SetThemeBrushes(dict, isDark);
-                }
-                foreach (var windowObject in Current.Windows)
-                {
-                    var window = windowObject as Window;
-                    if (window == null)
-                    {
-                        continue;
-                    }
-                    SetThemeBrushes(window.Resources, isDark);
-                    foreach (var dict in window.Resources.MergedDictionaries)
-                    {
-                        SetThemeBrushes(dict, isDark);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        private static void SetThemeBrushes(System.Windows.ResourceDictionary resources, bool isDark)
+        private static void SetThemeBrushes(ResourceDictionary resources, bool isDark)
         {
             if (resources == null)
             {
                 return;
             }
-
             var background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#34445D" : "#E8D8C9"));
             var foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#E8D8C9" : "#2E3949"));
             var card = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#4B607F" : "#FDFBF8"));
@@ -292,7 +280,6 @@ namespace DailyPlaner
             var sidebar = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#2E3949" : "#4B607F"));
             var inputBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#3D4F6B" : "#F5F0E8"));
             var mutedText = new SolidColorBrush((Color)ColorConverter.ConvertFromString(isDark ? "#B9C2D4" : "#8B93A3"));
-
             if (resources.Contains("WindowBackgroundBrush"))
             {
                 resources["WindowBackgroundBrush"] = background;
@@ -300,7 +287,6 @@ namespace DailyPlaner
                 resources["WindowCardBrush"] = card;
                 resources["WindowSubtleBrush"] = subtle;
             }
-
             if (resources.Contains("LightBackgroundBrush"))
             {
                 resources["LightBackgroundBrush"] = background;
@@ -308,35 +294,24 @@ namespace DailyPlaner
                 resources["LightCardBrush"] = card;
                 resources["LightBorderBrush"] = border;
             }
-
             if (resources.Contains("SecondaryBrush"))
             {
                 resources["SecondaryBrush"] = sidebar;
             }
-
             if (resources.Contains("SoftBeigeBrush"))
             {
                 resources["SoftBeigeBrush"] = inputBackground;
             }
-
             if (resources.Contains("MutedTextBrush"))
             {
                 resources["MutedTextBrush"] = mutedText;
             }
         }
 
-        private void CheckAndCreateDatabase()
+        internal static class Win32
         {
-            try
-            {
-                var databaseService = new Services.DatabaseService();
-                databaseService.TestConnection();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось подключиться к базе данных:\n{ex.Message}\n\nПроверьте, что SQL Server (PCGl1tch) запущен и база DailyPlannerDB создана.", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+            internal static extern bool DestroyIcon(IntPtr hIcon);
         }
-
     }
 }

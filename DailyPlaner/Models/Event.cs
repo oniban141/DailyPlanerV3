@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DailyPlaner.Models
 {
@@ -11,7 +7,6 @@ namespace DailyPlaner.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
@@ -19,9 +14,10 @@ namespace DailyPlaner.Models
         public string Location { get; set; }
 
         private string _status;
+
         public string Status
         {
-            get => _status;
+            get { return _status; }
             set
             {
                 _status = value;
@@ -32,8 +28,8 @@ namespace DailyPlaner.Models
 
         public bool IsCompleted
         {
-            get => Status == "Завершено" || Status == "Completed";
-            set => Status = value ? "Завершено" : "Запланировано";
+            get { return Status == "Завершено" || Status == "Completed"; }
+            set { Status = value ? "Завершено" : "Запланировано"; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
