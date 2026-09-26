@@ -433,8 +433,8 @@
                     <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="10">
                         <Grid>
                             <DatePicker x:Name="AdminSearchDatePicker" SelectedDate="{Binding AdminSearchDate, Mode=TwoWay}"
-                                        Width="140" VerticalAlignment="Center" Opacity="0" IsHitTestVisible="False"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        Width="1" VerticalAlignment="Center" Opacity="0" IsHitTestVisible="False"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button x:Name="AdminCalendarToggleButton" Content="📅" Padding="10,6"
                                         Style="{StaticResource SecondaryButtonStyle}" Click="AdminCalendarToggleButton_Click"
                                         ToolTip="Выбрать дату регистрации"/>
