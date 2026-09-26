@@ -535,6 +535,7 @@
                             <Calendar Grid.Row="1" x:Name="MainCalendar" Width="360" Height="230"
                                       HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="12"
                                       SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                      SelectedDatesChanged="MainCalendar_SelectedDatesChanged"
                                       Background="{DynamicResource LightCardBrush}"
                                       BorderBrush="Transparent" BorderThickness="0"/>
                         </Grid>

@@ -137,6 +137,11 @@ namespace DailyPlaner
             DayTasksList.ItemsSource = vm.Tasks.Where(t => t.DueDate.Date == date).OrderBy(t => t.DueDate).ToList();
         }
 
+        private void MainCalendar_SelectedDatesChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RefreshDayLists();
+        }
+
         private void DayItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             object item = (sender as ListView)?.SelectedItem;
