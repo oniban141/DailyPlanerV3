@@ -290,10 +290,9 @@ Toast-уведомления Windows с резервным показом чер
 - `SelectedTask`, `SelectedEvent`, `SelectedNote` — выбранные записи.
 - `SearchText` — текст поиска (вызывает `ApplyNameSearch`).
 - `SelectedDate` — дата для страницы календаря.
-- `IsDarkTheme` — состояние темы.
 - `CompletedTasksCount` — вычисляемое: число выполненных задач (счётчик на странице «Обзор»).
 
-Команды (17 `ICommand`): `AddTaskCommand`, `EditTaskCommand`, `DeleteTaskCommand`, `CompleteTaskCommand`, `AddEventCommand`, `EditEventCommand`, `DeleteEventCommand`, `CompleteEventCommand`, `AddNoteCommand`, `EditNoteCommand`, `DeleteNoteCommand`, `ClearSearchCommand`, `ToggleThemeCommand`, `ExportToJsonCommand`, `ImportFromJsonCommand`, `TestNotificationCommand`, `LogoutCommand`.
+Команды (18 `ICommand`): `AddTaskCommand`, `EditTaskCommand`, `DeleteTaskCommand`, `CompleteTaskCommand`, `AddEventCommand`, `EditEventCommand`, `DeleteEventCommand`, `CompleteEventCommand`, `AddNoteCommand`, `EditNoteCommand`, `DeleteNoteCommand`, `ClearSearchCommand`, `ExportToJsonCommand`, `ImportFromJsonCommand`, `TestNotificationCommand`, `LogoutCommand`, `DeleteUserCommand`, `ResetUserPasswordCommand`.
 
 Методы:
 
@@ -302,28 +301,29 @@ Toast-уведомления Windows с резервным показом чер
 - `CanExecuteTaskCommand/EventCommand/NoteCommand(object) : bool` — доступность кнопок (есть выбранные записи).
 - `GetSelectedTasks/GetSelectedEvents/GetSelectedNotes(object) : List<>` — выбранные записи из мультиселекта списка либо `Selected*`.
 - `PluralForms(int count, string one, string few, string many) : string` — `static` — русская форма множественного числа (1 задача / 2 задачи / 5 задач).
-- `ConfirmDelete(int count, string word, string singleText) : bool` — диалог подтверждения удаления (одиночного и массового).
+- `DeleteItems<T>(List<T>, Func<T,bool>, Func<string>, string, string, Action) : void` — обобщённое удаление выбранных записей: подтверждение (одиночное/массовое с формами множественного числа), подсчёт удалённых, обновление страницы и сброс выделения.
 - `ExecuteAddTask(object)` — диалог `TaskDialog` → `CreateTask` → при включённом напоминании `CreateReminder` (использует `task.Id` из `SCOPE_IDENTITY`) → уведомление.
 - `ExecuteEditTask(object)` — `TaskDialog` с данными выбранной задачи → `UpdateTask`.
-- `ExecuteDeleteTask(object)` — подтверждение → `DeleteTask` для каждой выбранной.
+- `ExecuteDeleteTask(object)` — удаляет выбранные задачи через `DeleteItems` (подтверждение → `DeleteTask` для каждой).
 - `ExecuteCompleteTask(object)` — переключает `IsCompleted` выбранной задачи → `UpdateTask` → уведомление.
 - `ExecuteAddEvent(object)` — диалог `EventDialog` → `CreateEvent` → отложенное напоминание `ScheduleNotification`.
 - `ExecuteEditEvent(object)` — `EventDialog` → `UpdateEvent`.
-- `ExecuteDeleteEvent(object)` — подтверждение → `DeleteEvent` для каждой выбранной.
+- `ExecuteDeleteEvent(object)` — удаляет выбранные события через `DeleteItems`.
 - `ExecuteCompleteEvent(object)` — переключает `IsCompleted` события → `UpdateEvent`.
 - `ExecuteAddNote(object)` — диалог `NoteDialog` → `CreateNote`.
 - `ExecuteEditNote(object)` — `NoteDialog` → `UpdateNote`.
-- `ExecuteDeleteNote(object)` — подтверждение → `DeleteNote` для каждой выбранной.
+- `ExecuteDeleteNote(object)` — удаляет выбранные заметки через `DeleteItems`.
 - `ExecuteClearSearch(object)` — сбрасывает поиск и перезагружает данные.
 - `ApplyNameSearch() : void` — `public` — поиск по названию/описанию (задачи/события) или заголовку/содержимому (заметки) на текущей странице.
 - `ResetFiltersAndReload() : void` — `public` — очищает `SearchText` и перезагружает данные.
+- `FilterByQuery<T>(List<T>, string, Func<T,string>, Func<T,string>) : List<T>` — `static` — фильтрация по подстроке без учёта регистра по двум полям (название + описание/содержимое).
 - `RefreshDataForCurrentPage() : void` — обновляет списки с учётом активной страницы (поиск или полная загрузка).
-- `ExecuteToggleTheme(object)` — переключает тему через `App.ApplyTheme`.
 - `ExecuteExportToJson(object)` — сериализует задачи пользователя в JSON (`Newtonsoft.Json`) через `SaveFileDialog`.
 - `ExecuteImportFromJson(object)` — читает JSON через `OpenFileDialog`, создаёт задачи для текущего пользователя.
 - `ExecuteTestNotification(object)` — кнопка «Проверить напоминания»: статистика из `ReminderScheduler` + тестовое уведомление.
 - `ExecuteLogout(object)` — останавливает планировщик, очищает данные, открывает окно входа в `NavigationWindow`, закрывает все окна (разрешая закрытие главного).
 - `OnPropertyChanged(string) : void` — `protected virtual`.
+- `SetField<T>(ref T, T, string) : void` — присваивает поле и уведомляет UI, если значение изменилось (используется свойствами `Total*`).
 
 ---
 

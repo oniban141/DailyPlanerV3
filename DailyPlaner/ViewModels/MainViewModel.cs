@@ -34,7 +34,6 @@ namespace DailyPlaner.ViewModels
         private Note _selectedNote;
         private string _searchText;
         private DateTime _selectedDate;
-        private bool _isDarkTheme;
         private ObservableCollection<User> _users;
         private User _selectedAdminUser;
         private bool _isAdmin;
@@ -150,16 +149,6 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public bool IsDarkTheme
-        {
-            get { return _isDarkTheme; }
-            set
-            {
-                _isDarkTheme = value;
-                OnPropertyChanged(nameof(IsDarkTheme));
-            }
-        }
-
         public int CompletedTasksCount
         {
             get { return Tasks.Count(t => t.IsCompleted); }
@@ -231,51 +220,31 @@ namespace DailyPlaner.ViewModels
         public int TotalTasks
         {
             get { return _totalTasks; }
-            set
-            {
-                _totalTasks = value;
-                OnPropertyChanged(nameof(TotalTasks));
-            }
+            set { SetField(ref _totalTasks, value, nameof(TotalTasks)); }
         }
 
         public int TotalEvents
         {
             get { return _totalEvents; }
-            set
-            {
-                _totalEvents = value;
-                OnPropertyChanged(nameof(TotalEvents));
-            }
+            set { SetField(ref _totalEvents, value, nameof(TotalEvents)); }
         }
 
         public int TotalNotes
         {
             get { return _totalNotes; }
-            set
-            {
-                _totalNotes = value;
-                OnPropertyChanged(nameof(TotalNotes));
-            }
+            set { SetField(ref _totalNotes, value, nameof(TotalNotes)); }
         }
 
         public int TotalReminders
         {
             get { return _totalReminders; }
-            set
-            {
-                _totalReminders = value;
-                OnPropertyChanged(nameof(TotalReminders));
-            }
+            set { SetField(ref _totalReminders, value, nameof(TotalReminders)); }
         }
 
         public int TotalUsers
         {
             get { return _totalUsers; }
-            set
-            {
-                _totalUsers = value;
-                OnPropertyChanged(nameof(TotalUsers));
-            }
+            set { SetField(ref _totalUsers, value, nameof(TotalUsers)); }
         }
 
         public ICommand AddTaskCommand { get; }
@@ -290,7 +259,6 @@ namespace DailyPlaner.ViewModels
         public ICommand EditNoteCommand { get; }
         public ICommand DeleteNoteCommand { get; }
         public ICommand ClearSearchCommand { get; }
-        public ICommand ToggleThemeCommand { get; }
         public ICommand ExportToJsonCommand { get; }
         public ICommand ImportFromJsonCommand { get; }
         public ICommand TestNotificationCommand { get; }
@@ -318,7 +286,6 @@ namespace DailyPlaner.ViewModels
             EditNoteCommand = new RelayCommand(ExecuteEditNote, CanExecuteNoteCommand);
             DeleteNoteCommand = new RelayCommand(ExecuteDeleteNote, CanExecuteNoteCommand);
             ClearSearchCommand = new RelayCommand(ExecuteClearSearch);
-            ToggleThemeCommand = new RelayCommand(ExecuteToggleTheme);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
             TestNotificationCommand = new RelayCommand(ExecuteTestNotification);
@@ -497,57 +464,28 @@ namespace DailyPlaner.ViewModels
 
         private void ExecuteDeleteTask(object parameter)
         {
-            try
-            {
-                var tasks = GetSelectedTasks(parameter);
-                if (tasks.Count == 0)
-                {
-                    return;
-                }
-                if (!ConfirmDelete(tasks.Count, PluralForms(tasks.Count, "задачу", "задачи", "задач"), "эту задачу"))
-                {
-                    return;
-                }
-                int deleted = 0;
-                foreach (var task in tasks)
-                {
-                    if (_databaseService.DeleteTask(task.Id))
-                    {
-                        deleted++;
-                    }
-                }
-                if (deleted > 0)
-                {
-                    RefreshDataForCurrentPage();
-                    SelectedTask = null;
-                }
-                if (deleted < tasks.Count)
-                {
-                    MessageBox.Show($"Удалено {deleted} из {tasks.Count}. Некоторые записи не удалось удалить.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при удалении задачи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            var tasks = GetSelectedTasks(parameter);
+            DeleteItems(tasks, t => _databaseService.DeleteTask(t.Id),
+                () => PluralForms(tasks.Count, "задачу", "задачи", "задач"), "эту задачу", "задачи",
+                () => SelectedTask = null);
         }
 
         private void ExecuteCompleteTask(object parameter)
         {
+            var task = SelectedTask;
+            if (task == null)
+            {
+                return;
+            }
             try
             {
-                var task = SelectedTask;
-                if (task == null)
-                {
-                    return;
-                }
                 task.IsCompleted = !task.IsCompleted;
                 if (_databaseService.UpdateTask(task))
                 {
-                    string taskTitle = task.Title;
-                    bool isCompleted = task.IsCompleted;
+                    string title = task.Title;
+                    bool completed = task.IsCompleted;
                     RefreshDataForCurrentPage();
-                    _notificationService.ShowNotification("Задача обновлена", $"Задача '{taskTitle}' отмечена как {(isCompleted ? "выполненная" : "невыполненная")}");
+                    _notificationService.ShowNotification("Задача обновлена", $"Задача '{title}' отмечена как {(completed ? "выполненная" : "невыполненная")}");
                 }
             }
             catch (Exception ex)
@@ -628,57 +566,28 @@ namespace DailyPlaner.ViewModels
 
         private void ExecuteDeleteEvent(object parameter)
         {
-            try
-            {
-                var events = GetSelectedEvents(parameter);
-                if (events.Count == 0)
-                {
-                    return;
-                }
-                if (!ConfirmDelete(events.Count, PluralForms(events.Count, "событие", "события", "событий"), "это событие"))
-                {
-                    return;
-                }
-                int deleted = 0;
-                foreach (var ev in events)
-                {
-                    if (_databaseService.DeleteEvent(ev.Id))
-                    {
-                        deleted++;
-                    }
-                }
-                if (deleted > 0)
-                {
-                    RefreshDataForCurrentPage();
-                    SelectedEvent = null;
-                }
-                if (deleted < events.Count)
-                {
-                    MessageBox.Show($"Удалено {deleted} из {events.Count}. Некоторые записи не удалось удалить.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при удалении события: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            var events = GetSelectedEvents(parameter);
+            DeleteItems(events, ev => _databaseService.DeleteEvent(ev.Id),
+                () => PluralForms(events.Count, "событие", "события", "событий"), "это событие", "события",
+                () => SelectedEvent = null);
         }
 
         private void ExecuteCompleteEvent(object parameter)
         {
+            var ev = SelectedEvent;
+            if (ev == null)
+            {
+                return;
+            }
             try
             {
-                var ev = SelectedEvent;
-                if (ev == null)
-                {
-                    return;
-                }
                 ev.IsCompleted = !ev.IsCompleted;
                 if (_databaseService.UpdateEvent(ev))
                 {
-                    string eventTitle = ev.Title;
-                    bool isCompleted = ev.IsCompleted;
+                    string title = ev.Title;
+                    bool completed = ev.IsCompleted;
                     RefreshDataForCurrentPage();
-                    _notificationService.ShowNotification("Событие обновлено", $"Событие '{eventTitle}' отмечено как {(isCompleted ? "завершённое" : "незавершённое")}");
+                    _notificationService.ShowNotification("Событие обновлено", $"Событие '{title}' отмечено как {(completed ? "завершённое" : "незавершённое")}");
                 }
             }
             catch (Exception ex)
@@ -749,48 +658,43 @@ namespace DailyPlaner.ViewModels
 
         private void ExecuteDeleteNote(object parameter)
         {
+            var notes = GetSelectedNotes(parameter);
+            DeleteItems(notes, n => _databaseService.DeleteNote(n.Id),
+                () => PluralForms(notes.Count, "заметку", "заметки", "заметок"), "эту заметку", "заметки",
+                () => SelectedNote = null);
+        }
+
+        private void DeleteItems<T>(List<T> items, Func<T, bool> delete, Func<string> word, string singleText, string errorTitle, Action resetSelection)
+        {
             try
             {
-                var notes = GetSelectedNotes(parameter);
-                if (notes.Count == 0)
+                if (items.Count == 0)
                 {
                     return;
                 }
-                if (!ConfirmDelete(notes.Count, PluralForms(notes.Count, "заметку", "заметки", "заметок"), "эту заметку"))
+                string plural = word();
+                bool confirmed = items.Count > 1
+                    ? MessageBox.Show($"Вы точно хотите удалить {items.Count} {plural}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes
+                    : MessageBox.Show($"Вы уверены, что хотите удалить {singleText}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+                if (!confirmed)
                 {
                     return;
                 }
-                int deleted = 0;
-                foreach (var note in notes)
-                {
-                    if (_databaseService.DeleteNote(note.Id))
-                    {
-                        deleted++;
-                    }
-                }
+                int deleted = items.Count(item => delete(item));
                 if (deleted > 0)
                 {
                     RefreshDataForCurrentPage();
-                    SelectedNote = null;
+                    resetSelection();
                 }
-                if (deleted < notes.Count)
+                if (deleted < items.Count)
                 {
-                    MessageBox.Show($"Удалено {deleted} из {notes.Count}. Некоторые записи не удалось удалить.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Удалено {deleted} из {items.Count}. Некоторые записи не удалось удалить.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при удалении заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при удалении {errorTitle}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private bool ConfirmDelete(int count, string word, string singleText)
-        {
-            if (count > 1)
-            {
-                return MessageBox.Show($"Вы точно хотите удалить {count} {word}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
-            }
-            return MessageBox.Show($"Вы уверены, что хотите удалить {singleText}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
         }
 
         private void ExecuteClearSearch(object parameter)
@@ -811,45 +715,37 @@ namespace DailyPlaner.ViewModels
             try
             {
                 string query = SearchText?.Trim() ?? string.Empty;
-                bool hasQuery = query.Length > 0;
                 if (ActivePage == PageTasks)
                 {
                     var items = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                    if (hasQuery)
-                    {
-                        items = items.Where(t =>
-                            (t.Title != null && t.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (t.Description != null && t.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-                    }
-                    Tasks = new ObservableCollection<Models.Task>(items);
+                    Tasks = new ObservableCollection<Models.Task>(FilterByQuery(items, query, t => t.Title, t => t.Description));
                 }
                 else if (ActivePage == PageEvents)
                 {
                     var items = _databaseService.GetEventsByUserId(CurrentUser.Id);
-                    if (hasQuery)
-                    {
-                        items = items.Where(ev =>
-                            (ev.Title != null && ev.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (ev.Description != null && ev.Description.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-                    }
-                    Events = new ObservableCollection<Event>(items);
+                    Events = new ObservableCollection<Event>(FilterByQuery(items, query, ev => ev.Title, ev => ev.Description));
                 }
                 else
                 {
                     var items = _databaseService.GetNotesByUserId(CurrentUser.Id);
-                    if (hasQuery)
-                    {
-                        items = items.Where(n =>
-                            (n.Title != null && n.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                            (n.Content != null && n.Content.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-                    }
-                    Notes = new ObservableCollection<Note>(items);
+                    Notes = new ObservableCollection<Note>(FilterByQuery(items, query, n => n.Title, n => n.Content));
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при поиске: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private static List<T> FilterByQuery<T>(List<T> items, string query, Func<T, string> title, Func<T, string> body)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                return items;
+            }
+            return items.Where(item =>
+                (title(item) != null && title(item).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                (body(item) != null && body(item).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
         }
 
         public void ResetFiltersAndReload()
@@ -1033,12 +929,6 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        private void ExecuteToggleTheme(object parameter)
-        {
-            IsDarkTheme = !IsDarkTheme;
-            App.ApplyTheme(IsDarkTheme);
-        }
-
         private void ExecuteExportToJson(object parameter)
         {
             try
@@ -1179,6 +1069,16 @@ namespace DailyPlaner.ViewModels
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void SetField<T>(ref T field, T value, string propertyName)
+        {
+            if (Equals(field, value))
+            {
+                return;
+            }
+            field = value;
+            OnPropertyChanged(propertyName);
         }
     }
 }
