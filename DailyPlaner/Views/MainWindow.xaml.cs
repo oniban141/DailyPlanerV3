@@ -179,6 +179,30 @@ namespace DailyPlaner
             Views.Dialogs.DetailsDialog.ShowNote(this, note);
         }
 
+        private void AdminUsersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender as ListView)?.SelectedItem is User user && DataContext is MainViewModel vm)
+            {
+                vm.ShowAdminUserDetails(user);
+            }
+        }
+
+        private void AdminClearSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.AdminSearchText = string.Empty;
+            }
+        }
+
+        private void AdminClearDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                vm.AdminSearchDate = null;
+            }
+        }
+
         private void ShowTaskDetails(Task task)
         {
             Views.Dialogs.DetailsDialog.ShowTask(this, task);

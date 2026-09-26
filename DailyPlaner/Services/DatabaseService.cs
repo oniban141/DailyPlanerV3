@@ -332,6 +332,13 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
             return result != null ? Convert.ToInt32(result) : 0;
         }
 
+        public int CountUserRows(string table, int userId)
+        {
+            var result = Scalar($"SELECT COUNT(1) FROM {table} WHERE UserId = @UserId",
+                command => command.Parameters.AddWithValue("@UserId", userId));
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
         public List<Reminder> GetAllReminders()
         {
             return Query("SELECT * FROM Reminders", null, ReadReminder);

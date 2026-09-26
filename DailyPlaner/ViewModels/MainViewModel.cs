@@ -38,6 +38,10 @@ namespace DailyPlaner.ViewModels
         private ObservableCollection<User> _users;
         private User _selectedAdminUser;
         private bool _isAdmin;
+        private List<User> _allUsers;
+        private string _adminSearchText;
+        private DateTime? _adminSearchDate;
+        private string _adminStatsHeader;
         private int _totalTasks;
         private int _totalEvents;
         private int _totalNotes;
@@ -188,6 +192,39 @@ namespace DailyPlaner.ViewModels
             {
                 _selectedAdminUser = value;
                 OnPropertyChanged(nameof(SelectedAdminUser));
+                UpdateAdminStats();
+            }
+        }
+
+        public string AdminSearchText
+        {
+            get { return _adminSearchText; }
+            set
+            {
+                _adminSearchText = value;
+                OnPropertyChanged(nameof(AdminSearchText));
+                ApplyAdminSearch();
+            }
+        }
+
+        public DateTime? AdminSearchDate
+        {
+            get { return _adminSearchDate; }
+            set
+            {
+                _adminSearchDate = value;
+                OnPropertyChanged(nameof(AdminSearchDate));
+                ApplyAdminSearch();
+            }
+        }
+
+        public string AdminStatsHeader
+        {
+            get { return _adminStatsHeader; }
+            set
+            {
+                _adminStatsHeader = value;
+                OnPropertyChanged(nameof(AdminStatsHeader));
             }
         }
 
@@ -856,16 +893,54 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                Users = new ObservableCollection<User>(_databaseService.GetAllUsers());
+                _allUsers = _databaseService.GetAllUsers();
+                ApplyAdminSearch();
+                if (SelectedAdminUser == null)
+                {
+                    UpdateAdminStats();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных администрирования: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ApplyAdminSearch()
+        {
+            if (_allUsers == null)
+            {
+                return;
+            }
+            string query = AdminSearchText?.Trim() ?? string.Empty;
+            var filtered = _allUsers.Where(u =>
+                (query.Length == 0 ||
+                    (u.Username != null && u.Username.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (u.Email != null && u.Email.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)) &&
+                (AdminSearchDate == null || u.CreatedAt.Date == AdminSearchDate.Value.Date)).ToList();
+            Users = new ObservableCollection<User>(filtered);
+        }
+
+        private void UpdateAdminStats()
+        {
+            var user = SelectedAdminUser;
+            if (user == null)
+            {
+                AdminStatsHeader = "Общая статистика по всей базе";
                 TotalUsers = _databaseService.CountRows("Users");
                 TotalTasks = _databaseService.CountRows("Tasks");
                 TotalEvents = _databaseService.CountRows("Events");
                 TotalNotes = _databaseService.CountRows("Notes");
                 TotalReminders = _databaseService.CountRows("Reminders");
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Ошибка загрузки данных администрирования: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AdminStatsHeader = $"Данные пользователя \"{user.Username}\"";
+                TotalUsers = 1;
+                TotalTasks = _databaseService.CountUserRows("Tasks", user.Id);
+                TotalEvents = _databaseService.CountUserRows("Events", user.Id);
+                TotalNotes = _databaseService.CountUserRows("Notes", user.Id);
+                TotalReminders = _databaseService.CountUserRows("Reminders", user.Id);
             }
         }
 
@@ -890,9 +965,10 @@ namespace DailyPlaner.ViewModels
                 }
                 if (_databaseService.DeleteUserWithAllData(user.Id))
                 {
+                    var name = user.Username;
                     SelectedAdminUser = null;
                     LoadAdminData();
-                    MessageBox.Show($"Пользователь \"{user.Username}\" удалён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Пользователь \"{name}\" удалён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
@@ -931,6 +1007,29 @@ namespace DailyPlaner.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при сбросе пароля: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public void ShowAdminUserDetails(User user)
+        {
+            if (user == null)
+            {
+                return;
+            }
+            try
+            {
+                int tasks = _databaseService.CountUserRows("Tasks", user.Id);
+                int events = _databaseService.CountUserRows("Events", user.Id);
+                int notes = _databaseService.CountUserRows("Notes", user.Id);
+                int reminders = _databaseService.CountUserRows("Reminders", user.Id);
+                string role = user.RoleId == 2 ? "Администратор" : "Пользователь";
+                MessageBox.Show(
+                    $"Логин: {user.Username}\nEmail: {(string.IsNullOrWhiteSpace(user.Email) ? "—" : user.Email)}\nРоль: {role}\nДата регистрации: {user.CreatedAt:dd.MM.yyyy HH:mm}\n\nЗадач: {tasks}\nСобытий: {events}\nЗаметок: {notes}\nНапоминаний: {reminders}",
+                    $"Пользователь \"{user.Username}\"", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке информации о пользователе: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

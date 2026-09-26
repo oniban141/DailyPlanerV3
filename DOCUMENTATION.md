@@ -162,7 +162,8 @@
 - `GetAllUsers() : List<User>` — все пользователи (для страницы «Администрирование»; видна только при `RoleId = 2`).
 - `ResetUserPassword(int userId, string passwordHash) : bool` — сброс пароля пользователя.
 - `DeleteUserWithAllData(int userId) : bool` — удаляет пользователя и все его напоминания, задачи, события и заметки.
-- `CountRows(string table) : int` — количество записей таблицы (статистика администратора).
+- `CountRows(string table) : int` — количество записей таблицы (статистика администратора по всей базе).
+- `CountUserRows(string table, int userId) : int` — количество записей таблицы конкретного пользователя (статистика по выбранному пользователю).
 
 ### Класс `NotificationService` — DailyPlaner/Services/NotificationService.cs
 

@@ -406,10 +406,37 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,14">
+                <TextBlock Grid.Row="0" Text="{Binding AdminStatsHeader}" Style="{StaticResource SectionTitleStyle}" Margin="0,10,0,10"/>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                    <Border Style="{StaticResource CardStyle}" Padding="0" Margin="0,0,10,0" MinWidth="260">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding AdminSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource WatermarkTextBoxStyle}" Tag="   Поиск по имени или email"/>
+                            <Button Grid.Column="1" Content="✕" Width="30" Margin="4"
+                                    Style="{StaticResource SecondaryButtonStyle}" Click="AdminClearSearchButton_Click"/>
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource CardStyle}" Padding="10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📅 Дата регистрации: " Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center"/>
+                            <DatePicker SelectedDate="{Binding AdminSearchDate, Mode=TwoWay}" Width="140" VerticalAlignment="Center"/>
+                            <Button Content="✕" Width="26" Margin="6,0,0,0" Style="{StaticResource SecondaryButtonStyle}"
+                                    Click="AdminClearDateButton_Click"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,12">
                     <Border Style="{StaticResource CardStyle}" Padding="14,10" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="👥 Пользователей: " Style="{StaticResource BaseTextBlockStyle}"/>
@@ -442,15 +469,15 @@
                     </Border>
                 </StackPanel>
 
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,14">
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,12">
                     <Button Content="🔑 Сбросить пароль" Command="{Binding ResetUserPasswordCommand}"
                             Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,10,0"/>
                     <Button Content="🗑 Удалить пользователя" Command="{Binding DeleteUserCommand}"
                             Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
 
-                <ListView Grid.Row="2" x:Name="AdminUsersList" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedAdminUser}"
-                          SelectionMode="Single" Style="{StaticResource BaseListViewStyle}">
+                <ListView Grid.Row="4" x:Name="AdminUsersList" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedAdminUser}"
+                          SelectionMode="Single" Style="{StaticResource BaseListViewStyle}" MouseDoubleClick="AdminUsersList_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
@@ -468,7 +495,7 @@
                                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                             <TextBlock Text="✉ " Style="{StaticResource MutedTextBlockStyle}"/>
                                             <TextBlock Text="{Binding Email}" Style="{StaticResource MutedTextBlockStyle}" Margin="2,0,12,0"/>
-                                            <TextBlock Text="Registration: " Style="{StaticResource MutedTextBlockStyle}"/>
+                                            <TextBlock Text="Регистрация: " Style="{StaticResource MutedTextBlockStyle}"/>
                                             <TextBlock Text="{Binding CreatedAt, StringFormat='dd.MM.yyyy HH:mm'}" Style="{StaticResource MutedTextBlockStyle}"/>
                                         </StackPanel>
                                     </StackPanel>
