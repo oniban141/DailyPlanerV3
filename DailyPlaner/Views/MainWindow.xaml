@@ -460,8 +460,21 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}"
-                                   Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,10"/>
+                        <!-- Большая дата, как на образце -->
+                        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,28,0,24">
+                            <TextBlock Text="{Binding SelectedDate, StringFormat='dd'}"
+                                       FontSize="96" FontWeight="Bold" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource OrangeDarkBrush}"/>
+                            <TextBlock Text="{Binding SelectedDate, StringFormat='dddd'}"
+                                       FontSize="22" HorizontalAlignment="Center" Margin="0,8,0,0"
+                                       Style="{StaticResource BaseTextBlockStyle}"/>
+                            <TextBlock Text="{Binding SelectedDate, StringFormat='MMMM'}"
+                                       FontSize="18" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                       Style="{StaticResource MutedTextBlockStyle}"/>
+                            <TextBlock Text="{Binding SelectedDate, StringFormat='yyyy'}"
+                                       FontSize="16" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                       Style="{StaticResource MutedTextBlockStyle}"/>
+                        </StackPanel>
 
                         <ListView Grid.Row="1" x:Name="DayTasksList" Style="{StaticResource BaseListViewStyle}"
                                   MouseDoubleClick="DayItem_MouseDoubleClick">
