@@ -943,7 +943,7 @@ namespace DailyPlaner.ViewModels
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 var saveFileDialog = new Microsoft.Win32.SaveFileDialog
                 {
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                    Filter = "Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*",
                     DefaultExt = ".json"
                 };
                 if (saveFileDialog.ShowDialog() == true)
@@ -964,7 +964,7 @@ namespace DailyPlaner.ViewModels
             {
                 var openFileDialog = new Microsoft.Win32.OpenFileDialog
                 {
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"
+                    Filter = "Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*"
                 };
                 if (openFileDialog.ShowDialog() != true)
                 {

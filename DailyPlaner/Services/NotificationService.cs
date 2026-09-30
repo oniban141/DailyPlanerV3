@@ -30,7 +30,7 @@ namespace DailyPlaner.Services
             catch (Exception ex)
             {
                 ShowTrayFallback(title, message);
-                Console.WriteLine($"Error showing notification: {ex.Message}");
+                Console.WriteLine($"Ошибка показа уведомления: {ex.Message}");
             }
         }
 
@@ -38,11 +38,11 @@ namespace DailyPlaner.Services
         {
             try
             {
-                ShowNotification(title, $"{message}\n\nDue: {dueDate:yyyy-MM-dd HH:mm}");
+                ShowNotification(title, $"{message}\n\nСрок: {dueDate:yyyy-MM-dd HH:mm}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error showing reminder: {ex.Message}");
+                Console.WriteLine($"Ошибка показа напоминания: {ex.Message}");
             }
         }
 
@@ -79,7 +79,7 @@ namespace DailyPlaner.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error scheduling notification: {ex.Message}");
+                Console.WriteLine($"Ошибка планирования уведомления: {ex.Message}");
             }
         }
 
@@ -99,7 +99,7 @@ namespace DailyPlaner.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error showing tray notification: {ex.Message}");
+                Console.WriteLine($"Ошибка показа уведомления в трее: {ex.Message}");
             }
         }
     }
