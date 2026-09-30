@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 
 namespace DailyPlaner
