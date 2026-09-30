@@ -87,6 +87,22 @@ namespace DailyPlaner
                 }
                 e.Handled = true;
             }
+            UpdateSearchWatermark();
+        }
+
+        private void SearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            UpdateSearchWatermark();
+        }
+
+        private void UpdateSearchWatermark()
+        {
+            if (SearchWatermark != null)
+            {
+                SearchWatermark.Visibility = string.IsNullOrEmpty(SearchTextBox.Text)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
         }
 
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)

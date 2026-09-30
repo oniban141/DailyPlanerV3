@@ -33,6 +33,22 @@ namespace DailyPlaner.Views.Dialogs
             DialogResult = true;
         }
 
+        private void TitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (TitleWatermark != null)
+            {
+                TitleWatermark.Visibility = string.IsNullOrEmpty(TitleBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void ContentBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (ContentWatermark != null)
+            {
+               ContentWatermark.Visibility = string.IsNullOrEmpty(ContentBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;

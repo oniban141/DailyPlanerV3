@@ -29,6 +29,28 @@ namespace DailyPlaner.Views
             }
         }
 
+        private void UsernameBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            if (UsernameWatermark != null)
+            {
+                UsernameWatermark.Visibility = string.IsNullOrEmpty(textBox.Text)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
+        private void EmailBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            if (EmailWatermark != null)
+            {
+                EmailWatermark.Visibility = string.IsNullOrEmpty(textBox.Text)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             var passwordBox = (PasswordBox)sender;
