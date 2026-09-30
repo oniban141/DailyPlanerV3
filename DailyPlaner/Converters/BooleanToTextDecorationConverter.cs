@@ -52,17 +52,4 @@ namespace DailyPlaner.Converters
         }
     }
 
-    public class BooleanToOpacityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            bool completed = value is bool boolValue && boolValue;
-            return completed ? 0.55 : 1.0;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return false;
-        }
-    }
 }

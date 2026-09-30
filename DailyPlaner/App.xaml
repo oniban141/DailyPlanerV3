@@ -1,22 +1,12 @@
 <Application x:Class="DailyPlaner.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:DailyPlaner"
-             xmlns:converters="clr-namespace:DailyPlaner.Converters"
-            >
+             xmlns:converters="clr-namespace:DailyPlaner.Converters">
     <Application.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/DailyPlaner;component/Resourse/Styles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:BooleanToTextDecorationConverter x:Key="BooleanToTextDecorationConverter"/>
             <converters:BooleanToStatusBadgeConverter x:Key="BooleanToStatusBadgeConverter"/>
-            <converters:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter"/>
-
-            <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#E8D8C9"/>
-            <SolidColorBrush x:Key="WindowForegroundBrush" Color="#2E3949"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
