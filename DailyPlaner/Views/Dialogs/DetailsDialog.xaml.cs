@@ -13,7 +13,7 @@ namespace DailyPlaner.Views.Dialogs
         public static void ShowTask(Window owner, Task task)
         {
             var dialog = new DetailsDialog { Owner = owner };
-            dialog.KindIcon.Text = "\U0001F4CB";
+
             dialog.KindLabel.Text = "Задача";
             dialog.TitleText.Text = string.IsNullOrWhiteSpace(task.Title) ? "—" : task.Title;
             dialog.DescriptionText.Text = string.IsNullOrWhiteSpace(task.Description) ? "—" : task.Description;
@@ -29,7 +29,7 @@ namespace DailyPlaner.Views.Dialogs
         public static void ShowEvent(Window owner, Event ev)
         {
             var dialog = new DetailsDialog { Owner = owner };
-            dialog.KindIcon.Text = "\U0001F4C5";
+
             dialog.KindLabel.Text = "Событие";
             dialog.TitleText.Text = string.IsNullOrWhiteSpace(ev.Title) ? "—" : ev.Title;
             dialog.DescriptionText.Text = string.IsNullOrWhiteSpace(ev.Description) ? "—" : ev.Description;
@@ -45,7 +45,7 @@ namespace DailyPlaner.Views.Dialogs
         public static void ShowNote(Window owner, Note note)
         {
             var dialog = new DetailsDialog { Owner = owner };
-            dialog.KindIcon.Text = "\U0001F4DD";
+
             dialog.KindLabel.Text = "Заметка";
             dialog.TitleText.Text = string.IsNullOrWhiteSpace(note.Title) ? "—" : note.Title;
             dialog.DescriptionText.Text = string.IsNullOrWhiteSpace(note.Content) ? "—" : note.Content;

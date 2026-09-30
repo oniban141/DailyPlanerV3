@@ -1,10 +1,7 @@
-using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using DailyPlaner.Models;
 using DailyPlaner.ViewModels;
 
@@ -18,7 +15,6 @@ namespace DailyPlaner
         {
             InitializeComponent();
             App.SetWindowIcon(this);
-            LoadHeaderIcon();
             DataContext = new MainViewModel { ActivePage = MainViewModel.PageOverview };
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
             UpdateToolbarForPage(MainViewModel.PageOverview);
@@ -29,7 +25,6 @@ namespace DailyPlaner
         {
             InitializeComponent();
             App.SetWindowIcon(this);
-            LoadHeaderIcon();
             var viewModel = new MainViewModel();
             DataContext = viewModel;
             viewModel.CurrentUser = user;
@@ -73,12 +68,6 @@ namespace DailyPlaner
             NotesPage.Visibility = pageName == MainViewModel.PageNotes ? Visibility.Visible : Visibility.Collapsed;
             CalendarPage.Visibility = pageName == MainViewModel.PageCalendar ? Visibility.Visible : Visibility.Collapsed;
             AdminPage.Visibility = pageName == MainViewModel.PageAdmin ? Visibility.Visible : Visibility.Collapsed;
-            NavOverviewButton.Style = (Style)FindResource(pageName == MainViewModel.PageOverview ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavTasksButton.Style = (Style)FindResource(pageName == MainViewModel.PageTasks ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavEventsButton.Style = (Style)FindResource(pageName == MainViewModel.PageEvents ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavNotesButton.Style = (Style)FindResource(pageName == MainViewModel.PageNotes ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavCalendarButton.Style = (Style)FindResource(pageName == MainViewModel.PageCalendar ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
-            NavAdminButton.Style = (Style)FindResource(pageName == MainViewModel.PageAdmin ? "SidebarActiveButtonStyle" : "SidebarButtonStyle");
             UpdateToolbarForPage(pageName);
         }
 
@@ -103,27 +92,6 @@ namespace DailyPlaner
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)
         {
             App.SetAutoStart(AutoStartSidebarCheckBox.IsChecked == true);
-        }
-
-        private void LoadHeaderIcon()
-        {
-            try
-            {
-                if (HeaderIcon.Source != null)
-                {
-                    return;
-                }
-                string iconPath = App.FindIconFile();
-                if (iconPath != null)
-                {
-                    var bitmap = new BitmapImage(new Uri(iconPath));
-                    bitmap.Freeze();
-                    HeaderIcon.Source = bitmap;
-                }
-            }
-            catch (Exception)
-            {
-            }
         }
 
         private void RefreshDayLists()

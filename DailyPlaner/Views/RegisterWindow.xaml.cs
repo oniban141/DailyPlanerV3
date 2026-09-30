@@ -1,7 +1,5 @@
-using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using DailyPlaner.ViewModels;
 
 namespace DailyPlaner.Views
@@ -19,24 +17,6 @@ namespace DailyPlaner.Views
             App.SetWindowIcon(this);
             DataContext = new RegisterViewModel(new Services.DatabaseService());
             GenderComboBox.SelectionChanged += GenderComboBox_SelectionChanged;
-            LoadHeaderIcon();
-        }
-
-        private void LoadHeaderIcon()
-        {
-            try
-            {
-                string iconPath = App.FindIconFile();
-                if (iconPath != null)
-                {
-                    var bitmap = new BitmapImage(new Uri(iconPath));
-                    bitmap.Freeze();
-                    HeaderIcon.Source = bitmap;
-                }
-            }
-            catch (Exception)
-            {
-            }
         }
 
         private void GenderComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -77,16 +57,6 @@ namespace DailyPlaner.Views
                     ? Visibility.Visible
                     : Visibility.Collapsed;
             }
-        }
-
-        private void TextBox_TextChanged()
-        {
-
-        }
-
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
         }
     }
 }
