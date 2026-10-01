@@ -12,6 +12,17 @@ namespace DailyPlaner.Views
             DataContext = new LoginViewModel();
         }
 
+        private void UsernameBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            if (UsernameWatermark != null)
+            {
+                UsernameWatermark.Visibility = string.IsNullOrEmpty(textBox.Text)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             var passwordBox = (PasswordBox)sender;

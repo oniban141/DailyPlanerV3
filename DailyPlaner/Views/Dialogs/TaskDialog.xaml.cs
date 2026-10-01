@@ -147,6 +147,22 @@ namespace DailyPlaner.Views.Dialogs
             DialogResult = true;
         }
 
+        private void TitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (TitleWatermark != null)
+            {
+                TitleWatermark.Visibility = string.IsNullOrEmpty(TitleBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void DescriptionBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (DescriptionWatermark != null)
+            {
+                DescriptionWatermark.Visibility = string.IsNullOrEmpty(DescriptionBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;

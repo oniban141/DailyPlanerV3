@@ -4,6 +4,117 @@
              xmlns:converters="clr-namespace:DailyPlaner.Converters">
     <Application.Resources>
         <ResourceDictionary>
+            <SolidColorBrush x:Key="RetroBackgroundBrush" Color="#D8C8A8"/>
+            <SolidColorBrush x:Key="RetroCardBrush" Color="#EFE6D0"/>
+            <SolidColorBrush x:Key="RetroSidebarBrush" Color="#7A8B6F"/>
+            <SolidColorBrush x:Key="RetroAccentBrush" Color="#B85450"/>
+            <SolidColorBrush x:Key="RetroAccent2Brush" Color="#C9A227"/>
+            <SolidColorBrush x:Key="RetroTextBrush" Color="#2B2B2B"/>
+            <SolidColorBrush x:Key="RetroMutedBrush" Color="#6B6B5A"/>
+            <SolidColorBrush x:Key="RetroButtonBrush" Color="#C0C0C0"/>
+            <SolidColorBrush x:Key="RetroBorderBrush" Color="#4A4A3A"/>
+
+            <Style TargetType="Window">
+                <Setter Property="Background" Value="{StaticResource RetroBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+            <Style TargetType="Page">
+                <Setter Property="Background" Value="{StaticResource RetroBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource RetroButtonBrush}"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#DADADA"/>
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="#A8A8A8"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="TextBox">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="4,3"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="PasswordBox">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="4,3"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+            <Style TargetType="DatePicker">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+            <Style TargetType="CheckBox">
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+            <Style TargetType="ListView">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+            <Style TargetType="Calendar">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="FontFamily" Value="Tahoma"/>
+            </Style>
+            <Style TargetType="ProgressBar">
+                <Setter Property="Background" Value="{StaticResource RetroCardBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource RetroAccent2Brush}"/>
+                <Setter Property="Height" Value="14"/>
+                <Setter Property="BorderBrush" Value="{StaticResource RetroBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+            </Style>
+
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:BooleanToTextDecorationConverter x:Key="BooleanToTextDecorationConverter"/>
             <converters:BooleanToStatusBadgeConverter x:Key="BooleanToStatusBadgeConverter"/>
