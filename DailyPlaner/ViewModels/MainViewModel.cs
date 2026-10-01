@@ -73,6 +73,18 @@ namespace DailyPlaner.ViewModels
                 _tasks = value;
                 OnPropertyChanged(nameof(Tasks));
                 OnPropertyChanged(nameof(CompletedTasksCount));
+                OnPropertyChanged(nameof(UpcomingTasks));
+            }
+        }
+
+        public IEnumerable<Models.Task> UpcomingTasks
+        {
+            get
+            {
+                return Tasks
+                    .Where(t => !t.IsCompleted && t.DueDate >= DateTime.Now)
+                    .OrderBy(t => t.DueDate)
+                    .Take(10);
             }
         }
 

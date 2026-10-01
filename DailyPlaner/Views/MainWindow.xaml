@@ -83,23 +83,49 @@
                 </StackPanel>
                 <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Ближайшие события" FontWeight="Bold" Margin="0,0,0,6"/>
-                    <ListView Grid.Row="1" ItemsSource="{Binding Events}">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Margin="0,0,0,4">
-                                    <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding StartDate, StringFormat='dd.MM HH:mm'}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
-                                        <TextBlock Text="{Binding Location}" Foreground="{StaticResource RetroMutedBrush}"/>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Ближайшие задачи" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <ListView Grid.Row="1" ItemsSource="{Binding UpcomingTasks}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding DueDate, StringFormat='dd.MM HH:mm'}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding Priority}" Foreground="{StaticResource RetroMutedBrush}"/>
+                                        </StackPanel>
                                     </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Ближайшие события" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <ListView Grid.Row="1" ItemsSource="{Binding Events}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding StartDate, StringFormat='dd.MM HH:mm'}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding Location}" Foreground="{StaticResource RetroMutedBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
                 </Grid>
             </Grid>
 
@@ -255,12 +281,18 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                    <TextBlock Text="Календарь" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
-                    <Calendar x:Name="MainCalendar" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                <Grid Grid.Column="0" Margin="0,0,16,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Календарь" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
+                    <Calendar Grid.Row="1" x:Name="MainCalendar" SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                               SelectedDatesChanged="MainCalendar_SelectedDatesChanged"/>
-                    <TextBlock Text="Все события на выбранный день" FontWeight="Bold" Margin="0,10,0,6"/>
-                    <ListView x:Name="DayEventsList" MouseDoubleClick="DayItem_MouseDoubleClick">
+                    <TextBlock Grid.Row="2" Text="Все события на выбранный день" FontWeight="Bold" Margin="0,10,0,6"/>
+                    <ListView Grid.Row="3" x:Name="DayEventsList" MouseDoubleClick="DayItem_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -270,10 +302,14 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                </StackPanel>
-                <StackPanel Grid.Column="1">
-                    <TextBlock Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
-                    <ListView x:Name="DayTasksList" MouseDoubleClick="DayItem_MouseDoubleClick">
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="{Binding SelectedDate, StringFormat='dddd, dd MMMM yyyy'}" FontWeight="Bold" FontSize="14" Margin="0,0,0,6"/>
+                    <ListView Grid.Row="1" x:Name="DayTasksList" MouseDoubleClick="DayItem_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -283,7 +319,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
