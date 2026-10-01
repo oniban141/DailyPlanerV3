@@ -202,9 +202,5 @@ namespace DailyPlaner.Views.Dialogs
         {
             DialogResult = false;
         }
-
-        private void TitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-        }
     }
 }
