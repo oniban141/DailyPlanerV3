@@ -82,8 +82,9 @@ namespace DailyPlaner.ViewModels
             get
             {
                 return Tasks
-                    .Where(t => !t.IsCompleted && t.DueDate >= DateTime.Now)
-                    .OrderBy(t => t.DueDate)
+                    .Where(t => t.DueDate.Date >= DateTime.Today)
+                    .OrderBy(t => t.IsCompleted)
+                    .ThenBy(t => t.DueDate)
                     .Take(10);
             }
         }

@@ -95,11 +95,13 @@
                         <ListView Grid.Row="1" ItemsSource="{Binding UpcomingTasks}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="0,0,0,4">
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                    <StackPanel Margin="0,0,0,6">
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"
+                                                   TextDecorations="{Binding IsCompleted, Converter={StaticResource BooleanToTextDecorationConverter}}"/>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding DueDate, StringFormat='dd.MM HH:mm'}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
-                                            <TextBlock Text="{Binding Priority}" Foreground="{StaticResource RetroMutedBrush}"/>
+                                            <TextBlock Text="{Binding Priority}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BooleanToStatusBadgeConverter}}" FontWeight="Bold"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -115,11 +117,13 @@
                         <ListView Grid.Row="1" ItemsSource="{Binding Events}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="0,0,0,4">
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                    <StackPanel Margin="0,0,0,6">
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold"
+                                                   TextDecorations="{Binding IsCompleted, Converter={StaticResource BooleanToTextDecorationConverter}}"/>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding StartDate, StringFormat='dd.MM HH:mm'}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
-                                            <TextBlock Text="{Binding Location}" Foreground="{StaticResource RetroMutedBrush}"/>
+                                            <TextBlock Text="{Binding Location}" Foreground="{StaticResource RetroMutedBrush}" Margin="0,0,10,0"/>
+                                            <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BooleanToStatusBadgeConverter}, ConverterParameter=event}" FontWeight="Bold"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -295,9 +299,9 @@
                     <ListView Grid.Row="3" x:Name="DayEventsList" MouseDoubleClick="DayItem_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding StartDate, StringFormat='HH:mm'}" Margin="0,0,8,0"/>
-                                    <TextBlock Text="{Binding Title}"/>
+                                <StackPanel Orientation="Horizontal" Margin="4,5" MinHeight="26">
+                                    <TextBlock Text="{Binding StartDate, StringFormat='HH:mm'}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -312,9 +316,9 @@
                     <ListView Grid.Row="1" x:Name="DayTasksList" MouseDoubleClick="DayItem_MouseDoubleClick" ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding DueDate, StringFormat='HH:mm'}" Margin="0,0,8,0"/>
-                                    <TextBlock Text="{Binding Title}"/>
+                                <StackPanel Orientation="Horizontal" Margin="4,5" MinHeight="26">
+                                    <TextBlock Text="{Binding DueDate, StringFormat='HH:mm'}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Title}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
