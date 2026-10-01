@@ -17,11 +17,6 @@ namespace DailyPlaner.Services
                 : configured;
         }
 
-        public DatabaseService(string customConnectionString)
-        {
-            connectionString = customConnectionString;
-        }
-
         public static string GetFriendlyDatabaseError(Exception exception)
         {
             var sqlEx = exception as SqlException;
@@ -114,9 +109,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                     command.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Проверка базы данных: {ex.Message}");
             }
         }
 
@@ -140,9 +134,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                         return Convert.ToInt32(command.ExecuteScalar()) > 0;
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
                     return false;
                 }
             }
@@ -391,9 +384,8 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
                 }
             }
             return items;
@@ -419,10 +411,7 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                         System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных",
                             System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     }
-                    else
-                    {
-                        Console.WriteLine($"Error: {ex.Message}");
-                    }
+
                     return false;
                 }
             }
@@ -448,10 +437,7 @@ ALTER TABLE dbo.Tasks ADD CONSTRAINT CHK_Tasks_Status CHECK (Status IN (N'Ожи
                         System.Windows.MessageBox.Show(GetFriendlyDatabaseError(ex), "Ошибка базы данных",
                             System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                     }
-                    else
-                    {
-                        Console.WriteLine($"Error: {ex.Message}");
-                    }
+
                     return null;
                 }
             }
