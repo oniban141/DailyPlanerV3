@@ -23,7 +23,7 @@ namespace DailyPlaner.Services
                 case 53:
                     return "Сервер 'PCGl1tch' недоступен. Проверьте, что SQL Server запущен, и имя сервера указано верно (Server=PCGl1tch).";
                 case 4060:
-                    return "База данных 'DailyPlannerDB' не существует или недоступна. Выполните скрипт Database/DailyPlannerDB.sql для её создания.";
+                    return "База данных 'DailyPlanerDBV3' не существует или недоступна. Выполните скрипт Database/DailyPlannerDB.sql для её создания.";
                 case 18456:
                     return "Ошибка авторизации Windows. Проверьте, что учётная запись Windows имеет доступ к SQL Server.";
                 case 18452:
