@@ -84,48 +84,9 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
-    <Compile Include="DailyPlanerDBV3.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DailyPlanerDBV3.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DailyPlanerDBV3.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DailyPlanerDBV3.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DailyPlanerDBV3.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Event.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Gender.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Note.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Reminder.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Role.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
     <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\ReminderScheduler.cs" />
     <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="sysdiagram.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Task.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
-    <Compile Include="User.cs">
-      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
-    </Compile>
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\RegisterViewModel.cs" />
@@ -209,10 +170,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EntityDeploy Include="DailyPlanerDBV3.edmx">
+    <None Include="DailyPlanerDBV3.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DailyPlanerDBV3.Designer.cs</LastGenOutput>
-    </EntityDeploy>
+    </None>
     <None Include="DailyPlanerDBV3.edmx.diagram">
       <DependentUpon>DailyPlanerDBV3.edmx</DependentUpon>
     </None>
