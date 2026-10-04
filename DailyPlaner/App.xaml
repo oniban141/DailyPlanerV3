@@ -4,15 +4,15 @@
              xmlns:converters="clr-namespace:DailyPlaner.Converters">
     <Application.Resources>
         <ResourceDictionary>
-            <SolidColorBrush x:Key="RetroBackgroundBrush" Color="#D8C8A8"/>
-            <SolidColorBrush x:Key="RetroCardBrush" Color="#EFE6D0"/>
-            <SolidColorBrush x:Key="RetroSidebarBrush" Color="#7A8B6F"/>
-            <SolidColorBrush x:Key="RetroAccentBrush" Color="#B85450"/>
-            <SolidColorBrush x:Key="RetroAccent2Brush" Color="#C9A227"/>
-            <SolidColorBrush x:Key="RetroTextBrush" Color="#2B2B2B"/>
-            <SolidColorBrush x:Key="RetroMutedBrush" Color="#6B6B5A"/>
-            <SolidColorBrush x:Key="RetroButtonBrush" Color="#C0C0C0"/>
-            <SolidColorBrush x:Key="RetroBorderBrush" Color="#4A4A3A"/>
+            <SolidColorBrush x:Key="RetroBackgroundBrush" Color="#CFC0A4"/>
+            <SolidColorBrush x:Key="RetroCardBrush" Color="#E8DCC3"/>
+            <SolidColorBrush x:Key="RetroSidebarBrush" Color="#6E7D5D"/>
+            <SolidColorBrush x:Key="RetroAccentBrush" Color="#9C4A3F"/>
+            <SolidColorBrush x:Key="RetroAccent2Brush" Color="#B08D2E"/>
+            <SolidColorBrush x:Key="RetroTextBrush" Color="#33291F"/>
+            <SolidColorBrush x:Key="RetroMutedBrush" Color="#71675A"/>
+            <SolidColorBrush x:Key="RetroButtonBrush" Color="#C8C8BE"/>
+            <SolidColorBrush x:Key="RetroBorderBrush" Color="#574A38"/>
 
             <Style TargetType="Window">
                 <Setter Property="Background" Value="{StaticResource RetroBackgroundBrush}"/>
@@ -38,10 +38,10 @@
                 <Setter Property="Cursor" Value="Hand"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#DADADA"/>
+                        <Setter Property="Background" Value="#DCD8CC"/>
                     </Trigger>
                     <Trigger Property="IsPressed" Value="True">
-                        <Setter Property="Background" Value="#A8A8A8"/>
+                        <Setter Property="Background" Value="#AEAEA2"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
