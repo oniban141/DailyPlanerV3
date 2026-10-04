@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Задача" Height="560" Width="440"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
-    <Grid Margin="24" Background="{StaticResource RetroBackgroundBrush}">
+    <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

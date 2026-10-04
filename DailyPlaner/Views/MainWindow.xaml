@@ -66,11 +66,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <DockPanel Grid.Row="0" LastChildFill="False">
-                    <TextBlock Text="Обзор" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
-                    <Button DockPanel.Dock="Right" Content="Импорт JSON" Command="{Binding ImportFromJsonCommand}" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                    <Button DockPanel.Dock="Right" Content="Экспорт JSON" Command="{Binding ExportToJsonCommand}" VerticalAlignment="Center"/>
-                </DockPanel>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock Text="Обзор" FontWeight="Bold" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <Button Content="Экспорт JSON" Command="{Binding ExportToJsonCommand}" Margin="20,0,8,0" VerticalAlignment="Center"/>
+                    <Button Content="Импорт JSON" Command="{Binding ImportFromJsonCommand}" VerticalAlignment="Center"/>
+                </StackPanel>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Background="{StaticResource RetroCardBrush}" Margin="8,8,8,18">
                     <TextBlock Text="Всего задач: " Margin="0,0,4,0"/>
                     <TextBlock Text="{Binding Tasks.Count}" FontWeight="Bold" Margin="0,0,20,0"/>
