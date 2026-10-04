@@ -945,13 +945,17 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                var tasks = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                if (tasks == null || tasks.Count == 0)
+                var data = new
                 {
-                    MessageBox.Show("У вас нет задач для экспорта.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-                string json = JsonConvert.SerializeObject(tasks, Formatting.Indented,
+                    Tasks = _databaseService.GetTasksByUserId(CurrentUser.Id),
+                    Events = _databaseService.GetEventsByUserId(CurrentUser.Id),
+                    Notes = _databaseService.GetNotesByUserId(CurrentUser.Id),
+                    Settings = new
+                    {
+                        AutoStart = App.LoadAutoStartSetting()
+                    }
+                };
+                string json = JsonConvert.SerializeObject(data, Formatting.Indented,
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 var saveFileDialog = new Microsoft.Win32.SaveFileDialog
                 {
@@ -961,7 +965,7 @@ namespace DailyPlaner.ViewModels
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     File.WriteAllText(saveFileDialog.FileName, json);
-                    MessageBox.Show("Задачи успешно экспортированы в JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Задачи, события, заметки и настройки приложения успешно экспортированы в JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -988,16 +992,40 @@ namespace DailyPlaner.ViewModels
                     MessageBox.Show("Файл пуст — нечего импортировать.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                var tasks = JsonConvert.DeserializeObject<List<Models.Task>>(json);
-                if (tasks != null)
+                var data = JsonConvert.DeserializeObject<BackupData>(json);
+                if (data != null)
                 {
-                    foreach (var task in tasks)
+                    int imported = 0;
+                    if (data.Tasks != null)
                     {
-                        task.UserId = CurrentUser.Id;
-                        _databaseService.CreateTask(task);
+                        foreach (var task in data.Tasks)
+                        {
+                            task.UserId = CurrentUser.Id;
+                            if (_databaseService.CreateTask(task)) imported++;
+                        }
+                    }
+                    if (data.Events != null)
+                    {
+                        foreach (var ev in data.Events)
+                        {
+                            ev.UserId = CurrentUser.Id;
+                            if (_databaseService.CreateEvent(ev)) imported++;
+                        }
+                    }
+                    if (data.Notes != null)
+                    {
+                        foreach (var note in data.Notes)
+                        {
+                            note.UserId = CurrentUser.Id;
+                            if (_databaseService.CreateNote(note)) imported++;
+                        }
+                    }
+                    if (data.Settings != null && data.Settings.AutoStart.HasValue)
+                    {
+                        App.SetAutoStart(data.Settings.AutoStart.Value);
                     }
                     RefreshDataForCurrentPage();
-                    MessageBox.Show("Задачи успешно импортированы из JSON!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Данные успешно импортированы из JSON (записей: {imported})!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -1078,6 +1106,7 @@ namespace DailyPlaner.ViewModels
             }
         }
 
+
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -1092,5 +1121,18 @@ namespace DailyPlaner.ViewModels
             field = value;
             OnPropertyChanged(propertyName);
         }
+    }
+
+    public class BackupData
+    {
+        public List<Task> Tasks { get; set; }
+        public List<Event> Events { get; set; }
+        public List<Note> Notes { get; set; }
+        public BackupSettings Settings { get; set; }
+    }
+
+    public class BackupSettings
+    {
+        public bool? AutoStart { get; set; }
     }
 }
