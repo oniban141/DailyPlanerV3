@@ -41,9 +41,9 @@ namespace DailyPlaner.Converters
             bool completed = value is bool boolValue && boolValue;
             if (parameter is string kind && kind == "event")
             {
-                return completed ? "✔ Завершено" : "Запланировано";
+                return completed ? "Завершено" : "Запланировано";
             }
-            return completed ? "✔ Выполнена" : "Ожидает";
+            return completed ? "Выполнена" : "Ожидает";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

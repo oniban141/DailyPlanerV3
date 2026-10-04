@@ -34,7 +34,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup>    <Reference Include="System" />
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -74,11 +81,51 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    </ApplicationDefinition>
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
+    <Compile Include="DailyPlanerDBV3.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DailyPlanerDBV3.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DailyPlanerDBV3.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DailyPlanerDBV3.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DailyPlanerDBV3.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Event.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Gender.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Note.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Reminder.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Role.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
     <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\ReminderScheduler.cs" />
     <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="sysdiagram.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Task.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
+    <Compile Include="User.cs">
+      <DependentUpon>DailyPlanerDBV3.tt</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\RegisterViewModel.cs" />
@@ -161,7 +208,15 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>    <None Include="packages.config" />
+    </EmbeddedResource>
+    <EntityDeploy Include="DailyPlanerDBV3.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DailyPlanerDBV3.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="DailyPlanerDBV3.edmx.diagram">
+      <DependentUpon>DailyPlanerDBV3.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -171,7 +226,18 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Database\DailyPlannerDB.sql" />  </ItemGroup>
+    <Content Include="DailyPlanerDBV3.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DailyPlanerDBV3.edmx</DependentUpon>
+      <LastGenOutput>DailyPlanerDBV3.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="DailyPlanerDBV3.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DailyPlanerDBV3.edmx</DependentUpon>
+      <LastGenOutput>DailyPlanerDBV3.cs</LastGenOutput>
+    </Content>
+    <Content Include="Database\DailyPlannerDB.sql" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
