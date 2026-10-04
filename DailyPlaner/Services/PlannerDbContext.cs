@@ -34,10 +34,14 @@ namespace DailyPlaner.Services
             modelBuilder.Entity<Models.Task>()
                 .ToTable("Tasks")
                 .HasKey(t => t.Id);
+            modelBuilder.Entity<Models.Task>()
+                .Ignore(t => t.IsCompleted);
 
             modelBuilder.Entity<Event>()
                 .ToTable("Events")
                 .HasKey(e => e.Id);
+            modelBuilder.Entity<Event>()
+                .Ignore(e => e.IsCompleted);
 
             modelBuilder.Entity<Note>()
                 .ToTable("Notes")
