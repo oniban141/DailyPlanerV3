@@ -84,6 +84,11 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BooleanToTextDecorationConverter.cs" />
+    <Compile Include="DailyPlanerDBV3.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DailyPlanerDBV3.Context.tt</DependentUpon>
+    </Compile>
     <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\PlannerDbContext.cs" />
     <Compile Include="Services\ReminderScheduler.cs" />
