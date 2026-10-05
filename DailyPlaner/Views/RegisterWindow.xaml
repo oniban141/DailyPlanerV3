@@ -1,7 +1,8 @@
 <Window x:Class="DailyPlaner.Views.RegisterWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Регистрация" Height="375" Width="480" WindowStartupLocation="CenterScreen" MinHeight="480">
+        Title="Регистрация" Height="375" Width="480" WindowStartupLocation="CenterScreen" MinHeight="480"
+        Background="{StaticResource RetroBackgroundBrush}">
     <Grid Background="{StaticResource RetroBackgroundBrush}">
         <StackPanel Margin="20" VerticalAlignment="Center">
             <TextBlock Text="Ежедневник" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,4"/>

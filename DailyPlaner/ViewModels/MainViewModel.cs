@@ -31,7 +31,6 @@ namespace DailyPlaner.ViewModels
         private Task _selectedTask;
         private Event _selectedEvent;
         private Note _selectedNote;
-        private string _searchText;
         private DateTime _selectedDate;
         private ObservableCollection<User> _users;
         private User _selectedAdminUser;
@@ -139,16 +138,6 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public string SearchText
-        {
-            get { return _searchText; }
-            set
-            {
-                _searchText = value;
-                OnPropertyChanged(nameof(SearchText));
-                ApplyNameSearch();
-            }
-        }
 
         public DateTime SelectedDate
         {
@@ -269,7 +258,6 @@ namespace DailyPlaner.ViewModels
         public ICommand AddNoteCommand { get; }
         public ICommand EditNoteCommand { get; }
         public ICommand DeleteNoteCommand { get; }
-        public ICommand ClearSearchCommand { get; }
         public ICommand ExportToJsonCommand { get; }
         public ICommand ImportFromJsonCommand { get; }
         public ICommand TestNotificationCommand { get; }
@@ -296,7 +284,6 @@ namespace DailyPlaner.ViewModels
             AddNoteCommand = new RelayCommand(ExecuteAddNote);
             EditNoteCommand = new RelayCommand(ExecuteEditNote, CanExecuteNoteCommand);
             DeleteNoteCommand = new RelayCommand(ExecuteDeleteNote, CanExecuteNoteCommand);
-            ClearSearchCommand = new RelayCommand(ExecuteClearSearch);
             ExportToJsonCommand = new RelayCommand(ExecuteExportToJson);
             ImportFromJsonCommand = new RelayCommand(ExecuteImportFromJson);
             TestNotificationCommand = new RelayCommand(ExecuteTestNotification);
@@ -708,56 +695,6 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        private void ExecuteClearSearch(object parameter)
-        {
-            ResetFiltersAndReload();
-        }
-
-        public void ApplyNameSearch()
-        {
-            if (CurrentUser == null)
-            {
-                return;
-            }
-            if (ActivePage != PageTasks && ActivePage != PageEvents && ActivePage != PageNotes)
-            {
-                return;
-            }
-            try
-            {
-                string query = SearchText?.Trim() ?? string.Empty;
-                if (ActivePage == PageTasks)
-                {
-                    var items = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                    Tasks = new ObservableCollection<Task>(FilterByQuery(items, query, t => t.Title, t => t.Description));
-                }
-                else if (ActivePage == PageEvents)
-                {
-                    var items = _databaseService.GetEventsByUserId(CurrentUser.Id);
-                    Events = new ObservableCollection<Event>(FilterByQuery(items, query, ev => ev.Title, ev => ev.Description));
-                }
-                else
-                {
-                    var items = _databaseService.GetNotesByUserId(CurrentUser.Id);
-                    Notes = new ObservableCollection<Note>(FilterByQuery(items, query, n => n.Title, n => n.Content));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при поиске: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private static List<T> FilterByQuery<T>(List<T> items, string query, Func<T, string> title, Func<T, string> body)
-        {
-            if (string.IsNullOrEmpty(query))
-            {
-                return items;
-            }
-            return items.Where(item =>
-                (title(item) != null && title(item).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                (body(item) != null && body(item).IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)).ToList();
-        }
 
         public void ResetFiltersAndReload()
         {
@@ -765,7 +702,6 @@ namespace DailyPlaner.ViewModels
             {
                 return;
             }
-            SearchText = string.Empty;
             if (ActivePage == PageAdmin)
             {
                 LoadAdminData();
@@ -782,11 +718,7 @@ namespace DailyPlaner.ViewModels
             {
                 return;
             }
-            if (ActivePage == PageTasks || ActivePage == PageEvents || ActivePage == PageNotes)
-            {
-                ApplyNameSearch();
-            }
-            else if (ActivePage == PageAdmin)
+            if (ActivePage == PageAdmin)
             {
                 LoadAdminData();
             }
