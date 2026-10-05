@@ -8,7 +8,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Newtonsoft.Json;
-using DailyPlaner.Models;
 using DailyPlaner.Services;
 
 namespace DailyPlaner.ViewModels
@@ -26,10 +25,10 @@ namespace DailyPlaner.ViewModels
         private readonly NotificationService _notificationService;
         private ReminderScheduler _reminderScheduler;
         private User _currentUser;
-        private ObservableCollection<Models.Task> _tasks;
+        private ObservableCollection<Task> _tasks;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Note> _notes;
-        private Models.Task _selectedTask;
+        private Task _selectedTask;
         private Event _selectedEvent;
         private Note _selectedNote;
         private string _searchText;
@@ -65,7 +64,7 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public ObservableCollection<Models.Task> Tasks
+        public ObservableCollection<Task> Tasks
         {
             get { return _tasks; }
             set
@@ -77,7 +76,7 @@ namespace DailyPlaner.ViewModels
             }
         }
 
-        public IEnumerable<Models.Task> UpcomingTasks
+        public IEnumerable<Task> UpcomingTasks
         {
             get
             {
@@ -110,7 +109,7 @@ namespace DailyPlaner.ViewModels
 
         public string ActivePage { get; set; }
 
-        public Models.Task SelectedTask
+        public Task SelectedTask
         {
             get { return _selectedTask; }
             set
@@ -282,7 +281,7 @@ namespace DailyPlaner.ViewModels
         {
             _databaseService = new DatabaseService();
             _notificationService = new NotificationService();
-            Tasks = new ObservableCollection<Models.Task>();
+            Tasks = new ObservableCollection<Task>();
             Events = new ObservableCollection<Event>();
             Notes = new ObservableCollection<Note>();
             SelectedDate = DateTime.Today;
@@ -319,7 +318,7 @@ namespace DailyPlaner.ViewModels
         {
             try
             {
-                Tasks = new ObservableCollection<Models.Task>(_databaseService.GetTasksByUserId(CurrentUser.Id));
+                Tasks = new ObservableCollection<Task>(_databaseService.GetTasksByUserId(CurrentUser.Id));
                 Events = new ObservableCollection<Event>(_databaseService.GetEventsByUserId(CurrentUser.Id));
                 Notes = new ObservableCollection<Note>(_databaseService.GetNotesByUserId(CurrentUser.Id));
             }
@@ -344,12 +343,12 @@ namespace DailyPlaner.ViewModels
             return GetSelectedNotes(parameter).Count > 0;
         }
 
-        private List<Models.Task> GetSelectedTasks(object parameter)
+        private List<Task> GetSelectedTasks(object parameter)
         {
-            var items = new List<Models.Task>();
+            var items = new List<Task>();
             if (parameter is IList list)
             {
-                items.AddRange(list.OfType<Models.Task>());
+                items.AddRange(list.OfType<Task>());
             }
             if (items.Count == 0 && SelectedTask != null)
             {
@@ -411,7 +410,7 @@ namespace DailyPlaner.ViewModels
                 {
                     return;
                 }
-                var task = new Models.Task
+                var task = new Task
                 {
                     UserId = CurrentUser.Id,
                     Title = dialog.TaskTitle,
@@ -730,7 +729,7 @@ namespace DailyPlaner.ViewModels
                 if (ActivePage == PageTasks)
                 {
                     var items = _databaseService.GetTasksByUserId(CurrentUser.Id);
-                    Tasks = new ObservableCollection<Models.Task>(FilterByQuery(items, query, t => t.Title, t => t.Description));
+                    Tasks = new ObservableCollection<Task>(FilterByQuery(items, query, t => t.Title, t => t.Description));
                 }
                 else if (ActivePage == PageEvents)
                 {
@@ -947,9 +946,18 @@ namespace DailyPlaner.ViewModels
             {
                 var data = new
                 {
-                    Tasks = _databaseService.GetTasksByUserId(CurrentUser.Id),
-                    Events = _databaseService.GetEventsByUserId(CurrentUser.Id),
-                    Notes = _databaseService.GetNotesByUserId(CurrentUser.Id),
+                    Tasks = _databaseService.GetTasksByUserId(CurrentUser.Id).Select(t => new
+                    {
+                        t.Title, t.Description, t.DueDate, t.Priority, t.Status
+                    }),
+                    Events = _databaseService.GetEventsByUserId(CurrentUser.Id).Select(e => new
+                    {
+                        e.Title, e.Description, e.StartDate, e.EndDate, e.Location, e.Status
+                    }),
+                    Notes = _databaseService.GetNotesByUserId(CurrentUser.Id).Select(n => new
+                    {
+                        n.Title, n.Content, CreatedAt = n.CreatedDate
+                    }),
                     Settings = new
                     {
                         AutoStart = App.LoadAutoStartSetting()

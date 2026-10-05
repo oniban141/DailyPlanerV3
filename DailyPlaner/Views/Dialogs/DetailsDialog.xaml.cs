@@ -1,5 +1,4 @@
 using System.Windows;
-using DailyPlaner.Models;
 
 namespace DailyPlaner.Views.Dialogs
 {
