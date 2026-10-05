@@ -190,7 +190,7 @@ namespace DailyPlaner
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Не удалось подключиться к базе данных:\n{ex.Message}\n\nПроверьте, что SQL Server (PCGl1tch) запущен и база DailyPlanerDBV3 создана.", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось подключиться к базе данных:\n{ex.Message}\n\nПроверьте, что SQL Server (PCGl1tch) запущен и база DailyPlannerDBV3 создана.", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
