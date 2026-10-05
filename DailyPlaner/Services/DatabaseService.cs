@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
-using DailyPlaner.Models;
 
 namespace DailyPlaner.Services
 {
@@ -23,7 +22,7 @@ namespace DailyPlaner.Services
                 case 53:
                     return "Сервер 'PCGl1tch' недоступен. Проверьте, что SQL Server запущен, и имя сервера указано верно (Server=PCGl1tch).";
                 case 4060:
-                    return "База данных 'DailyPlanerDBV3' не существует или недоступна. Выполните скрипт Database/DailyPlannerDB.sql для её создания.";
+                    return "База данных 'DailyPlanerDBV3' не существует или недоступна.";
                 case 18456:
                     return "Ошибка авторизации Windows. Проверьте, что учётная запись Windows имеет доступ к SQL Server.";
                 case 18452:
@@ -47,32 +46,6 @@ namespace DailyPlaner.Services
             }
         }
 
-        private static string TaskStatus(bool isCompleted)
-        {
-            return isCompleted ? "Выполнена" : "Ожидает";
-        }
-
-        private static string EventStatus(bool isCompleted)
-        {
-            return isCompleted ? "Завершено" : "Запланировано";
-        }
-
-        public bool TestConnection()
-        {
-            try
-            {
-                using (var context = new PlannerDbContext())
-                {
-                    context.Database.Connection.Open();
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(GetFriendlyDatabaseError(GetInnermostException(ex)), ex);
-            }
-        }
-
         private static Exception GetInnermostException(Exception ex)
         {
             while (ex.InnerException != null)
@@ -86,7 +59,8 @@ namespace DailyPlaner.Services
         {
             try
             {
-                return context.SaveChanges() >= 0;
+                context.SaveChanges();
+                return true;
             }
             catch (Exception ex)
             {
@@ -98,11 +72,27 @@ namespace DailyPlaner.Services
             }
         }
 
+        public bool TestConnection()
+        {
+            try
+            {
+                using (var context = new DailyPlannerDBV3Entities())
+                {
+                    context.Database.Connection.Open();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(GetFriendlyDatabaseError(GetInnermostException(ex)), ex);
+            }
+        }
+
         public User GetUserByUsername(string username)
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Users.FirstOrDefault(u => u.Username == username);
                 }
@@ -117,7 +107,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Users.Any(u => u.Username == username);
                 }
@@ -130,7 +120,7 @@ namespace DailyPlaner.Services
 
         public bool CreateUser(User user)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 context.Users.Add(user);
                 return Save(context, true);
@@ -141,7 +131,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Genders.ToList();
                 }
@@ -152,47 +142,38 @@ namespace DailyPlaner.Services
             }
         }
 
-        public List<Models.Task> GetTasksByUserId(int userId)
+        public List<Task> GetTasksByUserId(int userId)
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Tasks.Where(t => t.UserId == userId).ToList();
                 }
             }
             catch
             {
-                return new List<Models.Task>();
+                return new List<Task>();
             }
         }
 
-        public bool CreateTask(Models.Task task)
+        public bool CreateTask(Task task)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
-                var dbTask = new Models.Task
+                task.Status = task.IsCompleted ? "Выполнена" : "Ожидает";
+                if (string.IsNullOrEmpty(task.Priority))
                 {
-                    UserId = task.UserId,
-                    Title = task.Title,
-                    Description = task.Description,
-                    DueDate = task.DueDate,
-                    Priority = string.IsNullOrEmpty(task.Priority) ? "Средний" : task.Priority,
-                    Status = TaskStatus(task.IsCompleted)
-                };
-                context.Tasks.Add(dbTask);
-                if (!Save(context, true))
-                {
-                    return false;
+                    task.Priority = "Средний";
                 }
-                task.Id = dbTask.Id;
-                return true;
+                context.Tasks.Add(task);
+                return Save(context, true);
             }
         }
 
-        public bool UpdateTask(Models.Task task)
+        public bool UpdateTask(Task task)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 var dbTask = context.Tasks.Find(task.Id);
                 if (dbTask == null)
@@ -204,14 +185,14 @@ namespace DailyPlaner.Services
                 dbTask.Description = task.Description;
                 dbTask.DueDate = task.DueDate;
                 dbTask.Priority = string.IsNullOrEmpty(task.Priority) ? "Средний" : task.Priority;
-                dbTask.Status = TaskStatus(task.IsCompleted);
+                dbTask.Status = task.IsCompleted ? "Выполнена" : "Ожидает";
                 return Save(context);
             }
         }
 
         public bool DeleteTask(int id)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 context.Reminders.RemoveRange(context.Reminders.Where(r => r.TaskId == id));
                 var task = context.Tasks.Find(id);
@@ -227,7 +208,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Events.Where(e => e.UserId == userId).ToList();
                 }
@@ -240,26 +221,17 @@ namespace DailyPlaner.Services
 
         public bool CreateEvent(Event ev)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
-                var dbEvent = new Event
-                {
-                    UserId = ev.UserId,
-                    Title = ev.Title,
-                    Description = ev.Description,
-                    StartDate = ev.StartDate,
-                    EndDate = ev.EndDate,
-                    Location = ev.Location,
-                    Status = EventStatus(ev.IsCompleted)
-                };
-                context.Events.Add(dbEvent);
+                ev.Status = ev.IsCompleted ? "Завершено" : "Запланировано";
+                context.Events.Add(ev);
                 return Save(context, true);
             }
         }
 
         public bool UpdateEvent(Event ev)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 var dbEvent = context.Events.Find(ev.Id);
                 if (dbEvent == null)
@@ -272,15 +244,16 @@ namespace DailyPlaner.Services
                 dbEvent.StartDate = ev.StartDate;
                 dbEvent.EndDate = ev.EndDate;
                 dbEvent.Location = ev.Location;
-                dbEvent.Status = EventStatus(ev.IsCompleted);
+                dbEvent.Status = ev.IsCompleted ? "Завершено" : "Запланировано";
                 return Save(context);
             }
         }
 
         public bool DeleteEvent(int id)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
+                context.Reminders.RemoveRange(context.Reminders.Where(r => r.EventId == id));
                 var ev = context.Events.Find(id);
                 if (ev != null)
                 {
@@ -294,7 +267,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Notes.Where(n => n.UserId == userId).ToList();
                 }
@@ -307,23 +280,20 @@ namespace DailyPlaner.Services
 
         public bool CreateNote(Note note)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
-                var dbNote = new Note
+                if (note.CreatedDate == default(DateTime))
                 {
-                    UserId = note.UserId,
-                    Title = note.Title,
-                    Content = note.Content,
-                    CreatedDate = note.CreatedDate == default(DateTime) ? DateTime.Now : note.CreatedDate
-                };
-                context.Notes.Add(dbNote);
+                    note.CreatedDate = DateTime.Now;
+                }
+                context.Notes.Add(note);
                 return Save(context, true);
             }
         }
 
         public bool UpdateNote(Note note)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 var dbNote = context.Notes.Find(note.Id);
                 if (dbNote == null)
@@ -339,7 +309,7 @@ namespace DailyPlaner.Services
 
         public bool DeleteNote(int id)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 var note = context.Notes.Find(id);
                 if (note != null)
@@ -354,7 +324,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Users.OrderBy(u => u.CreatedAt).ToList();
                 }
@@ -367,7 +337,7 @@ namespace DailyPlaner.Services
 
         public bool ResetUserPassword(int userId, string passwordHash)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 var user = context.Users.Find(userId);
                 if (user == null)
@@ -381,7 +351,7 @@ namespace DailyPlaner.Services
 
         public bool DeleteUserWithAllData(int userId)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 context.Reminders.RemoveRange(context.Reminders.Where(r => r.UserId == userId));
                 context.Tasks.RemoveRange(context.Tasks.Where(t => t.UserId == userId));
@@ -400,7 +370,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     switch (table)
                     {
@@ -423,7 +393,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     switch (table)
                     {
@@ -445,7 +415,7 @@ namespace DailyPlaner.Services
         {
             try
             {
-                using (var context = new PlannerDbContext())
+                using (var context = new DailyPlannerDBV3Entities())
                 {
                     return context.Reminders.ToList();
                 }
@@ -458,24 +428,16 @@ namespace DailyPlaner.Services
 
         public bool CreateReminder(Reminder reminder)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
-                var dbReminder = new Reminder
-                {
-                    UserId = reminder.UserId,
-                    TaskId = reminder.TaskId,
-                    ReminderDate = reminder.ReminderDate,
-                    Message = reminder.Message,
-                    IsShown = reminder.IsShown
-                };
-                context.Reminders.Add(dbReminder);
+                context.Reminders.Add(reminder);
                 return Save(context, true);
             }
         }
 
         public bool UpdateReminder(Reminder reminder)
         {
-            using (var context = new PlannerDbContext())
+            using (var context = new DailyPlannerDBV3Entities())
             {
                 var dbReminder = context.Reminders.Find(reminder.Id);
                 if (dbReminder == null)
@@ -484,9 +446,9 @@ namespace DailyPlaner.Services
                 }
                 dbReminder.UserId = reminder.UserId;
                 dbReminder.TaskId = reminder.TaskId;
-                dbReminder.ReminderDate = reminder.ReminderDate;
+                dbReminder.ReminderTime = reminder.ReminderTime;
                 dbReminder.Message = reminder.Message;
-                dbReminder.IsShown = reminder.IsShown;
+                dbReminder.IsActive = reminder.IsActive;
                 return Save(context);
             }
         }
