@@ -16,7 +16,6 @@ namespace DailyPlaner
             App.SetWindowIcon(this);
             DataContext = new MainViewModel { ActivePage = MainViewModel.PageOverview };
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
-            UpdateToolbarForPage(MainViewModel.PageOverview);
             Loaded += (s, e) => RefreshDayLists();
         }
 
@@ -30,7 +29,6 @@ namespace DailyPlaner
             viewModel.ActivePage = MainViewModel.PageOverview;
             NavAdminButton.Visibility = viewModel.IsAdmin ? Visibility.Visible : Visibility.Collapsed;
             AutoStartSidebarCheckBox.IsChecked = App.LoadAutoStartSetting();
-            UpdateToolbarForPage(MainViewModel.PageOverview);
             viewModel.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(MainViewModel.SelectedDate) || e.PropertyName == nameof(MainViewModel.Tasks) || e.PropertyName == nameof(MainViewModel.Events))
@@ -67,42 +65,8 @@ namespace DailyPlaner
             NotesPage.Visibility = pageName == MainViewModel.PageNotes ? Visibility.Visible : Visibility.Collapsed;
             CalendarPage.Visibility = pageName == MainViewModel.PageCalendar ? Visibility.Visible : Visibility.Collapsed;
             AdminPage.Visibility = pageName == MainViewModel.PageAdmin ? Visibility.Visible : Visibility.Collapsed;
-            UpdateToolbarForPage(pageName);
         }
 
-        private void UpdateToolbarForPage(string pageName)
-        {
-            bool isListPage = pageName == MainViewModel.PageTasks || pageName == MainViewModel.PageEvents || pageName == MainViewModel.PageNotes;
-            ToolbarBorder.Visibility = isListPage ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        private void SearchTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                if (DataContext is MainViewModel vm)
-                {
-                    vm.ApplyNameSearch();
-                }
-                e.Handled = true;
-            }
-            UpdateSearchWatermark();
-        }
-
-        private void SearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            UpdateSearchWatermark();
-        }
-
-        private void UpdateSearchWatermark()
-        {
-            if (SearchWatermark != null)
-            {
-                SearchWatermark.Visibility = string.IsNullOrEmpty(SearchTextBox.Text)
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
-            }
-        }
 
         private void AutoStartSidebar_Changed(object sender, RoutedEventArgs e)
         {
